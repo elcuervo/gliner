@@ -12,7 +12,7 @@ Gem::Specification.new do |spec|
   spec.description = "Basic Ruby inference wrapper for the GLiNER2 ONNX model."
   spec.homepage = "TODO"
   spec.license = "Apache-2.0"
-  spec.required_ruby_version = ">= 3.2"
+  spec.required_ruby_version = ">= 3.1"
 
   spec.metadata["homepage_uri"] = spec.homepage
   spec.metadata["source_code_uri"] = spec.homepage
