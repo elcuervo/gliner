@@ -6,14 +6,6 @@ require "tokenizers"
 
 module Gliner
   class Model
-    WORD_SPLIT_PATTERN = Regexp.new(
-      %r{(?:https?://[^\s]+|www\.[^\s]+)
-        |[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}
-        |@[a-z0-9_]+
-        |\w+(?:[-_]\w+)*
-        |\S}ix
-    )
-
     SPECIAL_TOKENS = [
       "[SEP_STRUCT]",
       "[SEP_TEXT]",
@@ -62,6 +54,7 @@ module Gliner
     def initialize(model_path:, tokenizer_path:, max_width: DEFAULT_MAX_WIDTH, max_seq_len: DEFAULT_MAX_SEQ_LEN)
       @model_path = model_path
       @tokenizer = Tokenizers.from_file(tokenizer_path)
+      @word_pre_tokenizer = Tokenizers::PreTokenizers::BertPreTokenizer.new
 
       missing_specials = SPECIAL_TOKENS.reject { |t| @tokenizer.token_to_id(t) }
       unless missing_specials.empty?
@@ -264,16 +257,17 @@ module Gliner
     end
 
     def split_words(text)
-      downcased = text.downcase
+      text = text.to_s
       tokens = []
       starts = []
       ends = []
 
-      downcased.scan(WORD_SPLIT_PATTERN) do
-        m = Regexp.last_match
-        tokens << m[0]
-        starts << m.begin(0)
-        ends << m.end(0)
+      @word_pre_tokenizer.pre_tokenize_str(text).each do |(token, (start_pos, end_pos))|
+        token = token.to_s.downcase
+        next if token.empty?
+        tokens << token
+        starts << start_pos
+        ends << end_pos
       end
 
       [tokens, starts, ends]
@@ -321,8 +315,7 @@ module Gliner
       input_ids = truncated[:input_ids]
       word_ids = truncated[:word_ids]
 
-      sep_idx = combined_tokens.index("[SEP_TEXT]")
-      text_start_combined = sep_idx + 1
+      text_start_combined = schema_tokens.length + 1
       full_text_len = words.length
       effective_text_len = infer_effective_text_len(word_ids, text_start_combined, full_text_len)
 
