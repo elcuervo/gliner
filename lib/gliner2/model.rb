@@ -6,14 +6,6 @@ require "tokenizers"
 
 module Gliner2
   class Model
-    WORD_SPLIT_PATTERN = Regexp.new(
-      %r{(?:https?://[^\s]+|www\.[^\s]+)
-        |[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}
-        |@[a-z0-9_]+
-        |\w+(?:[-_]\w+)*
-        |\S}ix
-    )
-
     SPECIAL_TOKENS = [
       "[SEP_STRUCT]",
       "[SEP_TEXT]",
@@ -62,14 +54,19 @@ module Gliner2
     def initialize(model_path:, tokenizer_path:, max_width: DEFAULT_MAX_WIDTH, max_seq_len: DEFAULT_MAX_SEQ_LEN)
       @model_path = model_path
       @tokenizer = Tokenizers.from_file(tokenizer_path)
+      @pre_tokenizer = @tokenizer.pre_tokenizer
 
       missing_specials = SPECIAL_TOKENS.reject { |t| @tokenizer.token_to_id(t) }
       unless missing_specials.empty?
         raise Error, "Tokenizer missing special tokens: #{missing_specials.join(', ')}"
       end
+      unless @pre_tokenizer.respond_to?(:pre_tokenize_str)
+        raise Error, "Tokenizer is missing a pre-tokenizer with pre_tokenize_str"
+      end
 
       @max_width = Integer(max_width)
       @max_seq_len = Integer(max_seq_len)
+      @tokenizer.enable_truncation(@max_seq_len)
 
       @session = OnnxRuntime::InferenceSession.new(@model_path)
       validate_io!
@@ -264,16 +261,16 @@ module Gliner2
     end
 
     def split_words(text)
-      downcased = text.downcase
+      text = text.to_s
       tokens = []
       starts = []
       ends = []
 
-      downcased.scan(WORD_SPLIT_PATTERN) do
-        m = Regexp.last_match
-        tokens << m[0]
-        starts << m.begin(0)
-        ends << m.end(0)
+      @pre_tokenizer.pre_tokenize_str(text).each do |(token, (start_pos, end_pos))|
+        next if token.to_s.empty?
+        tokens << token
+        starts << start_pos
+        ends << end_pos
       end
 
       [tokens, starts, ends]
@@ -300,12 +297,7 @@ module Gliner2
 
     def encode_pretokenized(tokens)
       enc = @tokenizer.encode(tokens, is_pretokenized: true, add_special_tokens: false)
-      { ids: enc.ids, word_ids: enc.word_ids }
-    end
-
-    def truncate_inputs!(input_ids, word_ids, max_len:)
-      return { input_ids: input_ids, word_ids: word_ids } if input_ids.length <= max_len
-      { input_ids: input_ids.take(max_len), word_ids: word_ids.take(max_len) }
+      { ids: enc.ids, word_ids: enc.word_ids, attention_mask: enc.attention_mask }
     end
 
     def prepare_inputs(text, schema_tokens, already_normalized: false)
@@ -316,20 +308,16 @@ module Gliner2
       encoded = encode_pretokenized(combined_tokens)
       input_ids = encoded[:ids]
       word_ids = encoded[:word_ids]
+      attention_mask = encoded[:attention_mask]
 
-      truncated = truncate_inputs!(input_ids, word_ids, max_len: @max_seq_len)
-      input_ids = truncated[:input_ids]
-      word_ids = truncated[:word_ids]
-
-      sep_idx = combined_tokens.index("[SEP_TEXT]")
-      text_start_combined = sep_idx + 1
+      text_start_combined = schema_tokens.length + 1
       full_text_len = words.length
       effective_text_len = infer_effective_text_len(word_ids, text_start_combined, full_text_len)
 
       {
         input_ids: input_ids,
         word_ids: word_ids,
-        attention_mask: Array.new(input_ids.length, 1),
+        attention_mask: attention_mask,
         words_mask: build_words_mask(word_ids, text_start_combined),
         pos_to_word_index: build_pos_to_word_index(word_ids, text_start_combined),
         start_map: start_map,
