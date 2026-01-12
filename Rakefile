@@ -1,15 +1,11 @@
 # frozen_string_literal: true
 
-require "rake/testtask"
+require "rspec/core/rake_task"
 require "fileutils"
 
-Rake::TestTask.new do |t|
-  t.libs << "test"
-  t.warning = true
-  t.test_files = FileList["test/**/*_test.rb"]
-end
+RSpec::Core::RakeTask.new(:spec)
 
-task default: :test
+task default: :spec
 
 namespace :model do
   DEFAULT_REPO_ID = "0riginalGandalf/gliner2-multi-v1-int8"
@@ -51,13 +47,13 @@ namespace :model do
   end
 end
 
-namespace :test do
+namespace :spec do
   desc "Runs real-model integration test (downloads ~357MB unless GLINER_MODEL_DIR is set)"
   task :integration do
     Rake::Task["model:pull"].invoke unless ENV["GLINER_MODEL_DIR"] && !ENV["GLINER_MODEL_DIR"].empty?
 
     env = { "GLINER_INTEGRATION" => "1" }
-    sh env, "ruby", "-Ilib", "-Itest", "test/integration_test.rb"
+    sh env, "rspec", "spec/integration_spec.rb"
   end
 end
 
