@@ -1,0 +1,17 @@
+AllCops:
+  TargetRubyVersion: 3.1
+  NewCops: enable
+  SuggestExtensions: false
+  Exclude:
+    - "tmp/**/*"
+    - "vendor/**/*"
+    - "node_modules/**/*"
+    - "pkg/**/*"
+    - "coverage/**/*"
+    - ".bundle/**/*"
+
+Layout/LineLength:
+  Max: 140
+
+Style/Documentation:
+  Enabled: false
