@@ -34,6 +34,24 @@ module Gliner
     TASK_TYPE_CLASSIFICATION = 1
     TASK_TYPE_JSON = 2
 
+    PreparedInputs = Data.define(
+      :input_ids,
+      :word_ids,
+      :attention_mask,
+      :words_mask,
+      :pos_to_word_index,
+      :start_map,
+      :end_map,
+      :original_text,
+      :text_len
+    )
+
+    FieldSpec = Data.define(:name, :dtype, :description)
+    ClassificationTask = Data.define(:labels, :multi_label, :cls_threshold, :prompt)
+    TokenizedInputs = Data.define(:input_ids, :word_ids)
+    WordSplit = Data.define(:tokens, :starts, :ends)
+    WordMaps = Data.define(:words_mask, :pos_to_word_index)
+
     def self.from_dir(dir, model_filename: nil)
       tokenizer_path = File.join(dir, "tokenizer.json")
       raise Error, "Missing tokenizer.json in #{dir}" unless File.exist?(tokenizer_path)
@@ -85,26 +103,16 @@ module Gliner
       prompt = build_prompt("entities", label_descriptions)
 
       schema_tokens = schema_tokens_for(prompt: prompt, labels: labels, label_prefix: "[E]")
-      prepared = prepare_inputs(text, schema_tokens)
-
-      logits = run_onnx(
-        input_ids: prepared[:input_ids],
-        attention_mask: prepared[:attention_mask],
-        words_mask: prepared[:words_mask],
-        text_lengths: [prepared[:text_len]],
-        task_type: TASK_TYPE_ENTITIES,
-        label_positions: label_positions_for(prepared[:word_ids], labels.length),
-        label_mask: Array.new(labels.length, 1)
-      )
+      prepared, logits = infer_logits(text, schema_tokens, labels.length, TASK_TYPE_ENTITIES)
 
       entities = extract_span_values(
         logits: logits,
         labels: labels,
-        pos_to_word_index: prepared[:pos_to_word_index],
-        start_map: prepared[:start_map],
-        end_map: prepared[:end_map],
-        original_text: prepared[:original_text],
-        text_len: prepared[:text_len],
+        pos_to_word_index: prepared.pos_to_word_index,
+        start_map: prepared.start_map,
+        end_map: prepared.end_map,
+        original_text: prepared.original_text,
+        text_len: prepared.text_len,
         threshold: threshold,
         include_confidence: include_confidence,
         include_spans: include_spans,
@@ -128,33 +136,23 @@ module Gliner
       out = {}
       tasks.each do |task_name, config|
         parsed = parse_classification_task(task_name, config)
-        schema_tokens = schema_tokens_for(prompt: parsed[:prompt], labels: parsed[:labels], label_prefix: "[L]")
-        prepared = prepare_inputs(text, schema_tokens)
-
-        logits = run_onnx(
-          input_ids: prepared[:input_ids],
-          attention_mask: prepared[:attention_mask],
-          words_mask: prepared[:words_mask],
-          text_lengths: [prepared[:text_len]],
-          task_type: TASK_TYPE_CLASSIFICATION,
-          label_positions: label_positions_for(prepared[:word_ids], parsed[:labels].length),
-          label_mask: Array.new(parsed[:labels].length, 1)
-        )
+        schema_tokens = schema_tokens_for(prompt: parsed.prompt, labels: parsed.labels, label_prefix: "[L]")
+        prepared, logits = infer_logits(text, schema_tokens, parsed.labels.length, TASK_TYPE_CLASSIFICATION)
 
         scores = classification_scores(
           logits: logits,
-          labels: parsed[:labels],
-          pos_to_word_index: prepared[:pos_to_word_index],
-          text_len: prepared[:text_len],
-          threshold: parsed[:cls_threshold]
+          labels: parsed.labels,
+          pos_to_word_index: prepared.pos_to_word_index,
+          text_len: prepared.text_len,
+          threshold: parsed.cls_threshold
         )
 
         out[task_name.to_s] = format_classification(
           scores,
-          labels: parsed[:labels],
-          multi_label: parsed[:multi_label],
+          labels: parsed.labels,
+          multi_label: parsed.multi_label,
           include_confidence: include_confidence,
-          cls_threshold: parsed[:cls_threshold]
+          cls_threshold: parsed.cls_threshold
         )
       end
 
@@ -183,40 +181,36 @@ module Gliner
       structures.each do |parent, fields|
         parent_name = parent.to_s
         parsed_fields = Array(fields).map { |spec| parse_field_spec(spec.to_s) }
-        labels = parsed_fields.map { |f| f[:name] }
-        descs = parsed_fields.filter_map { |f| f[:description] ? [f[:name], f[:description]] : nil }.to_h
+        labels = parsed_fields.map(&:name)
+        descs = parsed_fields.filter_map { |f| f.description ? [f.name, f.description] : nil }.to_h
 
         prompt = build_prompt(parent_name, descs)
         schema_tokens = schema_tokens_for(prompt: prompt, labels: labels, label_prefix: "[C]")
-        prepared = prepare_inputs(normalized_text, schema_tokens, already_normalized: true)
-
-        logits = run_onnx(
-          input_ids: prepared[:input_ids],
-          attention_mask: prepared[:attention_mask],
-          words_mask: prepared[:words_mask],
-          text_lengths: [prepared[:text_len]],
-          task_type: TASK_TYPE_JSON,
-          label_positions: label_positions_for(prepared[:word_ids], labels.length),
-          label_mask: Array.new(labels.length, 1)
+        prepared, logits = infer_logits(
+          normalized_text,
+          schema_tokens,
+          labels.length,
+          TASK_TYPE_JSON,
+          already_normalized: true
         )
 
         spans_by_label = extract_spans_by_label(
           logits: logits,
           labels: labels,
-          pos_to_word_index: prepared[:pos_to_word_index],
-          start_map: prepared[:start_map],
-          end_map: prepared[:end_map],
-          original_text: prepared[:original_text],
-          text_len: prepared[:text_len],
+          pos_to_word_index: prepared.pos_to_word_index,
+          start_map: prepared.start_map,
+          end_map: prepared.end_map,
+          original_text: prepared.original_text,
+          text_len: prepared.text_len,
           threshold: threshold
         )
 
         obj = {}
         parsed_fields.each do |field|
-          key = field[:name]
+          key = field.name
           spans = spans_by_label.fetch(key)
 
-          if field[:dtype] == :str
+          if field.dtype == :str
             best = choose_best_span(spans)
             obj[key] = format_single_span(best, include_confidence: include_confidence, include_spans: include_spans)
           else
@@ -276,7 +270,7 @@ module Gliner
         ends << m.end(0)
       end
 
-      [tokens, starts, ends]
+      WordSplit.new(tokens: tokens, starts: starts, ends: ends)
     end
 
     def build_prompt(base, label_descriptions)
@@ -300,68 +294,67 @@ module Gliner
 
     def encode_pretokenized(tokens)
       enc = @tokenizer.encode(tokens, is_pretokenized: true, add_special_tokens: false)
-      { ids: enc.ids, word_ids: enc.word_ids }
+      TokenizedInputs.new(input_ids: enc.ids, word_ids: enc.word_ids)
     end
 
-    def truncate_inputs!(input_ids, word_ids, max_len:)
-      return { input_ids: input_ids, word_ids: word_ids } if input_ids.length <= max_len
-      { input_ids: input_ids.take(max_len), word_ids: word_ids.take(max_len) }
+    def truncate_inputs(tokenized, max_len:)
+      return tokenized if tokenized.input_ids.length <= max_len
+
+      TokenizedInputs.new(
+        input_ids: tokenized.input_ids.take(max_len),
+        word_ids: tokenized.word_ids.take(max_len)
+      )
     end
 
     def prepare_inputs(text, schema_tokens, already_normalized: false)
       normalized_text = already_normalized ? text.to_s : normalize_text(text)
-      words, start_map, end_map = split_words(normalized_text)
-      combined_tokens = schema_tokens + ["[SEP_TEXT]"] + words
+      split = split_words(normalized_text)
+      combined_tokens = schema_tokens + ["[SEP_TEXT]"] + split.tokens
 
-      encoded = encode_pretokenized(combined_tokens)
-      input_ids = encoded[:ids]
-      word_ids = encoded[:word_ids]
-
-      truncated = truncate_inputs!(input_ids, word_ids, max_len: @max_seq_len)
-      input_ids = truncated[:input_ids]
-      word_ids = truncated[:word_ids]
+      tokenized = encode_pretokenized(combined_tokens)
+      tokenized = truncate_inputs(tokenized, max_len: @max_seq_len)
+      input_ids = tokenized.input_ids
+      word_ids = tokenized.word_ids
 
       sep_idx = combined_tokens.index("[SEP_TEXT]")
       text_start_combined = sep_idx + 1
-      full_text_len = words.length
+      full_text_len = split.tokens.length
       effective_text_len = infer_effective_text_len(word_ids, text_start_combined, full_text_len)
+      word_maps = build_word_maps(word_ids, text_start_combined)
 
-      {
+      PreparedInputs.new(
         input_ids: input_ids,
         word_ids: word_ids,
         attention_mask: Array.new(input_ids.length, 1),
-        words_mask: build_words_mask(word_ids, text_start_combined),
-        pos_to_word_index: build_pos_to_word_index(word_ids, text_start_combined),
-        start_map: start_map,
-        end_map: end_map,
+        words_mask: word_maps.words_mask,
+        pos_to_word_index: word_maps.pos_to_word_index,
+        start_map: split.starts,
+        end_map: split.ends,
         original_text: normalized_text,
         text_len: effective_text_len
-      }
+      )
     end
 
-    def build_words_mask(word_ids, text_start_combined)
-      mask = Array.new(word_ids.length, 0)
+    def build_word_maps(word_ids, text_start_combined)
+      words_mask = Array.new(word_ids.length, 0)
+      pos_to_word_index = Array.new(word_ids.length)
       last_wid = nil
+      seen = {}
+
       word_ids.each_with_index do |wid, i|
         next if wid.nil?
+
         if wid != last_wid
-          mask[i] = 1 if wid >= text_start_combined
+          words_mask[i] = 1 if wid >= text_start_combined
           last_wid = wid
         end
-      end
-      mask
-    end
 
-    def build_pos_to_word_index(word_ids, text_start_combined)
-      map = Array.new(word_ids.length)
-      seen = {}
-      word_ids.each_with_index do |wid, i|
-        next if wid.nil?
         next if seen.key?(wid)
         seen[wid] = true
-        map[i] = wid - text_start_combined if wid >= text_start_combined
+        pos_to_word_index[i] = wid - text_start_combined if wid >= text_start_combined
       end
-      map
+
+      WordMaps.new(words_mask: words_mask, pos_to_word_index: pos_to_word_index)
     end
 
     def infer_effective_text_len(word_ids, text_start_combined, full_text_len)
@@ -386,6 +379,20 @@ module Gliner
       # onnxruntime-ruby returns outputs in the same order as output_names
       out = @session.run(["logits"], inputs)
       out.fetch(0)
+    end
+
+    def infer_logits(text, schema_tokens, label_count, task_type, already_normalized: false)
+      prepared = prepare_inputs(text, schema_tokens, already_normalized: already_normalized)
+      logits = run_onnx(
+        input_ids: prepared.input_ids,
+        attention_mask: prepared.attention_mask,
+        words_mask: prepared.words_mask,
+        text_lengths: [prepared.text_len],
+        task_type: task_type,
+        label_positions: label_positions_for(prepared.word_ids, label_count),
+        label_mask: Array.new(label_count, 1)
+      )
+      [prepared, logits]
     end
 
     def sigmoid(x) = 1.0 / (1.0 + Math.exp(-x))
@@ -421,9 +428,15 @@ module Gliner
     end
 
     def label_positions_for(word_ids, label_count)
+      positions_by_word_id = {}
+      word_ids.each_with_index do |wid, idx|
+        next if wid.nil?
+        positions_by_word_id[wid] ||= idx
+      end
+
       label_count.times.map do |i|
         combined_idx = 4 + (i * 2)
-        pos = word_ids.index(combined_idx)
+        pos = positions_by_word_id[combined_idx]
         raise Error, "Could not locate label position at combined index #{combined_idx}" if pos.nil?
         pos
       end
@@ -480,16 +493,7 @@ module Gliner
     def format_single_span(span, include_confidence:, include_spans:)
       return nil if span.nil?
       text, score, start_pos, end_pos = span
-
-      if include_spans && include_confidence
-        { "text" => text, "confidence" => score, "start" => start_pos, "end" => end_pos }
-      elsif include_spans
-        { "text" => text, "start" => start_pos, "end" => end_pos }
-      elsif include_confidence
-        { "text" => text, "confidence" => score }
-      else
-        text
-      end
+      span_payload(text, score, start_pos, end_pos, include_confidence: include_confidence, include_spans: include_spans)
     end
 
     def parse_field_spec(spec)
@@ -517,7 +521,7 @@ module Gliner
         end
       end
 
-      { name: name, dtype: dtype, description: description }
+      FieldSpec.new(name: name, dtype: dtype, description: description)
     end
 
     def parse_classification_task(task_name, config)
@@ -553,20 +557,20 @@ module Gliner
         raise Error, "classification task #{task_name.inspect} must be an Array or Hash"
       end
 
-      {
+      ClassificationTask.new(
         labels: labels,
         multi_label: multi_label,
         cls_threshold: cls_threshold,
         prompt: build_prompt(task_name.to_s, label_descs)
-      }
+      )
     end
 
     def classification_scores(logits:, labels:, pos_to_word_index:, text_len:, threshold:)
       scores = []
+      seq_len = logits[0].length
 
       labels.each_index do |label_index|
         max = -Float::INFINITY
-        seq_len = logits[0].length
         (0...seq_len).each do |pos|
           start_word = pos_to_word_index[pos]
           next if start_word.nil?
@@ -610,15 +614,21 @@ module Gliner
         selected << [text, score, start_pos, end_pos]
       end
 
-      if include_spans && include_confidence
-        selected.map { |t, s, st, en| { "text" => t, "confidence" => s, "start" => st, "end" => en } }
-      elsif include_spans
-        selected.map { |t, _s, st, en| { "text" => t, "start" => st, "end" => en } }
-      elsif include_confidence
-        selected.map { |t, s, _st, _en| { "text" => t, "confidence" => s } }
-      else
-        selected.map(&:first)
+      selected.map do |text, score, start_pos, end_pos|
+        span_payload(text, score, start_pos, end_pos, include_confidence: include_confidence, include_spans: include_spans)
       end
+    end
+
+    def span_payload(text, score, start_pos, end_pos, include_confidence:, include_spans:)
+      return text unless include_confidence || include_spans
+
+      payload = { "text" => text }
+      payload["confidence"] = score if include_confidence
+      if include_spans
+        payload["start"] = start_pos
+        payload["end"] = end_pos
+      end
+      payload
     end
   end
 end
