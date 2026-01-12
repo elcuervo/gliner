@@ -4,7 +4,7 @@ require "json"
 require "onnxruntime"
 require "tokenizers"
 
-module Gliner2
+module Gliner
   class Model
     WORD_SPLIT_PATTERN = Regexp.new(
       %r{(?:https?://[^\s]+|www\.[^\s]+)

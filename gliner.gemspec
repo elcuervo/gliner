@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
-require_relative "lib/gliner2/version"
+require_relative "lib/gliner/version"
 
 Gem::Specification.new do |spec|
-  spec.name = "gliner2"
-  spec.version = Gliner2::VERSION
+  spec.name = "gliner"
+  spec.version = Gliner::VERSION
   spec.authors = ["TODO"]
   spec.email = ["TODO"]
 
@@ -18,7 +18,7 @@ Gem::Specification.new do |spec|
   spec.metadata["source_code_uri"] = spec.homepage
   spec.metadata["changelog_uri"] = "TODO"
 
-  spec.files = Dir.glob("lib/**/*") + Dir.glob("bin/*") + %w[README.md LICENSE.txt gliner2.gemspec]
+  spec.files = Dir.glob("lib/**/*") + Dir.glob("bin/*") + %w[README.md LICENSE.txt gliner.gemspec]
   spec.require_paths = ["lib"]
 
   spec.add_dependency "onnxruntime", ">= 0.10"

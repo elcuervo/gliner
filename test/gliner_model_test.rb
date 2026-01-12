@@ -2,9 +2,9 @@
 
 require "test_helper"
 
-class Gliner2ModelTest < Minitest::Test
+class GlinerModelTest < Minitest::Test
   def test_extract_entities_raises_without_files
-    err = assert_raises(Gliner2::Error) { Gliner2::Model.from_dir("does-not-exist") }
+    err = assert_raises(Gliner::Error) { Gliner::Model.from_dir("does-not-exist") }
     assert_match(/Missing tokenizer\.json/, err.message)
   end
 
@@ -24,7 +24,7 @@ class Gliner2ModelTest < Minitest::Test
 
   def allocate_model_for_unit_test
     # Avoid requiring a real ONNX model in unit tests.
-    model = Gliner2::Model.allocate
+    model = Gliner::Model.allocate
     model.instance_variable_set(:@max_width, 8)
     model
   end

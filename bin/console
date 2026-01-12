@@ -6,7 +6,7 @@ begin
 rescue LoadError
 end
 
-require "gliner2"
+require "gliner"
 require "irb"
 
 DEFAULT_REPO_ID = "0riginalGandalf/gliner2-multi-v1-int8"
@@ -43,45 +43,45 @@ def ensure_model_dir!(repo_id:, model_file:)
   dir
 end
 
-model_dir = ARGV[0] || ENV["GLINER2_MODEL_DIR"]
-repo_id = ENV["GLINER2_REPO_ID"] || DEFAULT_REPO_ID
-model_file = ENV["GLINER2_MODEL_FILE"] || DEFAULT_MODEL_FILE
+model_dir = ARGV[0] || ENV["GLINER_MODEL_DIR"]
+repo_id = ENV["GLINER_REPO_ID"] || DEFAULT_REPO_ID
+model_file = ENV["GLINER_MODEL_FILE"] || DEFAULT_MODEL_FILE
 
 if model_dir && !model_dir.empty?
-  $gliner2_model = Gliner2::Model.from_dir(model_dir)
+  $gliner_model = Gliner::Model.from_dir(model_dir)
 else
   begin
     require "fileutils"
     model_dir = ensure_model_dir!(repo_id: repo_id, model_file: model_file)
-    $gliner2_model = Gliner2::Model.from_dir(model_dir, model_filename: model_file)
+    $gliner_model = Gliner::Model.from_dir(model_dir, model_filename: model_file)
   rescue => e
     warn "No model loaded (auto-download failed: #{e.class}: #{e.message})"
-    warn "Set GLINER2_MODEL_DIR to a local model dir, or set GLINER2_REPO_ID/GLINER2_MODEL_FILE for auto-download."
+    warn "Set GLINER_MODEL_DIR to a local model dir, or set GLINER_REPO_ID/GLINER_MODEL_FILE for auto-download."
   end
 end
 
-def gliner2_extract(text, labels, **opts)
-  raise "No model loaded (set GLINER2_MODEL_DIR or pass a directory arg)" unless $gliner2_model
-  $gliner2_model.extract_entities(text, labels, **opts)
+def gliner_extract(text, labels, **opts)
+  raise "No model loaded (set GLINER_MODEL_DIR or pass a directory arg)" unless $gliner_model
+  $gliner_model.extract_entities(text, labels, **opts)
 end
 
-def gliner2_classify(text, tasks, **opts)
-  raise "No model loaded (set GLINER2_MODEL_DIR or pass a directory arg)" unless $gliner2_model
-  $gliner2_model.classify_text(text, tasks, **opts)
+def gliner_classify(text, tasks, **opts)
+  raise "No model loaded (set GLINER_MODEL_DIR or pass a directory arg)" unless $gliner_model
+  $gliner_model.classify_text(text, tasks, **opts)
 end
 
-def gliner2_extract_json(text, structures, **opts)
-  raise "No model loaded (set GLINER2_MODEL_DIR or pass a directory arg)" unless $gliner2_model
-  $gliner2_model.extract_json(text, structures, **opts)
+def gliner_extract_json(text, structures, **opts)
+  raise "No model loaded (set GLINER_MODEL_DIR or pass a directory arg)" unless $gliner_model
+  $gliner_model.extract_json(text, structures, **opts)
 end
 
-puts "Gliner2 console"
-puts "- model: #{$gliner2_model ? "loaded" : "not loaded"}"
-puts "- helper: gliner2_extract(text, labels, threshold: 0.5)"
-puts "- helper: gliner2_classify(text, tasks)"
-puts "- helper: gliner2_extract_json(text, structures)"
-puts "- model variable: $gliner2_model"
+puts "Gliner console"
+puts "- model: #{$gliner_model ? "loaded" : "not loaded"}"
+puts "- helper: gliner_extract(text, labels, threshold: 0.5)"
+puts "- helper: gliner_classify(text, tasks)"
+puts "- helper: gliner_extract_json(text, structures)"
+puts "- model variable: $gliner_model"
 puts "- model dir: #{model_dir.inspect}"
-puts "- auto-download env: GLINER2_REPO_ID=#{repo_id.inspect} GLINER2_MODEL_FILE=#{model_file.inspect}" unless $gliner2_model
+puts "- auto-download env: GLINER_REPO_ID=#{repo_id.inspect} GLINER_MODEL_FILE=#{model_file.inspect}" unless $gliner_model
 
 IRB.start(__FILE__)

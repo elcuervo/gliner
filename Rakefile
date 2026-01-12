@@ -47,23 +47,23 @@ namespace :model do
     end
 
     puts "Downloaded model to: #{dir}"
-    puts "Use with: GLINER2_MODEL_DIR=#{dir}"
+    puts "Use with: GLINER_MODEL_DIR=#{dir}"
   end
 end
 
 namespace :test do
-  desc "Runs real-model integration test (downloads ~357MB unless GLINER2_MODEL_DIR is set)"
+  desc "Runs real-model integration test (downloads ~357MB unless GLINER_MODEL_DIR is set)"
   task :integration do
-    Rake::Task["model:pull"].invoke unless ENV["GLINER2_MODEL_DIR"] && !ENV["GLINER2_MODEL_DIR"].empty?
+    Rake::Task["model:pull"].invoke unless ENV["GLINER_MODEL_DIR"] && !ENV["GLINER_MODEL_DIR"].empty?
 
-    env = { "GLINER2_INTEGRATION" => "1" }
+    env = { "GLINER_INTEGRATION" => "1" }
     sh env, "ruby", "-Ilib", "-Itest", "test/integration_test.rb"
   end
 end
 
 desc "Starts an IRB console (optionally pass MODEL_DIR=/path)"
 task :console do
-  model_dir = ENV["MODEL_DIR"] || ENV["GLINER2_MODEL_DIR"]
+  model_dir = ENV["MODEL_DIR"] || ENV["GLINER_MODEL_DIR"]
   args = ["ruby", "-Ilib", "bin/console"]
   args << model_dir if model_dir && !model_dir.empty?
   sh(*args)
