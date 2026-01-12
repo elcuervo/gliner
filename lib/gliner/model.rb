@@ -4,7 +4,7 @@ require "json"
 require "onnxruntime"
 require "tokenizers"
 
-module Gliner2
+module Gliner
   class Model
     SPECIAL_TOKENS = [
       "[SEP_STRUCT]",

@@ -1,4 +1,4 @@
-# gliner2 (Ruby)
+# gliner (Ruby)
 
 Minimal Ruby inference wrapper for the **GLiNER2** ONNX model using:
 
@@ -10,15 +10,15 @@ This gem does **not** ship model weights. Download an ONNX export + tokenizer fi
 ## Install
 
 ```ruby
-gem "gliner2"
+gem "gliner"
 ```
 
 ## Usage (entities)
 
 ```ruby
-require "gliner2"
+require "gliner"
 
-model = Gliner2::Model.from_dir("path/to/gliner2-multi-v1-int8")
+model = Gliner::Model.from_dir("path/to/gliner2-multi-v1-int8")
 
 text = "Apple CEO Tim Cook announced iPhone 15 in Cupertino yesterday."
 labels = ["company", "person", "product", "location"]
@@ -102,7 +102,7 @@ rake model:pull
 To reuse an existing local download:
 
 ```bash
-GLINER2_MODEL_DIR=/path/to/model_dir rake test:integration
+GLINER_MODEL_DIR=/path/to/model_dir rake test:integration
 ```
 
 ## Console (REPL)
@@ -118,7 +118,7 @@ If you omit `MODEL_DIR`, the console auto-downloads a public test model (configu
 ```bash
 rake console
 # or:
-GLINER2_REPO_ID=0riginalGandalf/gliner2-multi-v1-int8 GLINER2_MODEL_FILE=model_int8.onnx rake console
+GLINER_REPO_ID=0riginalGandalf/gliner2-multi-v1-int8 GLINER_MODEL_FILE=model_int8.onnx rake console
 ```
 
 Or:
