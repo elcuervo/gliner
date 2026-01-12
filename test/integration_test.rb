@@ -3,14 +3,14 @@
 require "test_helper"
 require "fileutils"
 
-class Gliner2IntegrationTest < Minitest::Test
+class GlinerIntegrationTest < Minitest::Test
   REPO_ID = "0riginalGandalf/gliner2-multi-v1-int8"
 
   def test_real_model_inference_entities
-    skip "set GLINER2_INTEGRATION=1 to run" unless ENV["GLINER2_INTEGRATION"] == "1"
+    skip "set GLINER_INTEGRATION=1 to run" unless ENV["GLINER_INTEGRATION"] == "1"
 
     model_dir = ensure_model_dir!
-    model = Gliner2::Model.from_dir(model_dir)
+    model = Gliner::Model.from_dir(model_dir)
 
     text = "Apple CEO Tim Cook announced iPhone 15 in Cupertino yesterday."
     labels = ["company", "person", "product", "location"]
@@ -25,10 +25,10 @@ class Gliner2IntegrationTest < Minitest::Test
   end
 
   def test_real_model_inference_classification
-    skip "set GLINER2_INTEGRATION=1 to run" unless ENV["GLINER2_INTEGRATION"] == "1"
+    skip "set GLINER_INTEGRATION=1 to run" unless ENV["GLINER_INTEGRATION"] == "1"
 
     model_dir = ensure_model_dir!
-    model = Gliner2::Model.from_dir(model_dir)
+    model = Gliner::Model.from_dir(model_dir)
 
     out = model.classify_text(
       "This laptop has amazing performance but terrible battery life!",
@@ -38,10 +38,10 @@ class Gliner2IntegrationTest < Minitest::Test
   end
 
   def test_real_model_inference_structured_extraction
-    skip "set GLINER2_INTEGRATION=1 to run" unless ENV["GLINER2_INTEGRATION"] == "1"
+    skip "set GLINER_INTEGRATION=1 to run" unless ENV["GLINER_INTEGRATION"] == "1"
 
     model_dir = ensure_model_dir!
-    model = Gliner2::Model.from_dir(model_dir)
+    model = Gliner::Model.from_dir(model_dir)
 
     text = "iPhone 15 Pro Max with 256GB storage, A17 Pro chip, priced at $1199."
     out = model.extract_json(
@@ -67,7 +67,7 @@ class Gliner2IntegrationTest < Minitest::Test
   private
 
   def ensure_model_dir!
-    from_env = ENV["GLINER2_MODEL_DIR"]
+    from_env = ENV["GLINER_MODEL_DIR"]
     return from_env if from_env && !from_env.empty?
 
     dir = File.expand_path("../tmp/#{REPO_ID.tr('/', '__')}", __dir__)
