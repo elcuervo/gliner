@@ -8,23 +8,18 @@ Tensor = torch.Tensor
 
 
 class SpanLogitsWrapper(torch.nn.Module):
-    def __init__(self, extractor: GLiNER2, p_token_id: int):
+    def __init__(self, extractor: GLiNER2):
         super().__init__()
         self.encoder = extractor.encoder
         self.span_rep = extractor.span_rep
         self.count_embed = extractor.count_embed
         self.classifier = extractor.classifier
         self.max_width = int(extractor.max_width)
-        self.register_buffer(
-            "p_token_id",
-            torch.tensor(int(p_token_id), dtype=torch.long),
-            persistent=False,
-        )
 
     def _text_embeddings(self, token_embeddings: Tensor, words_mask: Tensor) -> Tensor:
         # Assumes batch size 1; words_mask marks first subword per word.
         positions = torch.nonzero(words_mask[0], as_tuple=False).squeeze(-1)
-        return token_embeddings[0].index_select(0, positions).unsqueeze(0)
+        return token_embeddings[0].index_select(0, positions).unsqueeze(0), positions
 
     def _span_rep(self, text_embeddings: Tensor) -> Tensor:
         seq_len = text_embeddings.shape[1]
@@ -53,7 +48,7 @@ class SpanLogitsWrapper(torch.nn.Module):
         label_positions: Tensor,
         label_mask: Tensor,
         token_type_ids: Optional[Tensor] = None,
-    ) -> tuple[Tensor, Tensor]:
+    ) -> Tensor:
         if token_type_ids is None:
             outputs = self.encoder(input_ids=input_ids, attention_mask=attention_mask)
         else:
@@ -63,17 +58,16 @@ class SpanLogitsWrapper(torch.nn.Module):
                 token_type_ids=token_type_ids,
             )
 
-        token_embeddings = outputs.last_hidden_state  # (1, seq_len, hidden)
+        token_embeddings = outputs.last_hidden_state
         # Keep task_type/text_lengths as graph inputs.
         token_embeddings = token_embeddings + (
             task_type.to(token_embeddings.dtype).sum()
             + text_lengths.to(token_embeddings.dtype).sum()
         ) * 0.0
 
-        # Prompt embedding ([P]) for count-aware projection.
-        p_mask = input_ids[0].eq(self.p_token_id)
-        p_pos = torch.argmax(p_mask.to(torch.long))
-        p_emb = token_embeddings[0, p_pos, :]
+        seq_len = input_ids.shape[1]
+        num_labels = label_positions.shape[1]
+        device = token_embeddings.device
 
         # Label embeddings (shape: num_labels, hidden)
         label_positions = label_positions[0].to(torch.long)
@@ -83,11 +77,32 @@ class SpanLogitsWrapper(torch.nn.Module):
         # Classification logits (shape: num_labels)
         cls_logits = self.classifier(label_embs).squeeze(-1)
 
-        # Span logits (shape: text_len, max_width, num_labels)
-        text_embeddings = self._text_embeddings(token_embeddings, words_mask)
-        span_rep = self._span_rep(text_embeddings)[0]  # (text_len, max_width, hidden)
-        struct_proj = self.count_embed(label_embs, 1)  # (1, num_labels, hidden)
-        span_scores = torch.sigmoid(torch.einsum("lwd,pkd->plwk", span_rep, struct_proj))
-        logits = span_scores[0]  # (text_len, max_width, num_labels)
+        # Span logits for text tokens only (shape: text_len, max_width, num_labels)
+        text_embeddings, word_positions = self._text_embeddings(token_embeddings, words_mask)
+        span_rep = self._span_rep(text_embeddings)[0]
+        struct_proj = self.count_embed(label_embs, 1)
+        span_logits = torch.einsum("lwd,pkd->plwk", span_rep, struct_proj)[0]
 
-        return logits.unsqueeze(0), cls_logits.unsqueeze(0)
+        # Scatter span logits back into full sequence length.
+        fill_value = -1000.0
+        logits_span = torch.full(
+            (1, seq_len, self.max_width, num_labels), fill_value, device=device
+        )
+        index = word_positions.view(1, -1, 1, 1).expand_as(span_logits.unsqueeze(0))
+        logits_span = logits_span.scatter(1, index, span_logits.unsqueeze(0))
+
+        # Build classification logits tensor at a single text position.
+        logits_cls = torch.full(
+            (1, seq_len, self.max_width, num_labels), fill_value, device=device
+        )
+        safe_positions = torch.cat(
+            [word_positions, torch.zeros(1, device=device, dtype=word_positions.dtype)]
+        )
+        cls_pos = safe_positions[0]
+        logits_cls[0, cls_pos, 0, :] = cls_logits
+
+        # Select between span and classification logits based on task_type.
+        cls_mask = (task_type == 1).to(token_embeddings.dtype).view(-1, 1, 1, 1)
+        logits = logits_span * (1 - cls_mask) + logits_cls * cls_mask
+
+        return logits

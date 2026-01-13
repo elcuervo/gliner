@@ -18,7 +18,6 @@ from model import SpanLogitsWrapper
 from validation import validate_extraction_methods, validate_onnx, validate_quantized
 
 
-LABEL_TOKENS = ["[E]", "[C]", "[R]", "[L]"]
 DUMMY_TEXT = "Apple CEO Tim Cook announced iPhone 15."
 TOKENIZER_FILES = [
     "tokenizer.json",
@@ -71,20 +70,6 @@ def write_runtime_config(
         f.write("\n")
 
 
-def label_token_ids_for(
-    tokenizer: PreTrainedTokenizerBase, tokens: Sequence[str]
-) -> List[int]:
-    ids = [tokenizer.convert_tokens_to_ids(token) for token in tokens]
-    missing = [
-        token
-        for token, token_id in zip(tokens, ids)
-        if token_id is None or token_id == tokenizer.unk_token_id
-    ]
-    if missing:
-        raise ValueError(f"Tokenizer missing special tokens: {', '.join(missing)}")
-    return ids
-
-
 def build_inputs(
     tokenizer: PreTrainedTokenizerBase,
     max_seq_len: int,
@@ -131,8 +116,7 @@ def build_inputs(
         "task_type": {0: "batch"},
         "label_positions": {0: "batch", 1: "num_labels"},
         "label_mask": {0: "batch", 1: "num_labels"},
-        "logits": {0: "batch", 1: "text_len", 2: "max_width", 3: "num_labels"},
-        "cls_logits": {0: "batch", 1: "num_labels"},
+        "logits": {0: "batch", 1: "seq_len", 2: "max_width", 3: "num_labels"},
     }
 
     if include_token_type_ids:
@@ -159,7 +143,7 @@ def export_onnx(
         inputs,
         onnx_path.as_posix(),
         input_names=list(input_names),
-        output_names=["logits", "cls_logits"],
+        output_names=["logits"],
         dynamic_axes=dynamic_axes,
         opset_version=opset,
         do_constant_folding=True,
@@ -174,10 +158,7 @@ def export(config: ExportConfig) -> None:
     extractor = GLiNER2.from_pretrained(config.model_id)
     extractor.eval()
 
-    p_token_id = tokenizer.convert_tokens_to_ids("[P]")
-    if p_token_id is None or p_token_id == tokenizer.unk_token_id:
-        raise ValueError("Tokenizer missing [P] token")
-    wrapper = SpanLogitsWrapper(extractor, p_token_id)
+    wrapper = SpanLogitsWrapper(extractor)
     wrapper.eval()
 
     inputs, input_names, dynamic_axes = build_inputs(
