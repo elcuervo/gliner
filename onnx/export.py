@@ -55,7 +55,9 @@ def copy_tokenizer_files(model_id: str, output_dir: Path) -> None:
             shutil.copy2(src, output_dir / name)
 
 
-def write_runtime_config(output_dir: Path, extractor: GLiNER2, max_seq_len: int) -> None:
+def write_runtime_config(
+    output_dir: Path, extractor: GLiNER2, max_seq_len: int
+) -> None:
     config = {
         "hidden_size": int(extractor.encoder.config.hidden_size),
         "max_width": int(extractor.max_width),
@@ -69,9 +71,15 @@ def write_runtime_config(output_dir: Path, extractor: GLiNER2, max_seq_len: int)
         f.write("\n")
 
 
-def label_token_ids_for(tokenizer: PreTrainedTokenizerBase, tokens: Sequence[str]) -> List[int]:
+def label_token_ids_for(
+    tokenizer: PreTrainedTokenizerBase, tokens: Sequence[str]
+) -> List[int]:
     ids = [tokenizer.convert_tokens_to_ids(token) for token in tokens]
-    missing = [token for token, token_id in zip(tokens, ids) if token_id is None or token_id == tokenizer.unk_token_id]
+    missing = [
+        token
+        for token, token_id in zip(tokens, ids)
+        if token_id is None or token_id == tokenizer.unk_token_id
+    ]
     if missing:
         raise ValueError(f"Tokenizer missing special tokens: {', '.join(missing)}")
     return ids
@@ -171,7 +179,9 @@ def export(config: ExportConfig) -> None:
     write_runtime_config(config.output_dir, extractor, max_seq_len=config.max_seq_len)
 
     if config.validate:
-        max_abs = validate_onnx(onnx_path.as_posix(), wrapper, inputs, config.include_token_type_ids)
+        max_abs = validate_onnx(
+            onnx_path.as_posix(), wrapper, inputs, config.include_token_type_ids
+        )
         print(f"Validation OK (max abs diff: {max_abs:.6f})")
 
     if config.quantize and config.validate_quantized:
@@ -194,7 +204,9 @@ def export(config: ExportConfig) -> None:
 
 
 def parse_args() -> ExportConfig:
-    parser = argparse.ArgumentParser(description="Export fastino/gliner2-multi-v1 to ONNX.")
+    parser = argparse.ArgumentParser(
+        description="Export fastino/gliner2-multi-v1 to ONNX."
+    )
     parser.add_argument(
         "--model-id",
         default="fastino/gliner2-multi-v1",

@@ -28,8 +28,16 @@ class SpanLogitsWrapper(torch.nn.Module):
         batch_size, seq_len, _hidden = token_embeddings.shape
         device = token_embeddings.device
 
-        start = torch.arange(seq_len, device=device).unsqueeze(1).expand(seq_len, self.max_width)
-        widths = torch.arange(self.max_width, device=device).unsqueeze(0).expand(seq_len, self.max_width)
+        start = (
+            torch.arange(seq_len, device=device)
+            .unsqueeze(1)
+            .expand(seq_len, self.max_width)
+        )
+        widths = (
+            torch.arange(self.max_width, device=device)
+            .unsqueeze(0)
+            .expand(seq_len, self.max_width)
+        )
         end = start + widths
         valid = end < seq_len
         start = torch.where(valid, start, torch.zeros_like(start))

@@ -19,6 +19,7 @@
             rubocop
             python3
             pipenv
+            black
           ];
 
           BUNDLE_PATH = ".bundle";

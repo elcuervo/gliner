@@ -23,7 +23,9 @@ class PreparedInputs:
 
 
 class SpanLogitsDecoder:
-    def __init__(self, tokenizer: PreTrainedTokenizerBase, max_width: int, max_seq_len: int):
+    def __init__(
+        self, tokenizer: PreTrainedTokenizerBase, max_width: int, max_seq_len: int
+    ):
         self.tokenizer = tokenizer
         self.max_width = int(max_width)
         self.max_seq_len = int(max_seq_len)
@@ -57,14 +59,18 @@ class SpanLogitsDecoder:
                 prompt += f" [DESCRIPTION] {label}: {desc}"
         return prompt
 
-    def schema_tokens_for(self, prompt: str, labels: Sequence[str], label_prefix: str) -> List[str]:
+    def schema_tokens_for(
+        self, prompt: str, labels: Sequence[str], label_prefix: str
+    ) -> List[str]:
         tokens = ["(", "[P]", prompt, "("]
         for label in labels:
             tokens.extend([label_prefix, str(label)])
         tokens.extend([")", ")"])
         return tokens
 
-    def encode_pretokenized(self, tokens: Sequence[str]) -> Tuple[List[int], List[Optional[int]]]:
+    def encode_pretokenized(
+        self, tokens: Sequence[str]
+    ) -> Tuple[List[int], List[Optional[int]]]:
         enc = self.tokenizer(
             list(tokens),
             is_split_into_words=True,
@@ -74,12 +80,16 @@ class SpanLogitsDecoder:
         )
         return enc["input_ids"], enc.word_ids()
 
-    def truncate_inputs(self, input_ids: List[int], word_ids: List[Optional[int]]) -> Tuple[List[int], List[Optional[int]]]:
+    def truncate_inputs(
+        self, input_ids: List[int], word_ids: List[Optional[int]]
+    ) -> Tuple[List[int], List[Optional[int]]]:
         if len(input_ids) <= self.max_seq_len:
             return input_ids, word_ids
         return input_ids[: self.max_seq_len], word_ids[: self.max_seq_len]
 
-    def build_pos_to_word_index(self, word_ids: List[Optional[int]], text_start_combined: int) -> List[Optional[int]]:
+    def build_pos_to_word_index(
+        self, word_ids: List[Optional[int]], text_start_combined: int
+    ) -> List[Optional[int]]:
         mapping: List[Optional[int]] = [None] * len(word_ids)
         seen: Dict[int, bool] = {}
         for idx, word_id in enumerate(word_ids):
@@ -90,21 +100,32 @@ class SpanLogitsDecoder:
                 mapping[idx] = word_id - text_start_combined
         return mapping
 
-    def infer_effective_text_len(self, word_ids: List[Optional[int]], text_start_combined: int, full_text_len: int) -> int:
-        present = [wid for wid in word_ids if wid is not None and wid >= text_start_combined]
+    def infer_effective_text_len(
+        self,
+        word_ids: List[Optional[int]],
+        text_start_combined: int,
+        full_text_len: int,
+    ) -> int:
+        present = [
+            wid for wid in word_ids if wid is not None and wid >= text_start_combined
+        ]
         if not present:
             return full_text_len
         max_text_wid = max(present)
         return min((max_text_wid - text_start_combined) + 1, full_text_len)
 
-    def label_positions_for(self, word_ids: List[Optional[int]], label_count: int) -> List[int]:
+    def label_positions_for(
+        self, word_ids: List[Optional[int]], label_count: int
+    ) -> List[int]:
         positions: List[int] = []
         for idx in range(label_count):
             combined_idx = 4 + (idx * 2)
             try:
                 pos = word_ids.index(combined_idx)
             except ValueError as exc:
-                raise ValueError(f"Could not locate label position at combined index {combined_idx}") from exc
+                raise ValueError(
+                    f"Could not locate label position at combined index {combined_idx}"
+                ) from exc
             positions.append(pos)
         return positions
 
@@ -123,7 +144,9 @@ class SpanLogitsDecoder:
         input_ids, word_ids = self.truncate_inputs(input_ids, word_ids)
 
         text_start_combined = len(schema_tokens) + 1
-        text_len = self.infer_effective_text_len(word_ids, text_start_combined, len(words))
+        text_len = self.infer_effective_text_len(
+            word_ids, text_start_combined, len(words)
+        )
         pos_to_word_index = self.build_pos_to_word_index(word_ids, text_start_combined)
         label_positions = self.label_positions_for(word_ids, label_count)
 
@@ -169,10 +192,14 @@ class SpanLogitsDecoder:
                 spans.append((text_span, score, char_start, char_end))
         return spans
 
-    def choose_best_span(self, spans: List[Tuple[str, float, int, int]]) -> Optional[Tuple[str, float, int, int]]:
+    def choose_best_span(
+        self, spans: List[Tuple[str, float, int, int]]
+    ) -> Optional[Tuple[str, float, int, int]]:
         if not spans:
             return None
-        sorted_spans = sorted(spans, key=lambda item: (-item[1], item[3] - item[2], len(item[0])))
+        sorted_spans = sorted(
+            spans, key=lambda item: (-item[1], item[3] - item[2], len(item[0]))
+        )
         best = sorted_spans[0]
         best_score = best[1]
         near = [span for span in sorted_spans if (best_score - span[1]) <= 0.02]
@@ -186,7 +213,9 @@ class SpanLogitsDecoder:
         sorted_spans = sorted(spans, key=lambda item: -item[1])
         selected: List[Tuple[str, float, int, int]] = []
         for text, score, start_pos, end_pos in sorted_spans:
-            overlaps = any(not (end_pos <= s or start_pos >= e) for _, _, s, e in selected)
+            overlaps = any(
+                not (end_pos <= s or start_pos >= e) for _, _, s, e in selected
+            )
             if overlaps:
                 continue
             selected.append((text, score, start_pos, end_pos))
@@ -257,7 +286,9 @@ class SpanLogitsDecoder:
     ) -> Dict[str, List[str] | str]:
         scores = self.classification_scores(logits, prepared, labels)
         return {
-            task_name: self.format_classification(scores, labels, multi_label, threshold),
+            task_name: self.format_classification(
+                scores, labels, multi_label, threshold
+            ),
         }
 
     def parse_field_spec(self, spec: str) -> Tuple[str, str, Optional[str]]:
@@ -294,7 +325,9 @@ class SpanLogitsDecoder:
         spans_by_label: Dict[str, List[Tuple[str, float, int, int]]] = {}
         for label_index, label in enumerate(labels):
             label_pos = prepared.label_positions[label_index]
-            spans_by_label[label] = self.find_spans_for_label(logits, label_pos, prepared, threshold)
+            spans_by_label[label] = self.find_spans_for_label(
+                logits, label_pos, prepared, threshold
+            )
 
         obj: Dict[str, Optional[str] | List[str]] = {}
         for label in labels:

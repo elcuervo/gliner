@@ -13,7 +13,9 @@ Tensor = torch.Tensor
 InputTensors = Tuple[Tensor, ...]
 
 
-def run_ort(session: ort.InferenceSession, inputs: InputTensors, include_token_type_ids: bool) -> np.ndarray:
+def run_ort(
+    session: ort.InferenceSession, inputs: InputTensors, include_token_type_ids: bool
+) -> np.ndarray:
     input_ids, attention_mask = inputs[0], inputs[1]
     feed = {
         "input_ids": input_ids.cpu().numpy(),
@@ -39,7 +41,9 @@ def validate_onnx(
         torch_out = wrapper(*inputs).detach().cpu().numpy()
     ort_out = run_ort(session, inputs, include_token_type_ids)
     if torch_out.shape != ort_out.shape:
-        raise ValueError(f"ONNX output shape mismatch: torch {torch_out.shape} vs onnx {ort_out.shape}")
+        raise ValueError(
+            f"ONNX output shape mismatch: torch {torch_out.shape} vs onnx {ort_out.shape}"
+        )
     return float(np.max(np.abs(torch_out - ort_out)))
 
 
@@ -63,7 +67,9 @@ def run_torch_logits(wrapper: SpanLogitsWrapper, inputs: InputTensors) -> np.nda
 
 def compare_outputs(name: str, torch_out: object, onnx_out: object) -> None:
     if torch_out != onnx_out:
-        raise ValueError(f"{name} output mismatch.\nTorch: {torch_out}\nONNX:  {onnx_out}")
+        raise ValueError(
+            f"{name} output mismatch.\nTorch: {torch_out}\nONNX:  {onnx_out}"
+        )
 
 
 def validate_extraction_methods(
@@ -81,19 +87,31 @@ def validate_extraction_methods(
     # Entities
     prompt = decoder.build_prompt("entities", entities_case.descriptions)
     schema_tokens = decoder.schema_tokens_for(prompt, entities_case.labels, "[E]")
-    prepared = decoder.prepare_inputs(entities_case.text, schema_tokens, len(entities_case.labels))
+    prepared = decoder.prepare_inputs(
+        entities_case.text, schema_tokens, len(entities_case.labels)
+    )
     inputs: InputTensors = (prepared.input_ids, prepared.attention_mask)
     if include_token_type_ids:
-        inputs = (prepared.input_ids, prepared.attention_mask, torch.zeros_like(prepared.input_ids))
+        inputs = (
+            prepared.input_ids,
+            prepared.attention_mask,
+            torch.zeros_like(prepared.input_ids),
+        )
     torch_logits = run_torch_logits(wrapper, inputs)
     onnx_logits = run_ort(session, inputs, include_token_type_ids)
-    torch_entities = decoder.extract_entities(torch_logits, prepared, entities_case.labels, entities_case.threshold)
-    onnx_entities = decoder.extract_entities(onnx_logits, prepared, entities_case.labels, entities_case.threshold)
+    torch_entities = decoder.extract_entities(
+        torch_logits, prepared, entities_case.labels, entities_case.threshold
+    )
+    onnx_entities = decoder.extract_entities(
+        onnx_logits, prepared, entities_case.labels, entities_case.threshold
+    )
     compare_outputs("entities", torch_entities, onnx_entities)
 
     # Classification
     cls_prompt = decoder.build_prompt(classification_case.task_name, {})
-    cls_tokens = decoder.schema_tokens_for(cls_prompt, classification_case.labels, "[L]")
+    cls_tokens = decoder.schema_tokens_for(
+        cls_prompt, classification_case.labels, "[L]"
+    )
     prepared_cls = decoder.prepare_inputs(
         classification_case.text,
         cls_tokens,
@@ -101,7 +119,11 @@ def validate_extraction_methods(
     )
     inputs = (prepared_cls.input_ids, prepared_cls.attention_mask)
     if include_token_type_ids:
-        inputs = (prepared_cls.input_ids, prepared_cls.attention_mask, torch.zeros_like(prepared_cls.input_ids))
+        inputs = (
+            prepared_cls.input_ids,
+            prepared_cls.attention_mask,
+            torch.zeros_like(prepared_cls.input_ids),
+        )
     torch_logits = run_torch_logits(wrapper, inputs)
     onnx_logits = run_ort(session, inputs, include_token_type_ids)
     torch_cls = decoder.classify_text(
@@ -124,7 +146,9 @@ def validate_extraction_methods(
 
     # Structured extraction
     json_prompt = decoder.build_prompt(json_case.parent, {})
-    json_tokens = decoder.schema_tokens_for(json_prompt, [f.split("::")[0] for f in json_case.fields], "[C]")
+    json_tokens = decoder.schema_tokens_for(
+        json_prompt, [f.split("::")[0] for f in json_case.fields], "[C]"
+    )
     prepared_json = decoder.prepare_inputs(
         json_case.text,
         json_tokens,
@@ -132,7 +156,11 @@ def validate_extraction_methods(
     )
     inputs = (prepared_json.input_ids, prepared_json.attention_mask)
     if include_token_type_ids:
-        inputs = (prepared_json.input_ids, prepared_json.attention_mask, torch.zeros_like(prepared_json.input_ids))
+        inputs = (
+            prepared_json.input_ids,
+            prepared_json.attention_mask,
+            torch.zeros_like(prepared_json.input_ids),
+        )
     torch_logits = run_torch_logits(wrapper, inputs)
     onnx_logits = run_ort(session, inputs, include_token_type_ids)
     torch_json = decoder.extract_json(
