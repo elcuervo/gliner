@@ -232,20 +232,26 @@ module Gliner
 
     def validate_io!
       @input_names = @session.inputs.map { |i| i[:name] }
+
       output_names = @session.outputs.map { |o| o[:name] }
+
       @has_cls_logits = output_names.include?("cls_logits")
 
       if output_names.include?("logits")
         @output_name = "logits"
         @label_index_mode = :label_index
+
         expected_inputs = %w[input_ids attention_mask words_mask text_lengths task_type label_positions label_mask]
         missing = expected_inputs - @input_names
+
         raise Error, "Model missing inputs: #{missing.join(', ')}" unless missing.empty?
       elsif output_names.include?("span_logits")
         @output_name = "span_logits"
         @label_index_mode = :label_position
+
         expected_inputs = %w[input_ids attention_mask]
         missing = expected_inputs - @input_names
+
         raise Error, "Model missing inputs: #{missing.join(', ')}" unless missing.empty?
       else
         raise Error, "Model missing output: logits or span_logits"
@@ -267,6 +273,7 @@ module Gliner
       when Hash
         names = labels.keys.map(&:to_s)
         descs = labels.transform_keys(&:to_s).transform_values { |v| v.is_a?(String) ? v : nil }.compact
+
         [names, descs]
       else
         raise Error, "labels must be a String, Array, or Hash"
@@ -281,7 +288,9 @@ module Gliner
 
       @word_pre_tokenizer.pre_tokenize_str(text).each do |(token, (start_pos, end_pos))|
         token = token.to_s.downcase
+
         next if token.empty?
+
         tokens << token
         starts << start_pos
         ends << end_pos
@@ -301,16 +310,19 @@ module Gliner
 
     def schema_tokens_for(prompt:, labels:, label_prefix:)
       tokens = ["(", "[P]", prompt.to_s, "("]
+
       labels.each do |label|
         tokens << label_prefix
         tokens << label.to_s
       end
+
       tokens.concat([")", ")"])
       tokens
     end
 
     def encode_pretokenized(tokens)
       enc = @tokenizer.encode(tokens, is_pretokenized: true, add_special_tokens: false)
+
       { ids: enc.ids, word_ids: enc.word_ids }
     end
 
@@ -352,6 +364,7 @@ module Gliner
     def build_words_mask(word_ids, text_start_combined)
       mask = Array.new(word_ids.length, 0)
       last_wid = nil
+
       word_ids.each_with_index do |wid, i|
         next if wid.nil?
         if wid != last_wid
