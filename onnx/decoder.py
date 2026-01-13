@@ -168,20 +168,26 @@ class SpanLogitsDecoder:
         self,
         logits: np.ndarray,
         label_pos: int,
+        label_index: int,
+        num_labels: int,
+        pos_to_word_index: List[Optional[int]],
         prepared: PreparedInputs,
         threshold: float,
     ) -> List[Tuple[str, float, int, int]]:
         spans: List[Tuple[str, float, int, int]] = []
         seq_len = logits.shape[1]
         for pos in range(seq_len):
-            start_word = prepared.pos_to_word_index[pos]
+            start_word = pos_to_word_index[pos]
             if start_word is None:
                 continue
             for width in range(self.max_width):
                 end_word = start_word + width
                 if end_word >= prepared.text_len:
                     continue
-                score = self.sigmoid(float(logits[0, pos, width, label_pos]))
+                if logits.shape[-1] == num_labels:
+                    score = self.sigmoid(float(logits[0, pos, width, label_index]))
+                else:
+                    score = self.sigmoid(float(logits[0, pos, width, label_pos]))
                 if score < threshold:
                     continue
                 char_start = prepared.start_map[start_word]
@@ -228,10 +234,19 @@ class SpanLogitsDecoder:
         labels: Sequence[str],
         threshold: float,
     ) -> Dict[str, List[str]]:
+        pos_to_word_index = self._pos_to_word_index_for_logits(prepared, logits)
         entities: Dict[str, List[str]] = {}
         for label_index, label in enumerate(labels):
             label_pos = prepared.label_positions[label_index]
-            spans = self.find_spans_for_label(logits, label_pos, prepared, threshold)
+            spans = self.find_spans_for_label(
+                logits,
+                label_pos,
+                label_index,
+                len(labels),
+                pos_to_word_index,
+                prepared,
+                threshold,
+            )
             entities[str(label)] = self.format_spans(spans)
         return {"entities": entities}
 
@@ -241,20 +256,24 @@ class SpanLogitsDecoder:
         prepared: PreparedInputs,
         labels: Sequence[str],
     ) -> List[float]:
+        pos_to_word_index = self._pos_to_word_index_for_logits(prepared, logits)
         scores: List[float] = []
         for label_index in range(len(labels)):
             label_pos = prepared.label_positions[label_index]
             best = -float("inf")
             seq_len = logits.shape[1]
             for pos in range(seq_len):
-                start_word = prepared.pos_to_word_index[pos]
+                start_word = pos_to_word_index[pos]
                 if start_word is None:
                     continue
                 for width in range(self.max_width):
                     end_word = start_word + width
                     if end_word >= prepared.text_len:
                         continue
-                    score = self.sigmoid(float(logits[0, pos, width, label_pos]))
+                    if logits.shape[-1] == len(labels):
+                        score = self.sigmoid(float(logits[0, pos, width, label_index]))
+                    else:
+                        score = self.sigmoid(float(logits[0, pos, width, label_pos]))
                     if score > best:
                         best = score
             scores.append(best)
@@ -318,6 +337,7 @@ class SpanLogitsDecoder:
         fields: Sequence[str],
         threshold: float,
     ) -> Dict[str, List[Dict[str, Optional[str] | List[str]]]]:
+        pos_to_word_index = self._pos_to_word_index_for_logits(prepared, logits)
         parsed = [self.parse_field_spec(spec) for spec in fields]
         labels = [name for name, _dtype, _desc in parsed]
         field_map = {name: (dtype, desc) for name, dtype, desc in parsed}
@@ -326,7 +346,13 @@ class SpanLogitsDecoder:
         for label_index, label in enumerate(labels):
             label_pos = prepared.label_positions[label_index]
             spans_by_label[label] = self.find_spans_for_label(
-                logits, label_pos, prepared, threshold
+                logits,
+                label_pos,
+                label_index,
+                len(labels),
+                pos_to_word_index,
+                prepared,
+                threshold,
             )
 
         obj: Dict[str, Optional[str] | List[str]] = {}
@@ -339,3 +365,11 @@ class SpanLogitsDecoder:
             else:
                 obj[label] = self.format_spans(spans)
         return {parent: [obj]}
+
+    def _pos_to_word_index_for_logits(
+        self, prepared: PreparedInputs, logits: np.ndarray
+    ) -> List[Optional[int]]:
+        seq_len = int(logits.shape[1])
+        if seq_len == prepared.text_len:
+            return list(range(prepared.text_len))
+        return prepared.pos_to_word_index

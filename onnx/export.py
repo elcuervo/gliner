@@ -62,7 +62,7 @@ def write_runtime_config(
         "hidden_size": int(extractor.encoder.config.hidden_size),
         "max_width": int(extractor.max_width),
         "max_seq_len": int(max_seq_len),
-        "output_format": "span_logits",
+        "output_format": "logits",
         "has_count_embed": True,
         "schema_position_included": False,
     }
@@ -99,20 +99,47 @@ def build_inputs(
     )
     input_ids = dummy["input_ids"]
     attention_mask = dummy["attention_mask"]
-    inputs: InputTensors = (input_ids, attention_mask)
+    words_mask = attention_mask.clone()
+    text_lengths = torch.tensor([int(attention_mask.sum().item())], dtype=torch.long)
+    task_type = torch.tensor([0], dtype=torch.long)
+    label_positions = torch.tensor([[0, 1]], dtype=torch.long)
+    label_mask = torch.ones_like(label_positions, dtype=torch.long)
+    inputs: InputTensors = (
+        input_ids,
+        attention_mask,
+        words_mask,
+        text_lengths,
+        task_type,
+        label_positions,
+        label_mask,
+    )
 
-    input_names = ["input_ids", "attention_mask"]
+    input_names = [
+        "input_ids",
+        "attention_mask",
+        "words_mask",
+        "text_lengths",
+        "task_type",
+        "label_positions",
+        "label_mask",
+    ]
     dynamic_axes: DynamicAxes = {
         "input_ids": {0: "batch", 1: "seq_len"},
         "attention_mask": {0: "batch", 1: "seq_len"},
-        "span_logits": {0: "batch", 1: "seq_len", 3: "seq_len"},
+        "words_mask": {0: "batch", 1: "seq_len"},
+        "text_lengths": {0: "batch"},
+        "task_type": {0: "batch"},
+        "label_positions": {0: "batch", 1: "num_labels"},
+        "label_mask": {0: "batch", 1: "num_labels"},
+        "logits": {0: "batch", 1: "text_len", 2: "max_width", 3: "num_labels"},
+        "cls_logits": {0: "batch", 1: "num_labels"},
     }
 
     if include_token_type_ids:
         token_type_ids = dummy.get("token_type_ids")
         if token_type_ids is None:
             token_type_ids = torch.zeros_like(input_ids)
-        inputs = (input_ids, attention_mask, token_type_ids)
+        inputs = inputs + (token_type_ids,)
         input_names.append("token_type_ids")
         dynamic_axes["token_type_ids"] = {0: "batch", 1: "seq_len"}
 
@@ -132,7 +159,7 @@ def export_onnx(
         inputs,
         onnx_path.as_posix(),
         input_names=list(input_names),
-        output_names=["span_logits"],
+        output_names=["logits", "cls_logits"],
         dynamic_axes=dynamic_axes,
         opset_version=opset,
         do_constant_folding=True,
@@ -144,12 +171,13 @@ def export(config: ExportConfig) -> None:
     config.output_dir.mkdir(parents=True, exist_ok=True)
 
     tokenizer = AutoTokenizer.from_pretrained(config.model_id, use_fast=True)
-    label_token_ids = label_token_ids_for(tokenizer, LABEL_TOKENS)
-
     extractor = GLiNER2.from_pretrained(config.model_id)
     extractor.eval()
 
-    wrapper = SpanLogitsWrapper(extractor, label_token_ids)
+    p_token_id = tokenizer.convert_tokens_to_ids("[P]")
+    if p_token_id is None or p_token_id == tokenizer.unk_token_id:
+        raise ValueError("Tokenizer missing [P] token")
+    wrapper = SpanLogitsWrapper(extractor, p_token_id)
     wrapper.eval()
 
     inputs, input_names, dynamic_axes = build_inputs(

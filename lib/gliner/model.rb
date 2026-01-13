@@ -79,6 +79,7 @@ module Gliner
 
       schema_tokens = schema_tokens_for(prompt: prompt, labels: labels, label_prefix: "[E]")
       prepared = prepare_inputs(text, schema_tokens)
+      label_positions = label_positions_for(prepared[:word_ids], labels.length)
 
       logits = run_onnx(
         input_ids: prepared[:input_ids],
@@ -86,14 +87,16 @@ module Gliner
         words_mask: prepared[:words_mask],
         text_lengths: [prepared[:text_len]],
         task_type: TASK_TYPE_ENTITIES,
-        label_positions: label_positions_for(prepared[:word_ids], labels.length),
+        label_positions: label_positions,
         label_mask: Array.new(labels.length, 1)
       )
+      pos_to_word_index = pos_to_word_index_for(prepared, logits)
 
       entities = extract_span_values(
         logits: logits,
         labels: labels,
-        pos_to_word_index: prepared[:pos_to_word_index],
+        label_positions: label_positions,
+        pos_to_word_index: pos_to_word_index,
         start_map: prepared[:start_map],
         end_map: prepared[:end_map],
         original_text: prepared[:original_text],
@@ -123,24 +126,42 @@ module Gliner
         parsed = parse_classification_task(task_name, config)
         schema_tokens = schema_tokens_for(prompt: parsed[:prompt], labels: parsed[:labels], label_prefix: "[L]")
         prepared = prepare_inputs(text, schema_tokens)
+        label_positions = label_positions_for(prepared[:word_ids], parsed[:labels].length)
 
-        logits = run_onnx(
-          input_ids: prepared[:input_ids],
-          attention_mask: prepared[:attention_mask],
-          words_mask: prepared[:words_mask],
-          text_lengths: [prepared[:text_len]],
-          task_type: TASK_TYPE_CLASSIFICATION,
-          label_positions: label_positions_for(prepared[:word_ids], parsed[:labels].length),
-          label_mask: Array.new(parsed[:labels].length, 1)
-        )
-
-        scores = classification_scores(
-          logits: logits,
-          labels: parsed[:labels],
-          pos_to_word_index: prepared[:pos_to_word_index],
-          text_len: prepared[:text_len],
-          threshold: parsed[:cls_threshold]
-        )
+        scores =
+          if @has_cls_logits
+            out_logits = run_onnx(
+              input_ids: prepared[:input_ids],
+              attention_mask: prepared[:attention_mask],
+              words_mask: prepared[:words_mask],
+              text_lengths: [prepared[:text_len]],
+              task_type: TASK_TYPE_CLASSIFICATION,
+              label_positions: label_positions,
+              label_mask: Array.new(parsed[:labels].length, 1),
+              want_cls: true
+            )
+            cls_logits = Array(out_logits.fetch(:cls_logits).fetch(0))
+            parsed[:multi_label] ? cls_logits.map { |x| sigmoid(x) } : softmax(cls_logits)
+          else
+            logits = run_onnx(
+              input_ids: prepared[:input_ids],
+              attention_mask: prepared[:attention_mask],
+              words_mask: prepared[:words_mask],
+              text_lengths: [prepared[:text_len]],
+              task_type: TASK_TYPE_CLASSIFICATION,
+              label_positions: label_positions,
+              label_mask: Array.new(parsed[:labels].length, 1)
+            )
+            pos_to_word_index = pos_to_word_index_for(prepared, logits)
+            classification_scores(
+              logits: logits,
+              labels: parsed[:labels],
+              label_positions: label_positions,
+              pos_to_word_index: pos_to_word_index,
+              text_len: prepared[:text_len],
+              threshold: parsed[:cls_threshold]
+            )
+          end
 
         out[task_name.to_s] = format_classification(
           scores,
@@ -182,6 +203,7 @@ module Gliner
         prompt = build_prompt(parent_name, descs)
         schema_tokens = schema_tokens_for(prompt: prompt, labels: labels, label_prefix: "[C]")
         prepared = prepare_inputs(normalized_text, schema_tokens, already_normalized: true)
+        label_positions = label_positions_for(prepared[:word_ids], labels.length)
 
         logits = run_onnx(
           input_ids: prepared[:input_ids],
@@ -189,14 +211,16 @@ module Gliner
           words_mask: prepared[:words_mask],
           text_lengths: [prepared[:text_len]],
           task_type: TASK_TYPE_JSON,
-          label_positions: label_positions_for(prepared[:word_ids], labels.length),
+          label_positions: label_positions,
           label_mask: Array.new(labels.length, 1)
         )
+        pos_to_word_index = pos_to_word_index_for(prepared, logits)
 
         spans_by_label = extract_spans_by_label(
           logits: logits,
           labels: labels,
-          pos_to_word_index: prepared[:pos_to_word_index],
+          label_positions: label_positions,
+          pos_to_word_index: pos_to_word_index,
           start_map: prepared[:start_map],
           end_map: prepared[:end_map],
           original_text: prepared[:original_text],
@@ -226,13 +250,25 @@ module Gliner
     private
 
     def validate_io!
-      input_names = @session.inputs.map { |i| i[:name] }
-      expected_inputs = %w[input_ids attention_mask words_mask text_lengths task_type label_positions label_mask]
-      missing = expected_inputs - input_names
-      raise Error, "Model missing inputs: #{missing.join(', ')}" unless missing.empty?
-
+      @input_names = @session.inputs.map { |i| i[:name] }
       output_names = @session.outputs.map { |o| o[:name] }
-      raise Error, "Model missing output: logits" unless output_names.include?("logits")
+      @has_cls_logits = output_names.include?("cls_logits")
+
+      if output_names.include?("logits")
+        @output_name = "logits"
+        @label_index_mode = :label_index
+        expected_inputs = %w[input_ids attention_mask words_mask text_lengths task_type label_positions label_mask]
+        missing = expected_inputs - @input_names
+        raise Error, "Model missing inputs: #{missing.join(', ')}" unless missing.empty?
+      elsif output_names.include?("span_logits")
+        @output_name = "span_logits"
+        @label_index_mode = :label_position
+        expected_inputs = %w[input_ids attention_mask]
+        missing = expected_inputs - @input_names
+        raise Error, "Model missing inputs: #{missing.join(', ')}" unless missing.empty?
+      else
+        raise Error, "Model missing output: logits or span_logits"
+      end
     end
 
     def normalize_text(text)
@@ -365,26 +401,49 @@ module Gliner
       [present, full_text_len].min
     end
 
-    def run_onnx(input_ids:, attention_mask:, words_mask:, text_lengths:, task_type:, label_positions:, label_mask:)
+    def run_onnx(input_ids:, attention_mask:, words_mask:, text_lengths:, task_type:, label_positions:, label_mask:, want_cls: false)
+      text_lengths = Array(text_lengths).flatten
       inputs = {
         input_ids: [input_ids],
         attention_mask: [attention_mask],
         words_mask: [words_mask],
-        text_lengths: [text_lengths],
+        text_lengths: text_lengths,
         task_type: [task_type],
         label_positions: [label_positions],
         label_mask: [label_mask]
       }
+      if @input_names&.include?("token_type_ids")
+        inputs[:token_type_ids] = [Array.new(input_ids.length, 0)]
+      end
+      if @input_names
+        inputs.select! { |name, _| @input_names.include?(name.to_s) }
+      end
 
       # onnxruntime-ruby returns outputs in the same order as output_names
-      out = @session.run(["logits"], inputs)
+      output_names = [@output_name]
+      output_names << "cls_logits" if want_cls && @has_cls_logits
+      out = @session.run(output_names, inputs)
+      return { logits: out.fetch(0), cls_logits: out.fetch(1) } if output_names.length > 1
       out.fetch(0)
     end
 
     def sigmoid(x) = 1.0 / (1.0 + Math.exp(-x))
 
+    def softmax(values)
+      max = values.max
+      exps = values.map { |v| Math.exp(v - max) }
+      sum = exps.sum
+      exps.map { |v| v / sum }
+    end
+
+    def pos_to_word_index_for(prepared, logits)
+      seq_len = logits[0].length
+      return (0...prepared[:text_len]).to_a if seq_len == prepared[:text_len]
+      prepared[:pos_to_word_index]
+    end
+
     # Returns spans as [text, score, char_start, char_end]
-    def find_spans_for_label(logits:, label_index:, pos_to_word_index:, start_map:, end_map:, original_text:, text_len:, threshold:)
+    def find_spans_for_label(logits:, label_index:, label_positions:, pos_to_word_index:, start_map:, end_map:, original_text:, text_len:, threshold:)
       spans = []
 
       seq_len = logits[0].length
@@ -396,7 +455,7 @@ module Gliner
           end_word = start_word + width
           next if end_word >= text_len
 
-          score = sigmoid(logits[0][pos][width][label_index])
+          score = sigmoid(label_logit(logits, pos, width, label_index, label_positions))
           next if score < threshold
 
           char_start = start_map[start_word]
@@ -413,6 +472,16 @@ module Gliner
       spans
     end
 
+    def label_logit(logits, pos, width, label_index, label_positions)
+      if @label_index_mode == :label_position
+        raise Error, "Label positions required for span_logits output" if label_positions.nil?
+        label_pos = label_positions.fetch(label_index)
+        logits[0][pos][width][label_pos]
+      else
+        logits[0][pos][width][label_index]
+      end
+    end
+
     def label_positions_for(word_ids, label_count)
       label_count.times.map do |i|
         combined_idx = 4 + (i * 2)
@@ -422,12 +491,14 @@ module Gliner
       end
     end
 
-    def extract_spans_by_label(logits:, labels:, pos_to_word_index:, start_map:, end_map:, original_text:, text_len:, threshold:)
+    def extract_spans_by_label(logits:, labels:, label_positions:, pos_to_word_index:, start_map:, end_map:, original_text:, text_len:,
+                               threshold:)
       out = {}
       labels.each_with_index do |label, label_index|
         out[label.to_s] = find_spans_for_label(
           logits: logits,
           label_index: label_index,
+          label_positions: label_positions,
           pos_to_word_index: pos_to_word_index,
           start_map: start_map,
           end_map: end_map,
@@ -440,10 +511,11 @@ module Gliner
     end
 
     def extract_span_values(logits:, labels:, pos_to_word_index:, start_map:, end_map:, original_text:, text_len:, threshold:,
-                            include_confidence:, include_spans:, dtype:)
+                            include_confidence:, include_spans:, dtype:, label_positions:)
       spans_by_label = extract_spans_by_label(
         logits: logits,
         labels: labels,
+        label_positions: label_positions,
         pos_to_word_index: pos_to_word_index,
         start_map: start_map,
         end_map: end_map,
@@ -554,7 +626,7 @@ module Gliner
       }
     end
 
-    def classification_scores(logits:, labels:, pos_to_word_index:, text_len:, threshold:)
+    def classification_scores(logits:, labels:, label_positions:, pos_to_word_index:, text_len:, threshold:)
       scores = []
 
       labels.each_index do |label_index|
@@ -567,7 +639,7 @@ module Gliner
           (0...@max_width).each do |width|
             end_word = start_word + width
             next if end_word >= text_len
-            s = sigmoid(logits[0][pos][width][label_index])
+            s = sigmoid(label_logit(logits, pos, width, label_index, label_positions))
             max = s if s > max
           end
         end
