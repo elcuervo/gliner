@@ -120,7 +120,9 @@ def validate_extraction_methods(
     prepared = decoder.prepare_inputs(
         entities_case.text, schema_tokens, len(entities_case.labels)
     )
-    inputs = build_inputs(prepared, task_type_val=0, num_labels=len(entities_case.labels))
+    inputs = build_inputs(
+        prepared, task_type_val=0, num_labels=len(entities_case.labels)
+    )
     torch_logits = run_torch_logits(wrapper, inputs)
     onnx_logits = run_ort(session, inputs, include_token_type_ids)
     torch_entities = decoder.extract_entities(
@@ -174,7 +176,9 @@ def validate_extraction_methods(
         json_tokens,
         len(json_case.fields),
     )
-    inputs = build_inputs(prepared_json, task_type_val=2, num_labels=len(json_case.fields))
+    inputs = build_inputs(
+        prepared_json, task_type_val=2, num_labels=len(json_case.fields)
+    )
     torch_logits = run_torch_logits(wrapper, inputs)
     onnx_logits = run_ort(session, inputs, include_token_type_ids)
     torch_json = decoder.extract_json(
