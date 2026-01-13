@@ -9,7 +9,7 @@ end
 require "gliner"
 require "irb"
 
-DEFAULT_REPO_ID = "0riginalGandalf/gliner2-multi-v1-int8"
+DEFAULT_REPO_ID = "cuerbot/gliner2-multi-v1-int8"
 DEFAULT_MODEL_FILE = "model_int8.onnx"
 
 def ensure_model_dir!(repo_id:, model_file:)

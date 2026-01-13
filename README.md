@@ -83,7 +83,7 @@ This implementation expects a directory containing:
 - `model.onnx` or `model_int8.onnx`
 - (optional) `config.json` with `max_width` and `max_seq_len`
 
-One publicly available ONNX export is `0riginalGandalf/gliner2-multi-v1-int8` on Hugging Face.
+One publicly available ONNX export is `cuerbot/gliner2-multi-v1-int8` on Hugging Face.
 
 ## Integration test (real model)
 
@@ -118,7 +118,7 @@ If you omit `MODEL_DIR`, the console auto-downloads a public test model (configu
 ```bash
 rake console
 # or:
-GLINER_REPO_ID=0riginalGandalf/gliner2-multi-v1-int8 GLINER_MODEL_FILE=model_int8.onnx rake console
+GLINER_REPO_ID=cuerbot/gliner2-multi-v1-int8 GLINER_MODEL_FILE=model_int8.onnx rake console
 ```
 
 Or:

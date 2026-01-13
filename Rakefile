@@ -8,7 +8,7 @@ RSpec::Core::RakeTask.new(:spec)
 task default: :spec
 
 namespace :model do
-  DEFAULT_REPO_ID = '0riginalGandalf/gliner2-multi-v1-int8'
+  DEFAULT_REPO_ID = 'cuerbot/gliner2-multi-v1-int8'
   DEFAULT_MODEL_FILE = 'model_int8.onnx'
 
   desc 'Downloads a test model to tmp/ (REPO_ID=... MODEL_FILE=model_int8.onnx)'

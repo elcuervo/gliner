@@ -6,19 +6,6 @@ require "tokenizers"
 
 module Gliner
   class Model
-    SPECIAL_TOKENS = [
-      "[SEP_STRUCT]",
-      "[SEP_TEXT]",
-      "[P]",
-      "[C]",
-      "[E]",
-      "[R]",
-      "[L]",
-      "[EXAMPLE]",
-      "[OUTPUT]",
-      "[DESCRIPTION]"
-    ].freeze
-
     DEFAULT_MAX_WIDTH = 8
     DEFAULT_MAX_SEQ_LEN = 512
 
@@ -55,16 +42,10 @@ module Gliner
       @model_path = model_path
       @tokenizer = Tokenizers.from_file(tokenizer_path)
       @word_pre_tokenizer = Tokenizers::PreTokenizers::BertPreTokenizer.new
-
-      missing_specials = SPECIAL_TOKENS.reject { |t| @tokenizer.token_to_id(t) }
-      unless missing_specials.empty?
-        raise Error, "Tokenizer missing special tokens: #{missing_specials.join(', ')}"
-      end
-
       @max_width = Integer(max_width)
       @max_seq_len = Integer(max_seq_len)
-
       @session = OnnxRuntime::InferenceSession.new(@model_path)
+
       validate_io!
     end
 
