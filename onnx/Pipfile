@@ -1,0 +1,19 @@
+[[source]]
+name = "pypi"
+url = "https://pypi.org/simple"
+verify_ssl = true
+
+[packages]
+gliner2 = "==1.2.3"
+torch = "*"
+transformers = "*"
+huggingface-hub = "*"
+onnx = "*"
+onnxruntime = "*"
+numpy = "*"
+sentencepiece = "*"
+safetensors = "*"
+onnxscript = "*"
+
+[requires]
+python_version = "3.13"

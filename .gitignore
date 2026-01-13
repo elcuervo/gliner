@@ -5,3 +5,4 @@
 *.gem
 .rspec_status
 Gemfile.lock
+/onnx/gliner2-multi-v1/
