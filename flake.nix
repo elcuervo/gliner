@@ -10,6 +10,9 @@
     flake-utils.lib.eachDefaultSystem (system:
       let
         pkgs = import nixpkgs { inherit system; };
+        python-with-packages = pkgs.python3.withPackages (ps: with ps; [
+          huggingface-hub
+        ]);
       in
       {
         devShells.default = pkgs.mkShell {
@@ -17,7 +20,7 @@
             ruby
             bundler
             rubocop
-            python3
+            python-with-packages
             pipenv
             black
           ];
