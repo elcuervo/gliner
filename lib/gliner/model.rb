@@ -52,10 +52,13 @@ module Gliner
     # Supports:
     # - Array: ["company", "person"]
     # - Hash: {"company"=>"desc", "person"=>"desc"}
+    # - Hash config: {"email"=>{"description"=>"...", "dtype"=>"str", "threshold"=>0.9}}
     #
     # Returns: {"entities" => {"label" => ["span", ...], ...}}
     def extract_entities(text, entity_types, threshold: 0.5, format_results: true, include_confidence: false, include_spans: false)
-      labels, label_descriptions = normalize_labels_with_descriptions(entity_types)
+      parsed = parse_entity_types(entity_types)
+      labels = parsed[:labels]
+      label_descriptions = parsed[:descriptions]
       prompt = build_prompt("entities", label_descriptions)
 
       schema_tokens = schema_tokens_for(prompt: prompt, labels: labels, label_prefix: "[E]")
@@ -73,7 +76,7 @@ module Gliner
       )
       pos_to_word_index = pos_to_word_index_for(prepared, logits)
 
-      entities = extract_span_values(
+      spans_by_label = extract_spans_by_label(
         logits: logits,
         labels: labels,
         label_positions: label_positions,
@@ -83,10 +86,21 @@ module Gliner
         original_text: prepared[:original_text],
         text_len: prepared[:text_len],
         threshold: threshold,
-        include_confidence: include_confidence,
-        include_spans: include_spans,
-        dtype: :list
+        thresholds_by_label: parsed[:thresholds]
       )
+
+      entities = {}
+      labels.each do |label|
+        spans = spans_by_label.fetch(label)
+        dtype = parsed[:dtypes].fetch(label, :list)
+
+        entities[label] =
+          if dtype == :str
+            format_single_span(choose_best_span(spans), include_confidence: include_confidence, include_spans: include_spans)
+          else
+            format_spans(spans, include_confidence: include_confidence, include_spans: include_spans)
+          end
+      end
 
       { "entities" => entities }
     end
@@ -179,7 +193,7 @@ module Gliner
         parent_name = parent.to_s
         parsed_fields = Array(fields).map { |spec| parse_field_spec(spec.to_s) }
         labels = parsed_fields.map { |f| f[:name] }
-        descs = parsed_fields.filter_map { |f| f[:description] ? [f[:name], f[:description]] : nil }.to_h
+        descs = build_field_descriptions(parsed_fields)
 
         prompt = build_prompt(parent_name, descs)
         schema_tokens = schema_tokens_for(prompt: prompt, labels: labels, label_prefix: "[C]")
@@ -209,20 +223,12 @@ module Gliner
           threshold: threshold
         )
 
-        obj = {}
-        parsed_fields.each do |field|
-          key = field[:name]
-          spans = spans_by_label.fetch(key)
+        filtered_spans = apply_choice_filters(spans_by_label, parsed_fields)
+        instances = build_structure_instances(parsed_fields, filtered_spans,
+                                              include_confidence: include_confidence,
+                                              include_spans: include_spans)
 
-          if field[:dtype] == :str
-            best = choose_best_span(spans)
-            obj[key] = format_single_span(best, include_confidence: include_confidence, include_spans: include_spans)
-          else
-            obj[key] = format_spans(spans, include_confidence: include_confidence, include_spans: include_spans)
-          end
-        end
-
-        out[parent_name] = [obj]
+        out[parent_name] = instances
       end
 
       out
@@ -264,17 +270,60 @@ module Gliner
       str.end_with?(".", "!", "?") ? str : "#{str}."
     end
 
-    def normalize_labels_with_descriptions(labels)
-      case labels
+    def parse_entity_types(entity_types)
+      case entity_types
       when Array
-        [labels.map(&:to_s), {}]
+        {
+          labels: entity_types.map(&:to_s),
+          descriptions: {},
+          dtypes: {},
+          thresholds: {}
+        }
       when String, Symbol
-        [[labels.to_s], {}]
+        {
+          labels: [entity_types.to_s],
+          descriptions: {},
+          dtypes: {},
+          thresholds: {}
+        }
       when Hash
-        names = labels.keys.map(&:to_s)
-        descs = labels.transform_keys(&:to_s).transform_values { |v| v.is_a?(String) ? v : nil }.compact
+        labels = []
+        descriptions = {}
+        dtypes = {}
+        thresholds = {}
 
-        [names, descs]
+        entity_types.each do |label, config|
+          name = label.to_s
+          labels << name
+
+          case config
+          when String
+            descriptions[name] = config
+          when Hash
+            cfg = config.transform_keys(&:to_s)
+            if cfg["description"]
+              descriptions[name] = cfg["description"].to_s
+            end
+            if cfg["dtype"]
+              dtype = cfg["dtype"].to_s
+              dtypes[name] = dtype == "str" ? :str : :list
+            end
+            if cfg.key?("threshold")
+              thresholds[name] = Float(cfg["threshold"])
+            end
+          when nil
+            # ignore
+          else
+            descriptions[name] = config.to_s
+          end
+        end
+
+        {
+          labels: labels,
+          descriptions: descriptions,
+          dtypes: dtypes,
+          thresholds: thresholds
+        }
       else
         raise Error, "labels must be a String, Array, or Hash"
       end
@@ -486,9 +535,13 @@ module Gliner
     end
 
     def extract_spans_by_label(logits:, labels:, label_positions:, pos_to_word_index:, start_map:, end_map:, original_text:, text_len:,
-                               threshold:)
+                               threshold:, thresholds_by_label: nil)
       out = {}
       labels.each_with_index do |label, label_index|
+        label_threshold = threshold
+        if thresholds_by_label && thresholds_by_label.key?(label.to_s)
+          label_threshold = thresholds_by_label.fetch(label.to_s)
+        end
         out[label.to_s] = find_spans_for_label(
           logits: logits,
           label_index: label_index,
@@ -498,7 +551,7 @@ module Gliner
           end_map: end_map,
           original_text: original_text,
           text_len: text_len,
-          threshold: threshold
+          threshold: label_threshold
         )
       end
       out
@@ -557,6 +610,7 @@ module Gliner
       dtype = :list
       description = nil
       dtype_explicit = false
+      choices = nil
 
       parts.drop(1).each do |part|
         part = part.to_s
@@ -567,7 +621,8 @@ module Gliner
           dtype = :list
           dtype_explicit = true
         elsif part.start_with?("[") && part.end_with?("]")
-          # choices are currently ignored, but keep dtype default compatible with Python parser
+          # choices guide prompting and optional filtering
+          choices = part[1..-2].split("|").map(&:strip).reject(&:empty?)
           dtype = :str unless dtype_explicit
         elsif description.nil?
           description = part
@@ -576,7 +631,91 @@ module Gliner
         end
       end
 
-      { name: name, dtype: dtype, description: description }
+      { name: name, dtype: dtype, description: description, choices: choices }
+    end
+
+    def build_field_descriptions(parsed_fields)
+      parsed_fields.each_with_object({}) do |field, acc|
+        desc = field[:description].to_s
+        if field[:choices] && !field[:choices].empty?
+          choices_str = field[:choices].join("|")
+          desc = desc.empty? ? "Choices: #{choices_str}" : "#{desc} (choices: #{choices_str})"
+        end
+        acc[field[:name]] = desc unless desc.empty?
+      end
+    end
+
+    def apply_choice_filters(spans_by_label, parsed_fields)
+      filtered = spans_by_label.transform_values(&:dup)
+
+      parsed_fields.each do |field|
+        choices = field[:choices]
+        next if choices.nil? || choices.empty?
+
+        label = field[:name]
+        spans = filtered.fetch(label, [])
+        filtered[label] = filter_spans_by_choices(spans, choices)
+      end
+
+      filtered
+    end
+
+    def filter_spans_by_choices(spans, choices)
+      return spans if spans.empty? || choices.nil? || choices.empty?
+
+      normalized_choices = choices.map { |choice| normalize_choice(choice) }
+      matched = spans.select { |(text, _score, _start, _end)| normalized_choices.include?(normalize_choice(text)) }
+
+      matched.empty? ? spans : matched
+    end
+
+    def normalize_choice(value)
+      value.to_s.strip.downcase
+    end
+
+    def build_structure_instances(parsed_fields, spans_by_label, include_confidence:, include_spans:)
+      anchor_field = parsed_fields.find { |f| f[:dtype] == :str } || parsed_fields.first
+      return [{}] if anchor_field.nil?
+
+      anchors = spans_by_label.fetch(anchor_field[:name], [])
+      if anchors.empty?
+        return [format_structure_object(parsed_fields, spans_by_label,
+                                        include_confidence: include_confidence,
+                                        include_spans: include_spans)]
+      end
+
+      anchors_sorted = anchors.sort_by { |(_t, _s, start_pos, _e)| start_pos }
+      instance_spans = anchors_sorted.map { Hash.new { |h, k| h[k] = [] } }
+
+      spans_by_label.each do |label, spans|
+        spans.each do |span|
+          start_pos = span[2]
+          idx = anchors_sorted.rindex { |anchor| anchor[2] <= start_pos } || 0
+          instance_spans[idx][label] << span
+        end
+      end
+
+      instance_spans.map do |field_spans|
+        format_structure_object(parsed_fields, field_spans,
+                                include_confidence: include_confidence,
+                                include_spans: include_spans)
+      end
+    end
+
+    def format_structure_object(parsed_fields, spans_by_label, include_confidence:, include_spans:)
+      obj = {}
+      parsed_fields.each do |field|
+        key = field[:name]
+        spans = spans_by_label.fetch(key, [])
+
+        if field[:dtype] == :str
+          best = choose_best_span(spans)
+          obj[key] = format_single_span(best, include_confidence: include_confidence, include_spans: include_spans)
+        else
+          obj[key] = format_spans(spans, include_confidence: include_confidence, include_spans: include_spans)
+        end
+      end
+      obj
     end
 
     def parse_classification_task(task_name, config)

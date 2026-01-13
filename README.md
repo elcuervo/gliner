@@ -32,6 +32,17 @@ Expected shape:
 {"entities"=>{"company"=>["Apple"], "person"=>["Tim Cook"], "product"=>["iPhone 15"], "location"=>["Cupertino"]}}
 ```
 
+You can also pass per-entity configs:
+
+```ruby
+labels = {
+  "email" => { "description" => "Email addresses", "dtype" => "list", "threshold" => 0.9 },
+  "person" => { "description" => "Person names", "dtype" => "str" }
+}
+
+pp model.extract_entities("Email John Doe at john@example.com.", labels, threshold: 0.5)
+```
+
 ## Usage (classification)
 
 ```ruby
@@ -73,6 +84,15 @@ Expected shape:
 
 ```ruby
 {"product"=>[{"name"=>"iPhone 15 Pro Max", "storage"=>"256GB", "processor"=>"A17 Pro chip", "price"=>"$1199"}]}
+```
+
+Choices can be included in field specs:
+
+```ruby
+result = model.extract_json(
+  "Status: shipped",
+  { "order" => ["status::[pending|processing|shipped]::str"] }
+)
 ```
 
 ## Model files
