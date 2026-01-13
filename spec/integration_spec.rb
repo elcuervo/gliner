@@ -4,7 +4,7 @@ require 'spec_helper'
 require 'fileutils'
 
 describe 'Gliner Integration', if: ENV.key?('GLINER_INTEGRATION') do
-  REPO_ID = '0riginalGandalf/gliner2-multi-v1-int8'
+  REPO_ID = 'cuerbot/gliner2-multi-v1'
 
   describe 'real model inference' do
     context 'with entities extraction' do
