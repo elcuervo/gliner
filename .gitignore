@@ -6,3 +6,4 @@
 /tmp/
 *.gem
 Gemfile.lock
+/onnx/gliner2-multi-v1/

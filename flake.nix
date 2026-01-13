@@ -17,6 +17,8 @@
             ruby
             bundler
             rubocop
+            python3
+            pipenv
           ];
 
           BUNDLE_PATH = ".bundle";
