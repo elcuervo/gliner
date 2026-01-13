@@ -39,11 +39,13 @@ pipenv run python export.py \
 ```
 
 Validation is enabled by default and compares the exported ONNX output to the
-PyTorch output for a dummy batch. To skip validation or to load the quantized
-model, use:
+PyTorch output for a dummy batch. It also runs a small extraction-method check
+(entities, classification, JSON) using identical decoding logic. To skip
+validation or to load the quantized model, use:
 
 ```bash
 pipenv run python export.py --no-validate
+pipenv run python export.py --no-validate-extraction
 pipenv run python export.py --validate-quantized
 ```
 
