@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require_relative 'span'
-
 module Gliner
   class StructuredExtractor
     def initialize(span_extractor)

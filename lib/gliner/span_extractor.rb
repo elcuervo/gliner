@@ -1,8 +1,5 @@
 # frozen_string_literal: true
 
-require_relative 'span'
-require_relative 'prepared_input'
-
 module Gliner
   class SpanExtractor
     SCORE_SIMILARITY_THRESHOLD = 0.02

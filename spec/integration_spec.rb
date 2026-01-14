@@ -61,6 +61,7 @@ describe 'Gliner Integration', if: ENV.key?('GLINER_INTEGRATION') do
             'price::str::Product price with currency'
           ]
         }
+
         out = model.extract_json(text, complex_schema, threshold: 0.4)
         product = out.fetch('product').fetch(0)
 

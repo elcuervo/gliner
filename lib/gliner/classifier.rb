@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require_relative 'prepared_input'
-
 module Gliner
   class Classifier
     def initialize(inference, max_width:)

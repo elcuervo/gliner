@@ -4,8 +4,6 @@ require 'json'
 require 'onnxruntime'
 require 'tokenizers'
 
-require_relative 'span'
-require_relative 'prepared_input'
 require_relative 'text_processor'
 require_relative 'config_parser'
 require_relative 'inference'
