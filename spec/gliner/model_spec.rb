@@ -18,9 +18,9 @@ describe Gliner::SpanExtractor do
       span_extractor = described_class.new(inference, max_width: 8)
 
       spans = [
-        ['Tim', 0.8, 0, 3],
-        ['Tim Cook', 0.9, 0, 8],
-        ['Cook', 0.7, 4, 8]
+        Gliner::Span.new(text: 'Tim', score: 0.8, start: 0, end: 3),
+        Gliner::Span.new(text: 'Tim Cook', score: 0.9, start: 0, end: 8),
+        Gliner::Span.new(text: 'Cook', score: 0.7, start: 4, end: 8)
       ]
 
       out = span_extractor.format_spans(spans, include_confidence: false, include_spans: false)
@@ -52,19 +52,19 @@ describe Gliner::StructuredExtractor do
   describe '#filter_spans_by_choices' do
     it 'filters to matching choices when available' do
       spans = [
-        ['outdoor', 0.9, 10, 17],
-        ['patio', 0.8, 20, 25]
+        Gliner::Span.new(text: 'outdoor', score: 0.9, start: 10, end: 17),
+        Gliner::Span.new(text: 'patio', score: 0.8, start: 20, end: 25)
       ]
 
       filtered = structured_extractor.filter_spans_by_choices(spans, ['indoor', 'outdoor'])
 
-      expect(filtered.map(&:first)).to eq(['outdoor'])
+      expect(filtered.map(&:text)).to eq(['outdoor'])
     end
 
     it 'keeps original spans if no choices match' do
       spans = [
-        ['outdoor', 0.9, 10, 17],
-        ['patio', 0.8, 20, 25]
+        Gliner::Span.new(text: 'outdoor', score: 0.9, start: 10, end: 17),
+        Gliner::Span.new(text: 'patio', score: 0.8, start: 20, end: 25)
       ]
 
       filtered = structured_extractor.filter_spans_by_choices(spans, ['inside'])
@@ -82,9 +82,18 @@ describe Gliner::StructuredExtractor do
       ]
 
       spans_by_label = {
-        'date' => [['Jan 5', 0.9, 0, 5], ['Jan 6', 0.8, 40, 45]],
-        'merchant' => [['Starbucks', 0.9, 7, 16], ['Amazon', 0.7, 47, 53]],
-        'amount' => [['$5.50', 0.9, 17, 22], ['$156.99', 0.8, 54, 61]]
+        'date' => [
+          Gliner::Span.new(text: 'Jan 5', score: 0.9, start: 0, end: 5),
+          Gliner::Span.new(text: 'Jan 6', score: 0.8, start: 40, end: 45)
+        ],
+        'merchant' => [
+          Gliner::Span.new(text: 'Starbucks', score: 0.9, start: 7, end: 16),
+          Gliner::Span.new(text: 'Amazon', score: 0.7, start: 47, end: 53)
+        ],
+        'amount' => [
+          Gliner::Span.new(text: '$5.50', score: 0.9, start: 17, end: 22),
+          Gliner::Span.new(text: '$156.99', score: 0.8, start: 54, end: 61)
+        ]
       }
 
       instances = structured_extractor.build_structure_instances(parsed_fields, spans_by_label,

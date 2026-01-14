@@ -9,12 +9,13 @@ module Gliner
 
     def normalize_text(text)
       str = text.to_s
-      str = "." if str.empty?
-      str.end_with?(".", "!", "?") ? str : "#{str}."
+      str = '.' if str.empty?
+      str.end_with?('.', '!', '?') ? str : "#{str}."
     end
 
     def split_words(text)
       text = text.to_s
+
       tokens = []
       starts = []
       ends = []

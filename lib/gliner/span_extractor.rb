@@ -1,59 +1,58 @@
 # frozen_string_literal: true
 
+require_relative 'span'
+require_relative 'prepared_input'
+
 module Gliner
   class SpanExtractor
+    SCORE_SIMILARITY_THRESHOLD = 0.02
+
     def initialize(inference, max_width:)
       @inference = inference
       @max_width = max_width
     end
 
-    def extract_spans_by_label(logits:, labels:, label_positions:, pos_to_word_index:, start_map:, end_map:,
-                                original_text:, text_len:, threshold:, thresholds_by_label: nil)
+    def extract_spans_by_label(logits, labels, label_positions, prepared, threshold: 0.5, thresholds_by_label: nil)
       out = {}
+
       labels.each_with_index do |label, label_index|
         label_threshold = threshold
-        if thresholds_by_label && thresholds_by_label.key?(label.to_s)
-          label_threshold = thresholds_by_label.fetch(label.to_s)
-        end
+        label_threshold = thresholds_by_label.fetch(label.to_s) if thresholds_by_label && thresholds_by_label.key?(label.to_s)
+
         out[label.to_s] = find_spans_for_label(
           logits: logits,
           label_index: label_index,
           label_positions: label_positions,
-          pos_to_word_index: pos_to_word_index,
-          start_map: start_map,
-          end_map: end_map,
-          original_text: original_text,
-          text_len: text_len,
+          prepared: prepared,
           threshold: label_threshold
         )
       end
       out
     end
 
-    def find_spans_for_label(logits:, label_index:, label_positions:, pos_to_word_index:, start_map:, end_map:,
-                              original_text:, text_len:, threshold:)
+    def find_spans_for_label(logits:, label_index:, label_positions:, prepared:, threshold:)
       spans = []
 
       seq_len = logits[0].length
       (0...seq_len).each do |pos|
-        start_word = pos_to_word_index[pos]
+        start_word = prepared.pos_to_word_index[pos]
         next if start_word.nil?
 
         (0...@max_width).each do |width|
           end_word = start_word + width
-          next if end_word >= text_len
+          next if end_word >= prepared.text_len
 
           score = @inference.sigmoid(@inference.label_logit(logits, pos, width, label_index, label_positions))
           next if score < threshold
 
-          char_start = start_map[start_word]
-          char_end = end_map[end_word]
+          char_start = prepared.start_map[start_word]
+          char_end = prepared.end_map[end_word]
           next if char_start.nil? || char_end.nil?
 
-          text_span = original_text[char_start...char_end].to_s.strip
+          text_span = prepared.original_text[char_start...char_end].to_s.strip
           next if text_span.empty?
 
-          spans << [text_span, score, char_start, char_end]
+          spans << Span.new(text: text_span, score: score, start: char_start, end: char_end)
         end
       end
 
@@ -62,55 +61,49 @@ module Gliner
 
     def choose_best_span(spans)
       return nil if spans.empty?
-      sorted = spans.sort_by { |(t, score, start_pos, end_pos)| [-score, (end_pos - start_pos), t.length] }
+
+      sorted = spans.sort_by { |s| [-s.score, (s.end - s.start), s.text.length] }
       best = sorted[0]
-      best_score = best[1]
-      near = sorted.take_while { |s| (best_score - s[1]) <= 0.02 }
-      near.min_by { |(t, score, start_pos, end_pos)| [(end_pos - start_pos), -score, t.length] } || best
+      best_score = best.score
+      near = sorted.take_while { |s| (best_score - s.score) <= SCORE_SIMILARITY_THRESHOLD }
+      near.min_by { |s| [(s.end - s.start), -s.score, s.text.length] } || best
     end
 
     def format_single_span(span, include_confidence:, include_spans:)
-      return nil if span.nil?
-      text, score, start_pos, end_pos = span
-
-      if include_spans && include_confidence
-        { "text" => text, "confidence" => score, "start" => start_pos, "end" => end_pos }
-      elsif include_spans
-        { "text" => text, "start" => start_pos, "end" => end_pos }
-      elsif include_confidence
-        { "text" => text, "confidence" => score }
-      else
-        text
-      end
+      format_span(span, include_confidence: include_confidence, include_spans: include_spans)
     end
 
     def format_spans(spans, include_confidence:, include_spans:)
       return [] if spans.empty?
 
-      sorted = spans.sort_by { |(_, score, _, _)| -score }
+      sorted = spans.sort_by { |s| -s.score }
       selected = []
 
-      sorted.each do |text, score, start_pos, end_pos|
-        overlaps = selected.any? { |(_, _, s, e)| !(end_pos <= s || start_pos >= e) }
+      sorted.each do |span|
+        overlaps = selected.any? { |s| span.overlaps?(s) }
         next if overlaps
-        selected << [text, score, start_pos, end_pos]
+
+        selected << span
       end
 
-      if include_spans && include_confidence
-        selected.map { |t, s, st, en| { "text" => t, "confidence" => s, "start" => st, "end" => en } }
-      elsif include_spans
-        selected.map { |t, _s, st, en| { "text" => t, "start" => st, "end" => en } }
-      elsif include_confidence
-        selected.map { |t, s, _st, _en| { "text" => t, "confidence" => s } }
-      else
-        selected.map(&:first)
+      selected.map do |span|
+        format_span(span, include_confidence: include_confidence, include_spans: include_spans)
       end
     end
 
-    def pos_to_word_index_for(prepared, logits)
-      seq_len = logits[0].length
-      return (0...prepared[:text_len]).to_a if seq_len == prepared[:text_len]
-      prepared[:pos_to_word_index]
+    private
+
+    def format_span(span, include_confidence:, include_spans:)
+      return nil if span.nil?
+      return span.text unless include_confidence || include_spans
+
+      result = { 'text' => span.text }
+      result['confidence'] = span.score if include_confidence
+      if include_spans
+        result['start'] = span.start
+        result['end'] = span.end
+      end
+      result
     end
   end
 end

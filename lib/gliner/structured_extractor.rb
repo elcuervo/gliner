@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require_relative 'span'
+
 module Gliner
   class StructuredExtractor
     def initialize(span_extractor)
@@ -25,30 +27,31 @@ module Gliner
       return spans if spans.empty? || choices.nil? || choices.empty?
 
       normalized_choices = choices.map { |choice| normalize_choice(choice) }
-      matched = spans.select { |(text, _score, _start, _end)| normalized_choices.include?(normalize_choice(text)) }
+      matched = spans.select { |span| normalized_choices.include?(normalize_choice(span.text)) }
 
       matched.empty? ? spans : matched
     end
 
     def build_structure_instances(parsed_fields, spans_by_label, include_confidence:, include_spans:)
       anchor_field = parsed_fields.find { |f| f[:dtype] == :str } || parsed_fields.first
+
       return [{}] if anchor_field.nil?
 
       anchors = spans_by_label.fetch(anchor_field[:name], [])
+
       if anchors.empty?
         return [format_structure_object(parsed_fields, spans_by_label,
                                         include_confidence: include_confidence,
                                         include_spans: include_spans)]
       end
 
-      anchors_sorted = anchors.sort_by { |(_t, _s, start_pos, _e)| start_pos }
+      anchors_sorted = anchors.sort_by(&:start)
       instance_spans = anchors_sorted.map { Hash.new { |h, k| h[k] = [] } }
 
       spans_by_label.each do |label, spans|
         spans.each do |span|
-          start_pos = span[2]
-          idx = anchors_sorted.rindex { |anchor| anchor[2] <= start_pos } || 0
-          instance_spans[idx][label] << span
+          anchor_index = anchors_sorted.rindex { |anchor| anchor.start <= span.start } || 0
+          instance_spans[anchor_index][label] << span
         end
       end
 
@@ -61,6 +64,7 @@ module Gliner
 
     def format_structure_object(parsed_fields, spans_by_label, include_confidence:, include_spans:)
       obj = {}
+
       parsed_fields.each do |field|
         key = field[:name]
         spans = spans_by_label.fetch(key, [])
@@ -72,6 +76,7 @@ module Gliner
           obj[key] = @span_extractor.format_spans(spans, include_confidence: include_confidence, include_spans: include_spans)
         end
       end
+
       obj
     end
 

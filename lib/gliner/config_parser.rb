@@ -32,17 +32,13 @@ module Gliner
           when String
             descriptions[name] = config
           when Hash
-            cfg = config.transform_keys(&:to_s)
-            if cfg["description"]
-              descriptions[name] = cfg["description"].to_s
+            config_hash = config.transform_keys(&:to_s)
+            descriptions[name] = config_hash['description'].to_s if config_hash['description']
+            if config_hash['dtype']
+              dtype = config_hash['dtype'].to_s
+              dtypes[name] = dtype == 'str' ? :str : :list
             end
-            if cfg["dtype"]
-              dtype = cfg["dtype"].to_s
-              dtypes[name] = dtype == "str" ? :str : :list
-            end
-            if cfg.key?("threshold")
-              thresholds[name] = Float(cfg["threshold"])
-            end
+            thresholds[name] = Float(config_hash['threshold']) if config_hash.key?('threshold')
           when nil
             # ignore
           else
@@ -57,7 +53,7 @@ module Gliner
           thresholds: thresholds
         }
       else
-        raise Error, "labels must be a String, Array, or Hash"
+        raise Error, 'labels must be a String, Array, or Hash'
       end
     end
 
@@ -71,12 +67,12 @@ module Gliner
       when Array
         labels = config.map(&:to_s)
       when Hash
-        cfg = config.transform_keys(&:to_s)
-        if cfg.key?("labels")
-          multi_label = !!cfg["multi_label"]
-          cls_threshold = cfg["cls_threshold"] ? Float(cfg["cls_threshold"]) : cls_threshold
+        config_hash = config.transform_keys(&:to_s)
+        if config_hash.key?('labels')
+          multi_label = !!config_hash['multi_label']
+          cls_threshold = Float(config_hash['cls_threshold']) if config_hash['cls_threshold']
 
-          raw_labels = cfg["labels"]
+          raw_labels = config_hash['labels']
           if raw_labels.is_a?(Array)
             labels = raw_labels.map(&:to_s)
           elsif raw_labels.is_a?(Hash)
@@ -102,7 +98,7 @@ module Gliner
     end
 
     def parse_field_spec(spec)
-      parts = spec.split("::")
+      parts = spec.split('::')
       name = parts[0].to_s
       dtype = :list
       description = nil
@@ -111,14 +107,14 @@ module Gliner
 
       parts.drop(1).each do |part|
         part = part.to_s
-        if part == "str"
+        if part == 'str'
           dtype = :str
           dtype_explicit = true
-        elsif part == "list"
+        elsif part == 'list'
           dtype = :list
           dtype_explicit = true
-        elsif part.start_with?("[") && part.end_with?("]")
-          choices = part[1..-2].split("|").map(&:strip).reject(&:empty?)
+        elsif part.start_with?('[') && part.end_with?(']')
+          choices = part[1..-2].split('|').map(&:strip).reject(&:empty?)
           dtype = :str unless dtype_explicit
         elsif description.nil?
           description = part
@@ -132,20 +128,21 @@ module Gliner
 
     def build_field_descriptions(parsed_fields)
       parsed_fields.each_with_object({}) do |field, acc|
-        desc = field[:description].to_s
+        description = field[:description].to_s
         if field[:choices] && !field[:choices].empty?
-          choices_str = field[:choices].join("|")
-          desc = desc.empty? ? "Choices: #{choices_str}" : "#{desc} (choices: #{choices_str})"
+          choices_str = field[:choices].join('|')
+          description = description.empty? ? "Choices: #{choices_str}" : "#{description} (choices: #{choices_str})"
         end
-        acc[field[:name]] = desc unless desc.empty?
+        acc[field[:name]] = description unless description.empty?
       end
     end
 
     def build_prompt(base, label_descriptions)
       prompt = base.to_s
-      label_descriptions.to_h.each do |label, desc|
-        next if desc.to_s.empty?
-        prompt += " [DESCRIPTION] #{label}: #{desc}"
+      label_descriptions.to_h.each do |label, description|
+        next if description.to_s.empty?
+
+        prompt += " [DESCRIPTION] #{label}: #{description}"
       end
       prompt
     end

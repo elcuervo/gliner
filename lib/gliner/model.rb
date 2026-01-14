@@ -3,6 +3,8 @@
 require 'json'
 require 'onnxruntime'
 require 'tokenizers'
+require_relative 'span'
+require_relative 'prepared_input'
 require_relative 'text_processor'
 require_relative 'config_parser'
 require_relative 'inference'
@@ -21,22 +23,14 @@ module Gliner
     DEFAULT_MAX_WIDTH = 8
     DEFAULT_MAX_SEQ_LEN = 512
 
-    def self.from_dir(dir, model_filename: nil)
-      tokenizer_path = File.join(dir, 'tokenizer.json')
-      raise Error, "Missing tokenizer.json in #{dir}" unless File.exist?(tokenizer_path)
+    def self.from_dir(dir, file: 'model_int8.onnx')
+      raise Error, "Model directory not found: #{dir}" unless Dir.exist?(dir)
 
       config_path = File.join(dir, 'config.json')
       config = File.exist?(config_path) ? JSON.parse(File.read(config_path)) : {}
 
-      model_path =
-        if model_filename
-          File.join(dir, model_filename)
-        elsif File.exist?(File.join(dir, 'model_int8.onnx'))
-          File.join(dir, 'model_int8.onnx')
-        else
-          File.join(dir, 'model.onnx')
-        end
-      raise Error, "Missing model file in #{dir} (expected model.onnx or model_int8.onnx)" unless File.exist?(model_path)
+      model_path = File.join(dir, file)
+      tokenizer_path = File.join(dir, 'tokenizer.json')
 
       new(
         model_path: model_path,
@@ -48,19 +42,26 @@ module Gliner
 
     def initialize(model_path:, tokenizer_path:, max_width: DEFAULT_MAX_WIDTH, max_seq_len: DEFAULT_MAX_SEQ_LEN)
       @model_path = model_path
+      @tokenizer_path = tokenizer_path
       @max_width = Integer(max_width)
       @max_seq_len = Integer(max_seq_len)
 
-      tokenizer = Tokenizers.from_file(tokenizer_path)
+      raise Error, "Model file not found: #{@model_path}" unless File.exist?(@model_path)
+      raise Error, "Tokenizer file not found: #{@tokenizer_path}" unless File.exist?(@tokenizer_path)
+
+      tokenizer = Tokenizers.from_file(@tokenizer_path)
       session = OnnxRuntime::InferenceSession.new(@model_path)
 
       @text_processor = TextProcessor.new(tokenizer)
-      @config_parser = ConfigParser.new
       @inference = Inference.new(session)
       @input_builder = InputBuilder.new(@text_processor, max_seq_len: @max_seq_len)
       @span_extractor = SpanExtractor.new(@inference, max_width: @max_width)
       @classifier = Classifier.new(@inference, max_width: @max_width)
       @structured_extractor = StructuredExtractor.new(@span_extractor)
+    end
+
+    def config_parser
+      @_config_parser ||= ConfigParser.new
     end
 
     def pipeline
@@ -69,7 +70,7 @@ module Gliner
 
     def entity_task
       @_entity_task ||= Tasks::EntityExtraction.new(
-        config_parser: @config_parser,
+        config_parser: config_parser,
         inference: @inference,
         input_builder: @input_builder,
         span_extractor: @span_extractor
@@ -78,22 +79,20 @@ module Gliner
 
     def classification_task
       @_classification_task ||= Tasks::Classification.new(
-        config_parser: @config_parser,
+        config_parser: config_parser,
         inference: @inference,
         input_builder: @input_builder,
-        classifier: @classifier,
-        span_extractor: @span_extractor
+        classifier: @classifier
       )
     end
 
     def json_task
       @_json_task ||= Tasks::JsonExtraction.new(
-        config_parser: @config_parser,
+        config_parser: config_parser,
         inference: @inference,
         input_builder: @input_builder,
         span_extractor: @span_extractor,
-        structured_extractor: @structured_extractor,
-        text_processor: @text_processor
+        structured_extractor: @structured_extractor
       )
     end
 
@@ -108,10 +107,11 @@ module Gliner
     #
     # @param text [String] Input text
     # @param entity_types [Array, Hash] Entity types configuration
-    # @param threshold [Float] Confidence threshold (default: 0.5)
+    # @param threshold [Float, nil] Optional override for task cls_threshold
     # @param include_confidence [Boolean] Include confidence scores (default: false)
     # @param include_spans [Boolean] Include character positions (default: false)
     # @return [Hash] Extracted entities
+    #
     def extract_entities(text, entity_types, threshold: 0.5, format_results: true, include_confidence: false, include_spans: false)
       pipeline.execute(
         entity_task,
@@ -139,9 +139,12 @@ module Gliner
     # @param threshold [Float] Confidence threshold (default: 0.5)
     # @param include_confidence [Boolean] Include confidence scores (default: false)
     # @return [Hash] Classification results
-    def classify_text(text, tasks, threshold: 0.5, format_results: true, include_confidence: false, include_spans: false)
-      classification_task
-        .execute_all(pipeline, text, tasks, include_confidence: include_confidence)
+    #
+    def classify_text(text, tasks, threshold: nil, format_results: true, include_confidence: false, include_spans: false)
+      options = { include_confidence: include_confidence }
+      options[:threshold] = threshold unless threshold.nil?
+
+      classification_task.execute_all(pipeline, text, tasks, **options)
     end
 
     # Extract structured data from text
@@ -159,6 +162,7 @@ module Gliner
     # @param include_confidence [Boolean] Include confidence scores (default: false)
     # @param include_spans [Boolean] Include character positions (default: false)
     # @return [Hash] Extracted structured data
+    #
     def extract_json(text, structures, threshold: 0.5, format_results: true, include_confidence: false, include_spans: false)
       json_task.execute_all(
         pipeline,

@@ -17,11 +17,11 @@ module Gliner
       end
 
       def label_prefix
-        "[E]"
+        '[E]'
       end
 
       def build_prompt(parsed)
-        config_parser.build_prompt("entities", parsed[:descriptions])
+        config_parser.build_prompt('entities', parsed[:descriptions])
       end
 
       def labels(parsed)
@@ -33,17 +33,15 @@ module Gliner
         include_confidence = options.fetch(:include_confidence, false)
         include_spans = options.fetch(:include_spans, false)
 
-        pos_to_word_index = @span_extractor.pos_to_word_index_for(prepared, logits)
+        label_positions = options.fetch(:label_positions) do
+          inference.label_positions_for(prepared.word_ids, parsed[:labels].length)
+        end
 
         spans_by_label = @span_extractor.extract_spans_by_label(
-          logits: logits,
-          labels: parsed[:labels],
-          label_positions: inference.label_positions_for(prepared[:word_ids], parsed[:labels].length),
-          pos_to_word_index: pos_to_word_index,
-          start_map: prepared[:start_map],
-          end_map: prepared[:end_map],
-          original_text: prepared[:original_text],
-          text_len: prepared[:text_len],
+          logits,
+          parsed[:labels],
+          label_positions,
+          prepared,
           threshold: threshold,
           thresholds_by_label: parsed[:thresholds]
         )
@@ -65,7 +63,7 @@ module Gliner
             end
         end
 
-        { "entities" => entities }
+        { 'entities' => entities }
       end
     end
   end
