@@ -17,7 +17,7 @@ module Gliner
 
       labels.each_with_index do |label, label_index|
         label_threshold = threshold
-        label_threshold = thresholds_by_label.fetch(label.to_s) if thresholds_by_label && thresholds_by_label.key?(label.to_s)
+        label_threshold = thresholds_by_label.fetch(label.to_s) if thresholds_by_label&.key?(label.to_s)
 
         out[label.to_s] = find_spans_for_label(
           logits: logits,

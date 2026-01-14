@@ -69,7 +69,7 @@ module Gliner
       when Hash
         config_hash = config.transform_keys(&:to_s)
         if config_hash.key?('labels')
-          multi_label = !!config_hash['multi_label']
+          multi_label = !config_hash['multi_label'].nil?
           cls_threshold = Float(config_hash['cls_threshold']) if config_hash['cls_threshold']
 
           raw_labels = config_hash['labels']

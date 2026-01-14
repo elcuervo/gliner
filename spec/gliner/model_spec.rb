@@ -56,7 +56,7 @@ describe Gliner::StructuredExtractor do
         Gliner::Span.new(text: 'patio', score: 0.8, start: 20, end: 25)
       ]
 
-      filtered = structured_extractor.filter_spans_by_choices(spans, ['indoor', 'outdoor'])
+      filtered = structured_extractor.filter_spans_by_choices(spans, %w[indoor outdoor])
 
       expect(filtered.map(&:text)).to eq(['outdoor'])
     end
@@ -97,7 +97,7 @@ describe Gliner::StructuredExtractor do
       }
 
       instances = structured_extractor.build_structure_instances(parsed_fields, spans_by_label,
-                                                                  include_confidence: false, include_spans: false)
+                                                                 include_confidence: false, include_spans: false)
 
       expect(instances.length).to eq(2)
       expect(instances[0]).to eq({ 'date' => 'Jan 5', 'merchant' => 'Starbucks', 'amount' => '$5.50' })

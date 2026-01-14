@@ -3,6 +3,7 @@
 require 'json'
 require 'onnxruntime'
 require 'tokenizers'
+
 require_relative 'span'
 require_relative 'prepared_input'
 require_relative 'text_processor'
@@ -61,15 +62,15 @@ module Gliner
     end
 
     def config_parser
-      @_config_parser ||= ConfigParser.new
+      @config_parser ||= ConfigParser.new
     end
 
     def pipeline
-      @_pipeline ||= Pipeline.new(text_processor: @text_processor, inference: @inference)
+      @pipeline ||= Pipeline.new(text_processor: @text_processor, inference: @inference)
     end
 
     def entity_task
-      @_entity_task ||= Tasks::EntityExtraction.new(
+      @entity_task ||= Tasks::EntityExtraction.new(
         config_parser: config_parser,
         inference: @inference,
         input_builder: @input_builder,
@@ -78,7 +79,7 @@ module Gliner
     end
 
     def classification_task
-      @_classification_task ||= Tasks::Classification.new(
+      @classification_task ||= Tasks::Classification.new(
         config_parser: config_parser,
         inference: @inference,
         input_builder: @input_builder,
@@ -87,7 +88,7 @@ module Gliner
     end
 
     def json_task
-      @_json_task ||= Tasks::JsonExtraction.new(
+      @json_task ||= Tasks::JsonExtraction.new(
         config_parser: config_parser,
         inference: @inference,
         input_builder: @input_builder,

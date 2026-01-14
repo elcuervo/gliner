@@ -7,9 +7,9 @@ describe Gliner::ConfigParser do
 
   describe '#parse_entity_types' do
     it 'parses array format' do
-      result = parser.parse_entity_types(['company', 'person'])
+      result = parser.parse_entity_types(%w[company person])
 
-      expect(result[:labels]).to eq(['company', 'person'])
+      expect(result[:labels]).to eq(%w[company person])
       expect(result[:descriptions]).to eq({})
       expect(result[:dtypes]).to eq({})
       expect(result[:thresholds]).to eq({})
@@ -17,25 +17,25 @@ describe Gliner::ConfigParser do
 
     it 'parses hash with descriptions' do
       result = parser.parse_entity_types({
-        'company' => 'Company or organization names',
-        'person' => 'Person names'
-      })
+                                           'company' => 'Company or organization names',
+                                           'person' => 'Person names'
+                                         })
 
-      expect(result[:labels]).to eq(['company', 'person'])
+      expect(result[:labels]).to eq(%w[company person])
       expect(result[:descriptions]).to eq({
-        'company' => 'Company or organization names',
-        'person' => 'Person names'
-      })
+                                            'company' => 'Company or organization names',
+                                            'person' => 'Person names'
+                                          })
     end
 
     it 'parses hash with full config' do
       result = parser.parse_entity_types({
-        'email' => {
-          'description' => 'Email addresses',
-          'dtype' => 'str',
-          'threshold' => 0.9
-        }
-      })
+                                           'email' => {
+                                             'description' => 'Email addresses',
+                                             'dtype' => 'str',
+                                             'threshold' => 0.9
+                                           }
+                                         })
 
       expect(result[:labels]).to eq(['email'])
       expect(result[:descriptions]).to eq({ 'email' => 'Email addresses' })
@@ -46,21 +46,21 @@ describe Gliner::ConfigParser do
 
   describe '#parse_classification_task' do
     it 'parses simple array format' do
-      result = parser.parse_classification_task('sentiment', ['positive', 'negative'])
+      result = parser.parse_classification_task('sentiment', %w[positive negative])
 
-      expect(result[:labels]).to eq(['positive', 'negative'])
+      expect(result[:labels]).to eq(%w[positive negative])
       expect(result[:multi_label]).to be false
       expect(result[:cls_threshold]).to eq(0.5)
     end
 
     it 'parses multi-label config' do
       result = parser.parse_classification_task('aspects', {
-        'labels' => ['camera', 'battery', 'screen'],
-        'multi_label' => true,
-        'cls_threshold' => 0.4
-      })
+                                                  'labels' => %w[camera battery screen],
+                                                  'multi_label' => true,
+                                                  'cls_threshold' => 0.4
+                                                })
 
-      expect(result[:labels]).to eq(['camera', 'battery', 'screen'])
+      expect(result[:labels]).to eq(%w[camera battery screen])
       expect(result[:multi_label]).to be true
       expect(result[:cls_threshold]).to eq(0.4)
     end
@@ -69,9 +69,9 @@ describe Gliner::ConfigParser do
   describe '#build_prompt' do
     it 'builds prompt with descriptions' do
       prompt = parser.build_prompt('entities', {
-        'company' => 'Organization names',
-        'person' => 'Full names of people'
-      })
+                                     'company' => 'Organization names',
+                                     'person' => 'Full names of people'
+                                   })
 
       expect(prompt).to include('entities')
       expect(prompt).to include('[DESCRIPTION] company: Organization names')

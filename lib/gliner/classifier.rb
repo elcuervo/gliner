@@ -15,6 +15,7 @@ module Gliner
       labels.each_index do |label_index|
         max_score = -Float::INFINITY
         seq_len = logits[0].length
+
         (0...seq_len).each do |pos|
           start_word = prepared.pos_to_word_index[pos]
           next if start_word.nil?

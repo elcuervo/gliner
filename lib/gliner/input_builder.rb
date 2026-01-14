@@ -47,7 +47,7 @@ module Gliner
         tokens << label.to_s
       end
 
-      tokens.concat([')', ')'])
+      tokens.push(')', ')')
       tokens
     end
 

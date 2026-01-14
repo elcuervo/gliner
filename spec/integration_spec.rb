@@ -61,13 +61,13 @@ describe 'Gliner Integration', if: ENV.key?('GLINER_INTEGRATION') do
             'price::str::Product price with currency'
           ]
         }
-        out = model.extract_json( text, complex_schema, threshold: 0.4)
+        out = model.extract_json(text, complex_schema, threshold: 0.4)
         product = out.fetch('product').fetch(0)
 
         expect(product.fetch('name')).to include('iPhone')
         expect(product.fetch('storage')).to include('256')
         expect(product.fetch('processor')).to include('A17')
-        expect(product.fetch('price')).to include('$')
+        expect(product.fetch('price')).to include('1199')
       end
 
       it 'supports choices and multiple instances' do
