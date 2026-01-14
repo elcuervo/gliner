@@ -1,0 +1,103 @@
+# frozen_string_literal: true
+
+module Gliner
+  class Inference
+    TASK_TYPE_ENTITIES = 0
+    TASK_TYPE_CLASSIFICATION = 1
+    TASK_TYPE_JSON = 2
+
+    attr_reader :label_index_mode, :has_cls_logits
+
+    def initialize(session)
+      @session = session
+      validate_io!
+    end
+
+    def run(input_ids:, attention_mask:, words_mask:, text_lengths:, task_type:, label_positions:, label_mask:, want_cls: false)
+      text_lengths = Array(text_lengths).flatten
+      inputs = {
+        input_ids: [input_ids],
+        attention_mask: [attention_mask],
+        words_mask: [words_mask],
+        text_lengths: text_lengths,
+        task_type: [task_type],
+        label_positions: [label_positions],
+        label_mask: [label_mask]
+      }
+
+      if @input_names&.include?("token_type_ids")
+        inputs[:token_type_ids] = [Array.new(input_ids.length, 0)]
+      end
+
+      if @input_names
+        inputs.select! { |name, _| @input_names.include?(name.to_s) }
+      end
+
+      output_names = [@output_name]
+      output_names << "cls_logits" if want_cls && @has_cls_logits
+      out = @session.run(output_names, inputs)
+      return { logits: out.fetch(0), cls_logits: out.fetch(1) } if output_names.length > 1
+      out.fetch(0)
+    end
+
+    def label_positions_for(word_ids, label_count)
+      label_count.times.map do |i|
+        combined_idx = 4 + (i * 2)
+        pos = word_ids.index(combined_idx)
+        raise Error, "Could not locate label position at combined index #{combined_idx}" if pos.nil?
+        pos
+      end
+    end
+
+    def label_logit(logits, pos, width, label_index, label_positions)
+      if @label_index_mode == :label_position
+        raise Error, "Label positions required for span_logits output" if label_positions.nil?
+        label_pos = label_positions.fetch(label_index)
+        logits[0][pos][width][label_pos]
+      else
+        logits[0][pos][width][label_index]
+      end
+    end
+
+    def sigmoid(x)
+      1.0 / (1.0 + Math.exp(-x))
+    end
+
+    def softmax(values)
+      max = values.max
+      exps = values.map { |v| Math.exp(v - max) }
+      sum = exps.sum
+      exps.map { |v| v / sum }
+    end
+
+    private
+
+    def validate_io!
+      @input_names = @session.inputs.map { |i| i[:name] }
+
+      output_names = @session.outputs.map { |o| o[:name] }
+
+      @has_cls_logits = output_names.include?("cls_logits")
+
+      if output_names.include?("logits")
+        @output_name = "logits"
+        @label_index_mode = :label_index
+
+        expected_inputs = %w[input_ids attention_mask words_mask text_lengths task_type label_positions label_mask]
+        missing = expected_inputs - @input_names
+
+        raise Error, "Model missing inputs: #{missing.join(', ')}" unless missing.empty?
+      elsif output_names.include?("span_logits")
+        @output_name = "span_logits"
+        @label_index_mode = :label_position
+
+        expected_inputs = %w[input_ids attention_mask]
+        missing = expected_inputs - @input_names
+
+        raise Error, "Model missing inputs: #{missing.join(', ')}" unless missing.empty?
+      else
+        raise Error, "Model missing output: logits or span_logits"
+      end
+    end
+  end
+end
