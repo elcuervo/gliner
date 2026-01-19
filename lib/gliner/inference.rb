@@ -2,6 +2,17 @@
 
 module Gliner
   class Inference
+    Request = Data.define(
+      :input_ids,
+      :attention_mask,
+      :words_mask,
+      :text_lengths,
+      :task_type,
+      :label_positions,
+      :label_mask,
+      :want_cls
+    )
+
     TASK_TYPE_ENTITIES = 0
     TASK_TYPE_CLASSIFICATION = 1
     TASK_TYPE_JSON = 2
@@ -16,25 +27,27 @@ module Gliner
       validate_io!
     end
 
-    def run(input_ids:, attention_mask:, words_mask:, text_lengths:, task_type:, label_positions:, label_mask:, want_cls: false)
-      text_lengths = Array(text_lengths).flatten
+    def run(request)
+      text_lengths = Array(request.text_lengths).flatten
 
       inputs = {
-        input_ids: [input_ids],
-        attention_mask: [attention_mask],
-        words_mask: [words_mask],
+        input_ids: [request.input_ids],
+        attention_mask: [request.attention_mask],
+        words_mask: [request.words_mask],
         text_lengths: text_lengths,
-        task_type: [task_type],
-        label_positions: [label_positions],
-        label_mask: [label_mask]
+        task_type: [request.task_type],
+        label_positions: [request.label_positions],
+        label_mask: [request.label_mask]
       }
 
-      inputs[:token_type_ids] = [Array.new(input_ids.length, 0)] if @input_names&.include?('token_type_ids')
+      if @input_names&.include?('token_type_ids')
+        inputs[:token_type_ids] = [Array.new(request.input_ids.length, 0)]
+      end
 
       inputs.select! { |name, _| @input_names.include?(name.to_s) } if @input_names
 
       output_names = [@output_name]
-      output_names << 'cls_logits' if want_cls && @has_cls_logits
+      output_names << 'cls_logits' if request.want_cls && @has_cls_logits
       out = @session.run(output_names, inputs)
 
       return { logits: out.fetch(0), cls_logits: out.fetch(1) } if output_names.length > 1

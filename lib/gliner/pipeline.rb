@@ -27,7 +27,7 @@ module Gliner
 
       label_positions = @inference.label_positions_for(prepared.word_ids, labels.length)
 
-      logits = @inference.run(
+      request = Inference::Request.new(
         input_ids: prepared.input_ids,
         attention_mask: prepared.attention_mask,
         words_mask: prepared.words_mask,
@@ -37,6 +37,8 @@ module Gliner
         label_mask: Array.new(labels.length, 1),
         want_cls: task.needs_cls_logits?
       )
+
+      logits = @inference.run(request)
 
       task.process_output(logits, parsed, prepared, options.merge(label_positions: label_positions))
     end
