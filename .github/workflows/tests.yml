@@ -8,7 +8,7 @@ on:
 
 jobs:
   test:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
     steps:
       - uses: actions/checkout@v6
 
@@ -17,41 +17,8 @@ jobs:
           ruby-version: "3.2"
           bundler-cache: true
 
-      - name: Show environment
-        run: |
-          uname -a
-          lscpu
-          ruby -v
-          gem --version
-          bundler -v
-          bundle env
-          bundle config
-          gem list | grep -E 'onnxruntime|tokenizers' || true
-          bundle exec ruby -e "require 'gliner'; puts \"gliner #{Gliner::VERSION}\"" || true
-
       - name: Run unit tests
-        run: bundle exec rake spec
+        run: bundle exec rspec
 
       - name: Run integration tests
-        run: |
-          set -euo pipefail
-          bundle exec rake spec:integration | tee tmp/gha_integration.log
-
-      - name: Show model files
-        if: always()
-        run: |
-          if [ -d tmp/models ]; then
-            find tmp/models -maxdepth 3 -type f -print
-            find tmp/models -maxdepth 3 -type f -exec sha256sum {} \; || true
-          fi
-
-      - name: Upload integration artifacts (on failure)
-        if: failure()
-        uses: actions/upload-artifact@v4
-        with:
-          name: integration-debug
-          path: |
-            tmp/gha_integration.log
-            tmp/models/**/config.json
-            tmp/models/**/tokenizer.json
-            tmp/models/**/model_int8.onnx
+        run: bundle exec rake spec:integration
