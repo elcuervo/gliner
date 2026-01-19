@@ -2,7 +2,7 @@
 
 module Gliner
   class Configuration
-    DEFAULT_THRESHOLD = 0.5
+    DEFAULT_THRESHOLD = 0.3
 
     attr_accessor :threshold, :model_dir
 
