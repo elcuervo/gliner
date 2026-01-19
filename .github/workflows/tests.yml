@@ -20,6 +20,9 @@ jobs:
             os: macos-latest
 
     runs-on: ${{ matrix.os }}
+    env:
+      OMP_NUM_THREADS: "1"
+      OMP_WAIT_POLICY: "PASSIVE"
     steps:
       - uses: actions/checkout@v6
 
