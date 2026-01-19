@@ -24,11 +24,13 @@ module Gliner
 
     def build_prompt(base, label_descriptions)
       prompt = base.to_s
+
       label_descriptions.to_h.each do |label, description|
         next if description.to_s.empty?
 
         prompt += " [DESCRIPTION] #{label}: #{description}"
       end
+
       prompt
     end
   end

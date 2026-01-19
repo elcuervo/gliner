@@ -1,0 +1,7064 @@
+{
+  "meta": {
+    "repo_id": "fastino/gliner2-multi-v1",
+    "model_dir": ".context/onnx/fastino__gliner2-multi-v1",
+    "model_file": "model.onnx",
+    "generated_at": "2026-01-19T15:34:09.764579+00:00"
+  },
+  "entities": [
+    {
+      "input": {
+        "text": "Apple CEO Tim Cook announced iPhone 15 in Cupertino.",
+        "labels": [
+          "company",
+          "person",
+          "product",
+          "location"
+        ],
+        "descriptions": {
+          "company": "Organization or business names"
+        },
+        "threshold": 0.5
+      },
+      "expected": {
+        "entities": {
+          "company": [
+            "Apple"
+          ],
+          "person": [
+            "Tim Cook"
+          ],
+          "product": [
+            "iPhone 15"
+          ],
+          "location": [
+            "Cupertino"
+          ]
+        }
+      }
+    },
+    {
+      "input": {
+        "text": "At Seoul, Google launched the new Model Y, said Andy Jassy.",
+        "labels": [
+          "company",
+          "person",
+          "product",
+          "location"
+        ],
+        "descriptions": {
+          "company": "Organization or business names"
+        },
+        "threshold": 0.5
+      },
+      "expected": {
+        "entities": {
+          "company": [
+            "Google"
+          ],
+          "person": [
+            "Andy Jassy"
+          ],
+          "product": [
+            "Model Y"
+          ],
+          "location": [
+            "Seoul"
+          ]
+        }
+      }
+    },
+    {
+      "input": {
+        "text": "Phil Knight from Microsoft showcased iPhone 15 during a keynote in Menlo Park.",
+        "labels": [
+          "company",
+          "person",
+          "product",
+          "location"
+        ],
+        "descriptions": {
+          "company": "Organization or business names"
+        },
+        "threshold": 0.5
+      },
+      "expected": {
+        "entities": {
+          "company": [
+            "Microsoft"
+          ],
+          "person": [
+            "Phil Knight"
+          ],
+          "product": [
+            "iPhone 15"
+          ],
+          "location": [
+            "Menlo Park"
+          ]
+        }
+      }
+    },
+    {
+      "input": {
+        "text": "Amazon unveiled Model Y today in Mountain View with Kenichiro Yoshida on stage.",
+        "labels": [
+          "company",
+          "person",
+          "product",
+          "location"
+        ],
+        "descriptions": {
+          "company": "Organization or business names"
+        },
+        "threshold": 0.5
+      },
+      "expected": {
+        "entities": {
+          "company": [
+            "Amazon"
+          ],
+          "person": [
+            "Kenichiro Yoshida"
+          ],
+          "product": [
+            "Model Y"
+          ],
+          "location": [
+            "Mountain View"
+          ]
+        }
+      }
+    },
+    {
+      "input": {
+        "text": "Santa Clara hosted the Meta event where Satya Nadella introduced iPhone 15.",
+        "labels": [
+          "company",
+          "person",
+          "product",
+          "location"
+        ],
+        "descriptions": {
+          "company": "Organization or business names"
+        },
+        "threshold": 0.5
+      },
+      "expected": {
+        "entities": {
+          "company": [
+            "Meta"
+          ],
+          "person": [
+            "Satya Nadella"
+          ],
+          "product": [
+            "iPhone 15"
+          ],
+          "location": [
+            "Santa Clara"
+          ]
+        }
+      }
+    },
+    {
+      "input": {
+        "text": "Tesla CEO Elon Musk announced Model Y in Austin.",
+        "labels": [
+          "company",
+          "person",
+          "product",
+          "location"
+        ],
+        "descriptions": {
+          "company": "Organization or business names"
+        },
+        "threshold": 0.5
+      },
+      "expected": {
+        "entities": {
+          "company": [
+            "Tesla"
+          ],
+          "person": [
+            "Elon Musk"
+          ],
+          "product": [
+            "Model Y"
+          ],
+          "location": [
+            "Austin"
+          ]
+        }
+      }
+    },
+    {
+      "input": {
+        "text": "At Redmond, Nike launched the new iPhone 15, said Pat Gelsinger.",
+        "labels": [
+          "company",
+          "person",
+          "product",
+          "location"
+        ],
+        "descriptions": {
+          "company": "Organization or business names"
+        },
+        "threshold": 0.5
+      },
+      "expected": {
+        "entities": {
+          "company": [
+            "Nike"
+          ],
+          "person": [
+            "Pat Gelsinger"
+          ],
+          "product": [
+            "iPhone 15"
+          ],
+          "location": [
+            "Redmond"
+          ]
+        }
+      }
+    },
+    {
+      "input": {
+        "text": "Sundar Pichai from Samsung showcased Model Y during a keynote in Tokyo.",
+        "labels": [
+          "company",
+          "person",
+          "product",
+          "location"
+        ],
+        "descriptions": {
+          "company": "Organization or business names"
+        },
+        "threshold": 0.5
+      },
+      "expected": {
+        "entities": {
+          "company": [
+            "Samsung"
+          ],
+          "person": [
+            "Sundar Pichai"
+          ],
+          "product": [
+            "Model Y"
+          ],
+          "location": [
+            "Tokyo"
+          ]
+        }
+      }
+    },
+    {
+      "input": {
+        "text": "Intel unveiled iPhone 15 today in Portland with Mark Zuckerberg on stage.",
+        "labels": [
+          "company",
+          "person",
+          "product",
+          "location"
+        ],
+        "descriptions": {
+          "company": "Organization or business names"
+        },
+        "threshold": 0.5
+      },
+      "expected": {
+        "entities": {
+          "company": [
+            "Intel"
+          ],
+          "person": [
+            "Mark Zuckerberg"
+          ],
+          "product": [
+            "iPhone 15"
+          ],
+          "location": [
+            "Portland"
+          ]
+        }
+      }
+    },
+    {
+      "input": {
+        "text": "Seattle hosted the Sony event where Jong-Hee Han introduced Model Y.",
+        "labels": [
+          "company",
+          "person",
+          "product",
+          "location"
+        ],
+        "descriptions": {
+          "company": "Organization or business names"
+        },
+        "threshold": 0.5
+      },
+      "expected": {
+        "entities": {
+          "company": [
+            "Sony"
+          ],
+          "person": [
+            "Jong-Hee Han"
+          ],
+          "product": [
+            "Model Y"
+          ],
+          "location": [
+            "Seattle"
+          ]
+        }
+      }
+    },
+    {
+      "input": {
+        "text": "Apple CEO Tim Cook announced iPhone 15 in Cupertino.",
+        "labels": [
+          "company",
+          "person",
+          "product",
+          "location"
+        ],
+        "descriptions": {
+          "company": "Organization or business names"
+        },
+        "threshold": 0.5
+      },
+      "expected": {
+        "entities": {
+          "company": [
+            "Apple"
+          ],
+          "person": [
+            "Tim Cook"
+          ],
+          "product": [
+            "iPhone 15"
+          ],
+          "location": [
+            "Cupertino"
+          ]
+        }
+      }
+    },
+    {
+      "input": {
+        "text": "At Seoul, Google launched the new Model Y, said Andy Jassy.",
+        "labels": [
+          "company",
+          "person",
+          "product",
+          "location"
+        ],
+        "descriptions": {
+          "company": "Organization or business names"
+        },
+        "threshold": 0.5
+      },
+      "expected": {
+        "entities": {
+          "company": [
+            "Google"
+          ],
+          "person": [
+            "Andy Jassy"
+          ],
+          "product": [
+            "Model Y"
+          ],
+          "location": [
+            "Seoul"
+          ]
+        }
+      }
+    },
+    {
+      "input": {
+        "text": "Phil Knight from Microsoft showcased iPhone 15 during a keynote in Menlo Park.",
+        "labels": [
+          "company",
+          "person",
+          "product",
+          "location"
+        ],
+        "descriptions": {
+          "company": "Organization or business names"
+        },
+        "threshold": 0.5
+      },
+      "expected": {
+        "entities": {
+          "company": [
+            "Microsoft"
+          ],
+          "person": [
+            "Phil Knight"
+          ],
+          "product": [
+            "iPhone 15"
+          ],
+          "location": [
+            "Menlo Park"
+          ]
+        }
+      }
+    },
+    {
+      "input": {
+        "text": "Amazon unveiled Model Y today in Mountain View with Kenichiro Yoshida on stage.",
+        "labels": [
+          "company",
+          "person",
+          "product",
+          "location"
+        ],
+        "descriptions": {
+          "company": "Organization or business names"
+        },
+        "threshold": 0.5
+      },
+      "expected": {
+        "entities": {
+          "company": [
+            "Amazon"
+          ],
+          "person": [
+            "Kenichiro Yoshida"
+          ],
+          "product": [
+            "Model Y"
+          ],
+          "location": [
+            "Mountain View"
+          ]
+        }
+      }
+    },
+    {
+      "input": {
+        "text": "Santa Clara hosted the Meta event where Satya Nadella introduced iPhone 15.",
+        "labels": [
+          "company",
+          "person",
+          "product",
+          "location"
+        ],
+        "descriptions": {
+          "company": "Organization or business names"
+        },
+        "threshold": 0.5
+      },
+      "expected": {
+        "entities": {
+          "company": [
+            "Meta"
+          ],
+          "person": [
+            "Satya Nadella"
+          ],
+          "product": [
+            "iPhone 15"
+          ],
+          "location": [
+            "Santa Clara"
+          ]
+        }
+      }
+    },
+    {
+      "input": {
+        "text": "Tesla CEO Elon Musk announced Model Y in Austin.",
+        "labels": [
+          "company",
+          "person",
+          "product",
+          "location"
+        ],
+        "descriptions": {
+          "company": "Organization or business names"
+        },
+        "threshold": 0.5
+      },
+      "expected": {
+        "entities": {
+          "company": [
+            "Tesla"
+          ],
+          "person": [
+            "Elon Musk"
+          ],
+          "product": [
+            "Model Y"
+          ],
+          "location": [
+            "Austin"
+          ]
+        }
+      }
+    },
+    {
+      "input": {
+        "text": "At Redmond, Nike launched the new iPhone 15, said Pat Gelsinger.",
+        "labels": [
+          "company",
+          "person",
+          "product",
+          "location"
+        ],
+        "descriptions": {
+          "company": "Organization or business names"
+        },
+        "threshold": 0.5
+      },
+      "expected": {
+        "entities": {
+          "company": [
+            "Nike"
+          ],
+          "person": [
+            "Pat Gelsinger"
+          ],
+          "product": [
+            "iPhone 15"
+          ],
+          "location": [
+            "Redmond"
+          ]
+        }
+      }
+    },
+    {
+      "input": {
+        "text": "Sundar Pichai from Samsung showcased Model Y during a keynote in Tokyo.",
+        "labels": [
+          "company",
+          "person",
+          "product",
+          "location"
+        ],
+        "descriptions": {
+          "company": "Organization or business names"
+        },
+        "threshold": 0.5
+      },
+      "expected": {
+        "entities": {
+          "company": [
+            "Samsung"
+          ],
+          "person": [
+            "Sundar Pichai"
+          ],
+          "product": [
+            "Model Y"
+          ],
+          "location": [
+            "Tokyo"
+          ]
+        }
+      }
+    },
+    {
+      "input": {
+        "text": "Intel unveiled iPhone 15 today in Portland with Mark Zuckerberg on stage.",
+        "labels": [
+          "company",
+          "person",
+          "product",
+          "location"
+        ],
+        "descriptions": {
+          "company": "Organization or business names"
+        },
+        "threshold": 0.5
+      },
+      "expected": {
+        "entities": {
+          "company": [
+            "Intel"
+          ],
+          "person": [
+            "Mark Zuckerberg"
+          ],
+          "product": [
+            "iPhone 15"
+          ],
+          "location": [
+            "Portland"
+          ]
+        }
+      }
+    },
+    {
+      "input": {
+        "text": "Seattle hosted the Sony event where Jong-Hee Han introduced Model Y.",
+        "labels": [
+          "company",
+          "person",
+          "product",
+          "location"
+        ],
+        "descriptions": {
+          "company": "Organization or business names"
+        },
+        "threshold": 0.5
+      },
+      "expected": {
+        "entities": {
+          "company": [
+            "Sony"
+          ],
+          "person": [
+            "Jong-Hee Han"
+          ],
+          "product": [
+            "Model Y"
+          ],
+          "location": [
+            "Seattle"
+          ]
+        }
+      }
+    },
+    {
+      "input": {
+        "text": "Apple CEO Tim Cook announced iPhone 15 in Cupertino.",
+        "labels": [
+          "company",
+          "person",
+          "product",
+          "location"
+        ],
+        "descriptions": {
+          "company": "Organization or business names"
+        },
+        "threshold": 0.5
+      },
+      "expected": {
+        "entities": {
+          "company": [
+            "Apple"
+          ],
+          "person": [
+            "Tim Cook"
+          ],
+          "product": [
+            "iPhone 15"
+          ],
+          "location": [
+            "Cupertino"
+          ]
+        }
+      }
+    },
+    {
+      "input": {
+        "text": "At Seoul, Google launched the new Model Y, said Andy Jassy.",
+        "labels": [
+          "company",
+          "person",
+          "product",
+          "location"
+        ],
+        "descriptions": {
+          "company": "Organization or business names"
+        },
+        "threshold": 0.5
+      },
+      "expected": {
+        "entities": {
+          "company": [
+            "Google"
+          ],
+          "person": [
+            "Andy Jassy"
+          ],
+          "product": [
+            "Model Y"
+          ],
+          "location": [
+            "Seoul"
+          ]
+        }
+      }
+    },
+    {
+      "input": {
+        "text": "Phil Knight from Microsoft showcased iPhone 15 during a keynote in Menlo Park.",
+        "labels": [
+          "company",
+          "person",
+          "product",
+          "location"
+        ],
+        "descriptions": {
+          "company": "Organization or business names"
+        },
+        "threshold": 0.5
+      },
+      "expected": {
+        "entities": {
+          "company": [
+            "Microsoft"
+          ],
+          "person": [
+            "Phil Knight"
+          ],
+          "product": [
+            "iPhone 15"
+          ],
+          "location": [
+            "Menlo Park"
+          ]
+        }
+      }
+    },
+    {
+      "input": {
+        "text": "Amazon unveiled Model Y today in Mountain View with Kenichiro Yoshida on stage.",
+        "labels": [
+          "company",
+          "person",
+          "product",
+          "location"
+        ],
+        "descriptions": {
+          "company": "Organization or business names"
+        },
+        "threshold": 0.5
+      },
+      "expected": {
+        "entities": {
+          "company": [
+            "Amazon"
+          ],
+          "person": [
+            "Kenichiro Yoshida"
+          ],
+          "product": [
+            "Model Y"
+          ],
+          "location": [
+            "Mountain View"
+          ]
+        }
+      }
+    },
+    {
+      "input": {
+        "text": "Santa Clara hosted the Meta event where Satya Nadella introduced iPhone 15.",
+        "labels": [
+          "company",
+          "person",
+          "product",
+          "location"
+        ],
+        "descriptions": {
+          "company": "Organization or business names"
+        },
+        "threshold": 0.5
+      },
+      "expected": {
+        "entities": {
+          "company": [
+            "Meta"
+          ],
+          "person": [
+            "Satya Nadella"
+          ],
+          "product": [
+            "iPhone 15"
+          ],
+          "location": [
+            "Santa Clara"
+          ]
+        }
+      }
+    },
+    {
+      "input": {
+        "text": "Tesla CEO Elon Musk announced Model Y in Austin.",
+        "labels": [
+          "company",
+          "person",
+          "product",
+          "location"
+        ],
+        "descriptions": {
+          "company": "Organization or business names"
+        },
+        "threshold": 0.5
+      },
+      "expected": {
+        "entities": {
+          "company": [
+            "Tesla"
+          ],
+          "person": [
+            "Elon Musk"
+          ],
+          "product": [
+            "Model Y"
+          ],
+          "location": [
+            "Austin"
+          ]
+        }
+      }
+    },
+    {
+      "input": {
+        "text": "At Redmond, Nike launched the new iPhone 15, said Pat Gelsinger.",
+        "labels": [
+          "company",
+          "person",
+          "product",
+          "location"
+        ],
+        "descriptions": {
+          "company": "Organization or business names"
+        },
+        "threshold": 0.5
+      },
+      "expected": {
+        "entities": {
+          "company": [
+            "Nike"
+          ],
+          "person": [
+            "Pat Gelsinger"
+          ],
+          "product": [
+            "iPhone 15"
+          ],
+          "location": [
+            "Redmond"
+          ]
+        }
+      }
+    },
+    {
+      "input": {
+        "text": "Sundar Pichai from Samsung showcased Model Y during a keynote in Tokyo.",
+        "labels": [
+          "company",
+          "person",
+          "product",
+          "location"
+        ],
+        "descriptions": {
+          "company": "Organization or business names"
+        },
+        "threshold": 0.5
+      },
+      "expected": {
+        "entities": {
+          "company": [
+            "Samsung"
+          ],
+          "person": [
+            "Sundar Pichai"
+          ],
+          "product": [
+            "Model Y"
+          ],
+          "location": [
+            "Tokyo"
+          ]
+        }
+      }
+    },
+    {
+      "input": {
+        "text": "Intel unveiled iPhone 15 today in Portland with Mark Zuckerberg on stage.",
+        "labels": [
+          "company",
+          "person",
+          "product",
+          "location"
+        ],
+        "descriptions": {
+          "company": "Organization or business names"
+        },
+        "threshold": 0.5
+      },
+      "expected": {
+        "entities": {
+          "company": [
+            "Intel"
+          ],
+          "person": [
+            "Mark Zuckerberg"
+          ],
+          "product": [
+            "iPhone 15"
+          ],
+          "location": [
+            "Portland"
+          ]
+        }
+      }
+    },
+    {
+      "input": {
+        "text": "Seattle hosted the Sony event where Jong-Hee Han introduced Model Y.",
+        "labels": [
+          "company",
+          "person",
+          "product",
+          "location"
+        ],
+        "descriptions": {
+          "company": "Organization or business names"
+        },
+        "threshold": 0.5
+      },
+      "expected": {
+        "entities": {
+          "company": [
+            "Sony"
+          ],
+          "person": [
+            "Jong-Hee Han"
+          ],
+          "product": [
+            "Model Y"
+          ],
+          "location": [
+            "Seattle"
+          ]
+        }
+      }
+    },
+    {
+      "input": {
+        "text": "Apple CEO Tim Cook announced iPhone 15 in Cupertino.",
+        "labels": [
+          "company",
+          "person",
+          "product",
+          "location"
+        ],
+        "descriptions": {
+          "company": "Organization or business names"
+        },
+        "threshold": 0.5
+      },
+      "expected": {
+        "entities": {
+          "company": [
+            "Apple"
+          ],
+          "person": [
+            "Tim Cook"
+          ],
+          "product": [
+            "iPhone 15"
+          ],
+          "location": [
+            "Cupertino"
+          ]
+        }
+      }
+    },
+    {
+      "input": {
+        "text": "At Seoul, Google launched the new Model Y, said Andy Jassy.",
+        "labels": [
+          "company",
+          "person",
+          "product",
+          "location"
+        ],
+        "descriptions": {
+          "company": "Organization or business names"
+        },
+        "threshold": 0.5
+      },
+      "expected": {
+        "entities": {
+          "company": [
+            "Google"
+          ],
+          "person": [
+            "Andy Jassy"
+          ],
+          "product": [
+            "Model Y"
+          ],
+          "location": [
+            "Seoul"
+          ]
+        }
+      }
+    },
+    {
+      "input": {
+        "text": "Phil Knight from Microsoft showcased iPhone 15 during a keynote in Menlo Park.",
+        "labels": [
+          "company",
+          "person",
+          "product",
+          "location"
+        ],
+        "descriptions": {
+          "company": "Organization or business names"
+        },
+        "threshold": 0.5
+      },
+      "expected": {
+        "entities": {
+          "company": [
+            "Microsoft"
+          ],
+          "person": [
+            "Phil Knight"
+          ],
+          "product": [
+            "iPhone 15"
+          ],
+          "location": [
+            "Menlo Park"
+          ]
+        }
+      }
+    },
+    {
+      "input": {
+        "text": "Amazon unveiled Model Y today in Mountain View with Kenichiro Yoshida on stage.",
+        "labels": [
+          "company",
+          "person",
+          "product",
+          "location"
+        ],
+        "descriptions": {
+          "company": "Organization or business names"
+        },
+        "threshold": 0.5
+      },
+      "expected": {
+        "entities": {
+          "company": [
+            "Amazon"
+          ],
+          "person": [
+            "Kenichiro Yoshida"
+          ],
+          "product": [
+            "Model Y"
+          ],
+          "location": [
+            "Mountain View"
+          ]
+        }
+      }
+    },
+    {
+      "input": {
+        "text": "Santa Clara hosted the Meta event where Satya Nadella introduced iPhone 15.",
+        "labels": [
+          "company",
+          "person",
+          "product",
+          "location"
+        ],
+        "descriptions": {
+          "company": "Organization or business names"
+        },
+        "threshold": 0.5
+      },
+      "expected": {
+        "entities": {
+          "company": [
+            "Meta"
+          ],
+          "person": [
+            "Satya Nadella"
+          ],
+          "product": [
+            "iPhone 15"
+          ],
+          "location": [
+            "Santa Clara"
+          ]
+        }
+      }
+    },
+    {
+      "input": {
+        "text": "Tesla CEO Elon Musk announced Model Y in Austin.",
+        "labels": [
+          "company",
+          "person",
+          "product",
+          "location"
+        ],
+        "descriptions": {
+          "company": "Organization or business names"
+        },
+        "threshold": 0.5
+      },
+      "expected": {
+        "entities": {
+          "company": [
+            "Tesla"
+          ],
+          "person": [
+            "Elon Musk"
+          ],
+          "product": [
+            "Model Y"
+          ],
+          "location": [
+            "Austin"
+          ]
+        }
+      }
+    },
+    {
+      "input": {
+        "text": "At Redmond, Nike launched the new iPhone 15, said Pat Gelsinger.",
+        "labels": [
+          "company",
+          "person",
+          "product",
+          "location"
+        ],
+        "descriptions": {
+          "company": "Organization or business names"
+        },
+        "threshold": 0.5
+      },
+      "expected": {
+        "entities": {
+          "company": [
+            "Nike"
+          ],
+          "person": [
+            "Pat Gelsinger"
+          ],
+          "product": [
+            "iPhone 15"
+          ],
+          "location": [
+            "Redmond"
+          ]
+        }
+      }
+    },
+    {
+      "input": {
+        "text": "Sundar Pichai from Samsung showcased Model Y during a keynote in Tokyo.",
+        "labels": [
+          "company",
+          "person",
+          "product",
+          "location"
+        ],
+        "descriptions": {
+          "company": "Organization or business names"
+        },
+        "threshold": 0.5
+      },
+      "expected": {
+        "entities": {
+          "company": [
+            "Samsung"
+          ],
+          "person": [
+            "Sundar Pichai"
+          ],
+          "product": [
+            "Model Y"
+          ],
+          "location": [
+            "Tokyo"
+          ]
+        }
+      }
+    },
+    {
+      "input": {
+        "text": "Intel unveiled iPhone 15 today in Portland with Mark Zuckerberg on stage.",
+        "labels": [
+          "company",
+          "person",
+          "product",
+          "location"
+        ],
+        "descriptions": {
+          "company": "Organization or business names"
+        },
+        "threshold": 0.5
+      },
+      "expected": {
+        "entities": {
+          "company": [
+            "Intel"
+          ],
+          "person": [
+            "Mark Zuckerberg"
+          ],
+          "product": [
+            "iPhone 15"
+          ],
+          "location": [
+            "Portland"
+          ]
+        }
+      }
+    },
+    {
+      "input": {
+        "text": "Seattle hosted the Sony event where Jong-Hee Han introduced Model Y.",
+        "labels": [
+          "company",
+          "person",
+          "product",
+          "location"
+        ],
+        "descriptions": {
+          "company": "Organization or business names"
+        },
+        "threshold": 0.5
+      },
+      "expected": {
+        "entities": {
+          "company": [
+            "Sony"
+          ],
+          "person": [
+            "Jong-Hee Han"
+          ],
+          "product": [
+            "Model Y"
+          ],
+          "location": [
+            "Seattle"
+          ]
+        }
+      }
+    },
+    {
+      "input": {
+        "text": "Apple CEO Tim Cook announced iPhone 15 in Cupertino.",
+        "labels": [
+          "company",
+          "person",
+          "product",
+          "location"
+        ],
+        "descriptions": {
+          "company": "Organization or business names"
+        },
+        "threshold": 0.5
+      },
+      "expected": {
+        "entities": {
+          "company": [
+            "Apple"
+          ],
+          "person": [
+            "Tim Cook"
+          ],
+          "product": [
+            "iPhone 15"
+          ],
+          "location": [
+            "Cupertino"
+          ]
+        }
+      }
+    },
+    {
+      "input": {
+        "text": "At Seoul, Google launched the new Model Y, said Andy Jassy.",
+        "labels": [
+          "company",
+          "person",
+          "product",
+          "location"
+        ],
+        "descriptions": {
+          "company": "Organization or business names"
+        },
+        "threshold": 0.5
+      },
+      "expected": {
+        "entities": {
+          "company": [
+            "Google"
+          ],
+          "person": [
+            "Andy Jassy"
+          ],
+          "product": [
+            "Model Y"
+          ],
+          "location": [
+            "Seoul"
+          ]
+        }
+      }
+    },
+    {
+      "input": {
+        "text": "Phil Knight from Microsoft showcased iPhone 15 during a keynote in Menlo Park.",
+        "labels": [
+          "company",
+          "person",
+          "product",
+          "location"
+        ],
+        "descriptions": {
+          "company": "Organization or business names"
+        },
+        "threshold": 0.5
+      },
+      "expected": {
+        "entities": {
+          "company": [
+            "Microsoft"
+          ],
+          "person": [
+            "Phil Knight"
+          ],
+          "product": [
+            "iPhone 15"
+          ],
+          "location": [
+            "Menlo Park"
+          ]
+        }
+      }
+    },
+    {
+      "input": {
+        "text": "Amazon unveiled Model Y today in Mountain View with Kenichiro Yoshida on stage.",
+        "labels": [
+          "company",
+          "person",
+          "product",
+          "location"
+        ],
+        "descriptions": {
+          "company": "Organization or business names"
+        },
+        "threshold": 0.5
+      },
+      "expected": {
+        "entities": {
+          "company": [
+            "Amazon"
+          ],
+          "person": [
+            "Kenichiro Yoshida"
+          ],
+          "product": [
+            "Model Y"
+          ],
+          "location": [
+            "Mountain View"
+          ]
+        }
+      }
+    },
+    {
+      "input": {
+        "text": "Santa Clara hosted the Meta event where Satya Nadella introduced iPhone 15.",
+        "labels": [
+          "company",
+          "person",
+          "product",
+          "location"
+        ],
+        "descriptions": {
+          "company": "Organization or business names"
+        },
+        "threshold": 0.5
+      },
+      "expected": {
+        "entities": {
+          "company": [
+            "Meta"
+          ],
+          "person": [
+            "Satya Nadella"
+          ],
+          "product": [
+            "iPhone 15"
+          ],
+          "location": [
+            "Santa Clara"
+          ]
+        }
+      }
+    },
+    {
+      "input": {
+        "text": "Tesla CEO Elon Musk announced Model Y in Austin.",
+        "labels": [
+          "company",
+          "person",
+          "product",
+          "location"
+        ],
+        "descriptions": {
+          "company": "Organization or business names"
+        },
+        "threshold": 0.5
+      },
+      "expected": {
+        "entities": {
+          "company": [
+            "Tesla"
+          ],
+          "person": [
+            "Elon Musk"
+          ],
+          "product": [
+            "Model Y"
+          ],
+          "location": [
+            "Austin"
+          ]
+        }
+      }
+    },
+    {
+      "input": {
+        "text": "At Redmond, Nike launched the new iPhone 15, said Pat Gelsinger.",
+        "labels": [
+          "company",
+          "person",
+          "product",
+          "location"
+        ],
+        "descriptions": {
+          "company": "Organization or business names"
+        },
+        "threshold": 0.5
+      },
+      "expected": {
+        "entities": {
+          "company": [
+            "Nike"
+          ],
+          "person": [
+            "Pat Gelsinger"
+          ],
+          "product": [
+            "iPhone 15"
+          ],
+          "location": [
+            "Redmond"
+          ]
+        }
+      }
+    },
+    {
+      "input": {
+        "text": "Sundar Pichai from Samsung showcased Model Y during a keynote in Tokyo.",
+        "labels": [
+          "company",
+          "person",
+          "product",
+          "location"
+        ],
+        "descriptions": {
+          "company": "Organization or business names"
+        },
+        "threshold": 0.5
+      },
+      "expected": {
+        "entities": {
+          "company": [
+            "Samsung"
+          ],
+          "person": [
+            "Sundar Pichai"
+          ],
+          "product": [
+            "Model Y"
+          ],
+          "location": [
+            "Tokyo"
+          ]
+        }
+      }
+    },
+    {
+      "input": {
+        "text": "Intel unveiled iPhone 15 today in Portland with Mark Zuckerberg on stage.",
+        "labels": [
+          "company",
+          "person",
+          "product",
+          "location"
+        ],
+        "descriptions": {
+          "company": "Organization or business names"
+        },
+        "threshold": 0.5
+      },
+      "expected": {
+        "entities": {
+          "company": [
+            "Intel"
+          ],
+          "person": [
+            "Mark Zuckerberg"
+          ],
+          "product": [
+            "iPhone 15"
+          ],
+          "location": [
+            "Portland"
+          ]
+        }
+      }
+    },
+    {
+      "input": {
+        "text": "Seattle hosted the Sony event where Jong-Hee Han introduced Model Y.",
+        "labels": [
+          "company",
+          "person",
+          "product",
+          "location"
+        ],
+        "descriptions": {
+          "company": "Organization or business names"
+        },
+        "threshold": 0.5
+      },
+      "expected": {
+        "entities": {
+          "company": [
+            "Sony"
+          ],
+          "person": [
+            "Jong-Hee Han"
+          ],
+          "product": [
+            "Model Y"
+          ],
+          "location": [
+            "Seattle"
+          ]
+        }
+      }
+    },
+    {
+      "input": {
+        "text": "Apple CEO Tim Cook announced iPhone 15 in Cupertino.",
+        "labels": [
+          "company",
+          "person",
+          "product",
+          "location"
+        ],
+        "descriptions": {
+          "company": "Organization or business names"
+        },
+        "threshold": 0.5
+      },
+      "expected": {
+        "entities": {
+          "company": [
+            "Apple"
+          ],
+          "person": [
+            "Tim Cook"
+          ],
+          "product": [
+            "iPhone 15"
+          ],
+          "location": [
+            "Cupertino"
+          ]
+        }
+      }
+    },
+    {
+      "input": {
+        "text": "At Seoul, Google launched the new Model Y, said Andy Jassy.",
+        "labels": [
+          "company",
+          "person",
+          "product",
+          "location"
+        ],
+        "descriptions": {
+          "company": "Organization or business names"
+        },
+        "threshold": 0.5
+      },
+      "expected": {
+        "entities": {
+          "company": [
+            "Google"
+          ],
+          "person": [
+            "Andy Jassy"
+          ],
+          "product": [
+            "Model Y"
+          ],
+          "location": [
+            "Seoul"
+          ]
+        }
+      }
+    },
+    {
+      "input": {
+        "text": "Phil Knight from Microsoft showcased iPhone 15 during a keynote in Menlo Park.",
+        "labels": [
+          "company",
+          "person",
+          "product",
+          "location"
+        ],
+        "descriptions": {
+          "company": "Organization or business names"
+        },
+        "threshold": 0.5
+      },
+      "expected": {
+        "entities": {
+          "company": [
+            "Microsoft"
+          ],
+          "person": [
+            "Phil Knight"
+          ],
+          "product": [
+            "iPhone 15"
+          ],
+          "location": [
+            "Menlo Park"
+          ]
+        }
+      }
+    },
+    {
+      "input": {
+        "text": "Amazon unveiled Model Y today in Mountain View with Kenichiro Yoshida on stage.",
+        "labels": [
+          "company",
+          "person",
+          "product",
+          "location"
+        ],
+        "descriptions": {
+          "company": "Organization or business names"
+        },
+        "threshold": 0.5
+      },
+      "expected": {
+        "entities": {
+          "company": [
+            "Amazon"
+          ],
+          "person": [
+            "Kenichiro Yoshida"
+          ],
+          "product": [
+            "Model Y"
+          ],
+          "location": [
+            "Mountain View"
+          ]
+        }
+      }
+    },
+    {
+      "input": {
+        "text": "Santa Clara hosted the Meta event where Satya Nadella introduced iPhone 15.",
+        "labels": [
+          "company",
+          "person",
+          "product",
+          "location"
+        ],
+        "descriptions": {
+          "company": "Organization or business names"
+        },
+        "threshold": 0.5
+      },
+      "expected": {
+        "entities": {
+          "company": [
+            "Meta"
+          ],
+          "person": [
+            "Satya Nadella"
+          ],
+          "product": [
+            "iPhone 15"
+          ],
+          "location": [
+            "Santa Clara"
+          ]
+        }
+      }
+    },
+    {
+      "input": {
+        "text": "Tesla CEO Elon Musk announced Model Y in Austin.",
+        "labels": [
+          "company",
+          "person",
+          "product",
+          "location"
+        ],
+        "descriptions": {
+          "company": "Organization or business names"
+        },
+        "threshold": 0.5
+      },
+      "expected": {
+        "entities": {
+          "company": [
+            "Tesla"
+          ],
+          "person": [
+            "Elon Musk"
+          ],
+          "product": [
+            "Model Y"
+          ],
+          "location": [
+            "Austin"
+          ]
+        }
+      }
+    },
+    {
+      "input": {
+        "text": "At Redmond, Nike launched the new iPhone 15, said Pat Gelsinger.",
+        "labels": [
+          "company",
+          "person",
+          "product",
+          "location"
+        ],
+        "descriptions": {
+          "company": "Organization or business names"
+        },
+        "threshold": 0.5
+      },
+      "expected": {
+        "entities": {
+          "company": [
+            "Nike"
+          ],
+          "person": [
+            "Pat Gelsinger"
+          ],
+          "product": [
+            "iPhone 15"
+          ],
+          "location": [
+            "Redmond"
+          ]
+        }
+      }
+    },
+    {
+      "input": {
+        "text": "Sundar Pichai from Samsung showcased Model Y during a keynote in Tokyo.",
+        "labels": [
+          "company",
+          "person",
+          "product",
+          "location"
+        ],
+        "descriptions": {
+          "company": "Organization or business names"
+        },
+        "threshold": 0.5
+      },
+      "expected": {
+        "entities": {
+          "company": [
+            "Samsung"
+          ],
+          "person": [
+            "Sundar Pichai"
+          ],
+          "product": [
+            "Model Y"
+          ],
+          "location": [
+            "Tokyo"
+          ]
+        }
+      }
+    },
+    {
+      "input": {
+        "text": "Intel unveiled iPhone 15 today in Portland with Mark Zuckerberg on stage.",
+        "labels": [
+          "company",
+          "person",
+          "product",
+          "location"
+        ],
+        "descriptions": {
+          "company": "Organization or business names"
+        },
+        "threshold": 0.5
+      },
+      "expected": {
+        "entities": {
+          "company": [
+            "Intel"
+          ],
+          "person": [
+            "Mark Zuckerberg"
+          ],
+          "product": [
+            "iPhone 15"
+          ],
+          "location": [
+            "Portland"
+          ]
+        }
+      }
+    },
+    {
+      "input": {
+        "text": "Seattle hosted the Sony event where Jong-Hee Han introduced Model Y.",
+        "labels": [
+          "company",
+          "person",
+          "product",
+          "location"
+        ],
+        "descriptions": {
+          "company": "Organization or business names"
+        },
+        "threshold": 0.5
+      },
+      "expected": {
+        "entities": {
+          "company": [
+            "Sony"
+          ],
+          "person": [
+            "Jong-Hee Han"
+          ],
+          "product": [
+            "Model Y"
+          ],
+          "location": [
+            "Seattle"
+          ]
+        }
+      }
+    },
+    {
+      "input": {
+        "text": "Apple CEO Tim Cook announced iPhone 15 in Cupertino.",
+        "labels": [
+          "company",
+          "person",
+          "product",
+          "location"
+        ],
+        "descriptions": {
+          "company": "Organization or business names"
+        },
+        "threshold": 0.5
+      },
+      "expected": {
+        "entities": {
+          "company": [
+            "Apple"
+          ],
+          "person": [
+            "Tim Cook"
+          ],
+          "product": [
+            "iPhone 15"
+          ],
+          "location": [
+            "Cupertino"
+          ]
+        }
+      }
+    },
+    {
+      "input": {
+        "text": "At Seoul, Google launched the new Model Y, said Andy Jassy.",
+        "labels": [
+          "company",
+          "person",
+          "product",
+          "location"
+        ],
+        "descriptions": {
+          "company": "Organization or business names"
+        },
+        "threshold": 0.5
+      },
+      "expected": {
+        "entities": {
+          "company": [
+            "Google"
+          ],
+          "person": [
+            "Andy Jassy"
+          ],
+          "product": [
+            "Model Y"
+          ],
+          "location": [
+            "Seoul"
+          ]
+        }
+      }
+    },
+    {
+      "input": {
+        "text": "Phil Knight from Microsoft showcased iPhone 15 during a keynote in Menlo Park.",
+        "labels": [
+          "company",
+          "person",
+          "product",
+          "location"
+        ],
+        "descriptions": {
+          "company": "Organization or business names"
+        },
+        "threshold": 0.5
+      },
+      "expected": {
+        "entities": {
+          "company": [
+            "Microsoft"
+          ],
+          "person": [
+            "Phil Knight"
+          ],
+          "product": [
+            "iPhone 15"
+          ],
+          "location": [
+            "Menlo Park"
+          ]
+        }
+      }
+    },
+    {
+      "input": {
+        "text": "Amazon unveiled Model Y today in Mountain View with Kenichiro Yoshida on stage.",
+        "labels": [
+          "company",
+          "person",
+          "product",
+          "location"
+        ],
+        "descriptions": {
+          "company": "Organization or business names"
+        },
+        "threshold": 0.5
+      },
+      "expected": {
+        "entities": {
+          "company": [
+            "Amazon"
+          ],
+          "person": [
+            "Kenichiro Yoshida"
+          ],
+          "product": [
+            "Model Y"
+          ],
+          "location": [
+            "Mountain View"
+          ]
+        }
+      }
+    },
+    {
+      "input": {
+        "text": "Santa Clara hosted the Meta event where Satya Nadella introduced iPhone 15.",
+        "labels": [
+          "company",
+          "person",
+          "product",
+          "location"
+        ],
+        "descriptions": {
+          "company": "Organization or business names"
+        },
+        "threshold": 0.5
+      },
+      "expected": {
+        "entities": {
+          "company": [
+            "Meta"
+          ],
+          "person": [
+            "Satya Nadella"
+          ],
+          "product": [
+            "iPhone 15"
+          ],
+          "location": [
+            "Santa Clara"
+          ]
+        }
+      }
+    },
+    {
+      "input": {
+        "text": "Tesla CEO Elon Musk announced Model Y in Austin.",
+        "labels": [
+          "company",
+          "person",
+          "product",
+          "location"
+        ],
+        "descriptions": {
+          "company": "Organization or business names"
+        },
+        "threshold": 0.5
+      },
+      "expected": {
+        "entities": {
+          "company": [
+            "Tesla"
+          ],
+          "person": [
+            "Elon Musk"
+          ],
+          "product": [
+            "Model Y"
+          ],
+          "location": [
+            "Austin"
+          ]
+        }
+      }
+    },
+    {
+      "input": {
+        "text": "At Redmond, Nike launched the new iPhone 15, said Pat Gelsinger.",
+        "labels": [
+          "company",
+          "person",
+          "product",
+          "location"
+        ],
+        "descriptions": {
+          "company": "Organization or business names"
+        },
+        "threshold": 0.5
+      },
+      "expected": {
+        "entities": {
+          "company": [
+            "Nike"
+          ],
+          "person": [
+            "Pat Gelsinger"
+          ],
+          "product": [
+            "iPhone 15"
+          ],
+          "location": [
+            "Redmond"
+          ]
+        }
+      }
+    },
+    {
+      "input": {
+        "text": "Sundar Pichai from Samsung showcased Model Y during a keynote in Tokyo.",
+        "labels": [
+          "company",
+          "person",
+          "product",
+          "location"
+        ],
+        "descriptions": {
+          "company": "Organization or business names"
+        },
+        "threshold": 0.5
+      },
+      "expected": {
+        "entities": {
+          "company": [
+            "Samsung"
+          ],
+          "person": [
+            "Sundar Pichai"
+          ],
+          "product": [
+            "Model Y"
+          ],
+          "location": [
+            "Tokyo"
+          ]
+        }
+      }
+    },
+    {
+      "input": {
+        "text": "Intel unveiled iPhone 15 today in Portland with Mark Zuckerberg on stage.",
+        "labels": [
+          "company",
+          "person",
+          "product",
+          "location"
+        ],
+        "descriptions": {
+          "company": "Organization or business names"
+        },
+        "threshold": 0.5
+      },
+      "expected": {
+        "entities": {
+          "company": [
+            "Intel"
+          ],
+          "person": [
+            "Mark Zuckerberg"
+          ],
+          "product": [
+            "iPhone 15"
+          ],
+          "location": [
+            "Portland"
+          ]
+        }
+      }
+    },
+    {
+      "input": {
+        "text": "Seattle hosted the Sony event where Jong-Hee Han introduced Model Y.",
+        "labels": [
+          "company",
+          "person",
+          "product",
+          "location"
+        ],
+        "descriptions": {
+          "company": "Organization or business names"
+        },
+        "threshold": 0.5
+      },
+      "expected": {
+        "entities": {
+          "company": [
+            "Sony"
+          ],
+          "person": [
+            "Jong-Hee Han"
+          ],
+          "product": [
+            "Model Y"
+          ],
+          "location": [
+            "Seattle"
+          ]
+        }
+      }
+    },
+    {
+      "input": {
+        "text": "Apple CEO Tim Cook announced iPhone 15 in Cupertino.",
+        "labels": [
+          "company",
+          "person",
+          "product",
+          "location"
+        ],
+        "descriptions": {
+          "company": "Organization or business names"
+        },
+        "threshold": 0.5
+      },
+      "expected": {
+        "entities": {
+          "company": [
+            "Apple"
+          ],
+          "person": [
+            "Tim Cook"
+          ],
+          "product": [
+            "iPhone 15"
+          ],
+          "location": [
+            "Cupertino"
+          ]
+        }
+      }
+    },
+    {
+      "input": {
+        "text": "At Seoul, Google launched the new Model Y, said Andy Jassy.",
+        "labels": [
+          "company",
+          "person",
+          "product",
+          "location"
+        ],
+        "descriptions": {
+          "company": "Organization or business names"
+        },
+        "threshold": 0.5
+      },
+      "expected": {
+        "entities": {
+          "company": [
+            "Google"
+          ],
+          "person": [
+            "Andy Jassy"
+          ],
+          "product": [
+            "Model Y"
+          ],
+          "location": [
+            "Seoul"
+          ]
+        }
+      }
+    },
+    {
+      "input": {
+        "text": "Phil Knight from Microsoft showcased iPhone 15 during a keynote in Menlo Park.",
+        "labels": [
+          "company",
+          "person",
+          "product",
+          "location"
+        ],
+        "descriptions": {
+          "company": "Organization or business names"
+        },
+        "threshold": 0.5
+      },
+      "expected": {
+        "entities": {
+          "company": [
+            "Microsoft"
+          ],
+          "person": [
+            "Phil Knight"
+          ],
+          "product": [
+            "iPhone 15"
+          ],
+          "location": [
+            "Menlo Park"
+          ]
+        }
+      }
+    },
+    {
+      "input": {
+        "text": "Amazon unveiled Model Y today in Mountain View with Kenichiro Yoshida on stage.",
+        "labels": [
+          "company",
+          "person",
+          "product",
+          "location"
+        ],
+        "descriptions": {
+          "company": "Organization or business names"
+        },
+        "threshold": 0.5
+      },
+      "expected": {
+        "entities": {
+          "company": [
+            "Amazon"
+          ],
+          "person": [
+            "Kenichiro Yoshida"
+          ],
+          "product": [
+            "Model Y"
+          ],
+          "location": [
+            "Mountain View"
+          ]
+        }
+      }
+    },
+    {
+      "input": {
+        "text": "Santa Clara hosted the Meta event where Satya Nadella introduced iPhone 15.",
+        "labels": [
+          "company",
+          "person",
+          "product",
+          "location"
+        ],
+        "descriptions": {
+          "company": "Organization or business names"
+        },
+        "threshold": 0.5
+      },
+      "expected": {
+        "entities": {
+          "company": [
+            "Meta"
+          ],
+          "person": [
+            "Satya Nadella"
+          ],
+          "product": [
+            "iPhone 15"
+          ],
+          "location": [
+            "Santa Clara"
+          ]
+        }
+      }
+    },
+    {
+      "input": {
+        "text": "Tesla CEO Elon Musk announced Model Y in Austin.",
+        "labels": [
+          "company",
+          "person",
+          "product",
+          "location"
+        ],
+        "descriptions": {
+          "company": "Organization or business names"
+        },
+        "threshold": 0.5
+      },
+      "expected": {
+        "entities": {
+          "company": [
+            "Tesla"
+          ],
+          "person": [
+            "Elon Musk"
+          ],
+          "product": [
+            "Model Y"
+          ],
+          "location": [
+            "Austin"
+          ]
+        }
+      }
+    },
+    {
+      "input": {
+        "text": "At Redmond, Nike launched the new iPhone 15, said Pat Gelsinger.",
+        "labels": [
+          "company",
+          "person",
+          "product",
+          "location"
+        ],
+        "descriptions": {
+          "company": "Organization or business names"
+        },
+        "threshold": 0.5
+      },
+      "expected": {
+        "entities": {
+          "company": [
+            "Nike"
+          ],
+          "person": [
+            "Pat Gelsinger"
+          ],
+          "product": [
+            "iPhone 15"
+          ],
+          "location": [
+            "Redmond"
+          ]
+        }
+      }
+    },
+    {
+      "input": {
+        "text": "Sundar Pichai from Samsung showcased Model Y during a keynote in Tokyo.",
+        "labels": [
+          "company",
+          "person",
+          "product",
+          "location"
+        ],
+        "descriptions": {
+          "company": "Organization or business names"
+        },
+        "threshold": 0.5
+      },
+      "expected": {
+        "entities": {
+          "company": [
+            "Samsung"
+          ],
+          "person": [
+            "Sundar Pichai"
+          ],
+          "product": [
+            "Model Y"
+          ],
+          "location": [
+            "Tokyo"
+          ]
+        }
+      }
+    },
+    {
+      "input": {
+        "text": "Intel unveiled iPhone 15 today in Portland with Mark Zuckerberg on stage.",
+        "labels": [
+          "company",
+          "person",
+          "product",
+          "location"
+        ],
+        "descriptions": {
+          "company": "Organization or business names"
+        },
+        "threshold": 0.5
+      },
+      "expected": {
+        "entities": {
+          "company": [
+            "Intel"
+          ],
+          "person": [
+            "Mark Zuckerberg"
+          ],
+          "product": [
+            "iPhone 15"
+          ],
+          "location": [
+            "Portland"
+          ]
+        }
+      }
+    },
+    {
+      "input": {
+        "text": "Seattle hosted the Sony event where Jong-Hee Han introduced Model Y.",
+        "labels": [
+          "company",
+          "person",
+          "product",
+          "location"
+        ],
+        "descriptions": {
+          "company": "Organization or business names"
+        },
+        "threshold": 0.5
+      },
+      "expected": {
+        "entities": {
+          "company": [
+            "Sony"
+          ],
+          "person": [
+            "Jong-Hee Han"
+          ],
+          "product": [
+            "Model Y"
+          ],
+          "location": [
+            "Seattle"
+          ]
+        }
+      }
+    },
+    {
+      "input": {
+        "text": "Apple CEO Tim Cook announced iPhone 15 in Cupertino.",
+        "labels": [
+          "company",
+          "person",
+          "product",
+          "location"
+        ],
+        "descriptions": {
+          "company": "Organization or business names"
+        },
+        "threshold": 0.5
+      },
+      "expected": {
+        "entities": {
+          "company": [
+            "Apple"
+          ],
+          "person": [
+            "Tim Cook"
+          ],
+          "product": [
+            "iPhone 15"
+          ],
+          "location": [
+            "Cupertino"
+          ]
+        }
+      }
+    },
+    {
+      "input": {
+        "text": "At Seoul, Google launched the new Model Y, said Andy Jassy.",
+        "labels": [
+          "company",
+          "person",
+          "product",
+          "location"
+        ],
+        "descriptions": {
+          "company": "Organization or business names"
+        },
+        "threshold": 0.5
+      },
+      "expected": {
+        "entities": {
+          "company": [
+            "Google"
+          ],
+          "person": [
+            "Andy Jassy"
+          ],
+          "product": [
+            "Model Y"
+          ],
+          "location": [
+            "Seoul"
+          ]
+        }
+      }
+    },
+    {
+      "input": {
+        "text": "Phil Knight from Microsoft showcased iPhone 15 during a keynote in Menlo Park.",
+        "labels": [
+          "company",
+          "person",
+          "product",
+          "location"
+        ],
+        "descriptions": {
+          "company": "Organization or business names"
+        },
+        "threshold": 0.5
+      },
+      "expected": {
+        "entities": {
+          "company": [
+            "Microsoft"
+          ],
+          "person": [
+            "Phil Knight"
+          ],
+          "product": [
+            "iPhone 15"
+          ],
+          "location": [
+            "Menlo Park"
+          ]
+        }
+      }
+    },
+    {
+      "input": {
+        "text": "Amazon unveiled Model Y today in Mountain View with Kenichiro Yoshida on stage.",
+        "labels": [
+          "company",
+          "person",
+          "product",
+          "location"
+        ],
+        "descriptions": {
+          "company": "Organization or business names"
+        },
+        "threshold": 0.5
+      },
+      "expected": {
+        "entities": {
+          "company": [
+            "Amazon"
+          ],
+          "person": [
+            "Kenichiro Yoshida"
+          ],
+          "product": [
+            "Model Y"
+          ],
+          "location": [
+            "Mountain View"
+          ]
+        }
+      }
+    },
+    {
+      "input": {
+        "text": "Santa Clara hosted the Meta event where Satya Nadella introduced iPhone 15.",
+        "labels": [
+          "company",
+          "person",
+          "product",
+          "location"
+        ],
+        "descriptions": {
+          "company": "Organization or business names"
+        },
+        "threshold": 0.5
+      },
+      "expected": {
+        "entities": {
+          "company": [
+            "Meta"
+          ],
+          "person": [
+            "Satya Nadella"
+          ],
+          "product": [
+            "iPhone 15"
+          ],
+          "location": [
+            "Santa Clara"
+          ]
+        }
+      }
+    },
+    {
+      "input": {
+        "text": "Tesla CEO Elon Musk announced Model Y in Austin.",
+        "labels": [
+          "company",
+          "person",
+          "product",
+          "location"
+        ],
+        "descriptions": {
+          "company": "Organization or business names"
+        },
+        "threshold": 0.5
+      },
+      "expected": {
+        "entities": {
+          "company": [
+            "Tesla"
+          ],
+          "person": [
+            "Elon Musk"
+          ],
+          "product": [
+            "Model Y"
+          ],
+          "location": [
+            "Austin"
+          ]
+        }
+      }
+    },
+    {
+      "input": {
+        "text": "At Redmond, Nike launched the new iPhone 15, said Pat Gelsinger.",
+        "labels": [
+          "company",
+          "person",
+          "product",
+          "location"
+        ],
+        "descriptions": {
+          "company": "Organization or business names"
+        },
+        "threshold": 0.5
+      },
+      "expected": {
+        "entities": {
+          "company": [
+            "Nike"
+          ],
+          "person": [
+            "Pat Gelsinger"
+          ],
+          "product": [
+            "iPhone 15"
+          ],
+          "location": [
+            "Redmond"
+          ]
+        }
+      }
+    },
+    {
+      "input": {
+        "text": "Sundar Pichai from Samsung showcased Model Y during a keynote in Tokyo.",
+        "labels": [
+          "company",
+          "person",
+          "product",
+          "location"
+        ],
+        "descriptions": {
+          "company": "Organization or business names"
+        },
+        "threshold": 0.5
+      },
+      "expected": {
+        "entities": {
+          "company": [
+            "Samsung"
+          ],
+          "person": [
+            "Sundar Pichai"
+          ],
+          "product": [
+            "Model Y"
+          ],
+          "location": [
+            "Tokyo"
+          ]
+        }
+      }
+    },
+    {
+      "input": {
+        "text": "Intel unveiled iPhone 15 today in Portland with Mark Zuckerberg on stage.",
+        "labels": [
+          "company",
+          "person",
+          "product",
+          "location"
+        ],
+        "descriptions": {
+          "company": "Organization or business names"
+        },
+        "threshold": 0.5
+      },
+      "expected": {
+        "entities": {
+          "company": [
+            "Intel"
+          ],
+          "person": [
+            "Mark Zuckerberg"
+          ],
+          "product": [
+            "iPhone 15"
+          ],
+          "location": [
+            "Portland"
+          ]
+        }
+      }
+    },
+    {
+      "input": {
+        "text": "Seattle hosted the Sony event where Jong-Hee Han introduced Model Y.",
+        "labels": [
+          "company",
+          "person",
+          "product",
+          "location"
+        ],
+        "descriptions": {
+          "company": "Organization or business names"
+        },
+        "threshold": 0.5
+      },
+      "expected": {
+        "entities": {
+          "company": [
+            "Sony"
+          ],
+          "person": [
+            "Jong-Hee Han"
+          ],
+          "product": [
+            "Model Y"
+          ],
+          "location": [
+            "Seattle"
+          ]
+        }
+      }
+    },
+    {
+      "input": {
+        "text": "Apple CEO Tim Cook announced iPhone 15 in Cupertino.",
+        "labels": [
+          "company",
+          "person",
+          "product",
+          "location"
+        ],
+        "descriptions": {
+          "company": "Organization or business names"
+        },
+        "threshold": 0.5
+      },
+      "expected": {
+        "entities": {
+          "company": [
+            "Apple"
+          ],
+          "person": [
+            "Tim Cook"
+          ],
+          "product": [
+            "iPhone 15"
+          ],
+          "location": [
+            "Cupertino"
+          ]
+        }
+      }
+    },
+    {
+      "input": {
+        "text": "At Seoul, Google launched the new Model Y, said Andy Jassy.",
+        "labels": [
+          "company",
+          "person",
+          "product",
+          "location"
+        ],
+        "descriptions": {
+          "company": "Organization or business names"
+        },
+        "threshold": 0.5
+      },
+      "expected": {
+        "entities": {
+          "company": [
+            "Google"
+          ],
+          "person": [
+            "Andy Jassy"
+          ],
+          "product": [
+            "Model Y"
+          ],
+          "location": [
+            "Seoul"
+          ]
+        }
+      }
+    },
+    {
+      "input": {
+        "text": "Phil Knight from Microsoft showcased iPhone 15 during a keynote in Menlo Park.",
+        "labels": [
+          "company",
+          "person",
+          "product",
+          "location"
+        ],
+        "descriptions": {
+          "company": "Organization or business names"
+        },
+        "threshold": 0.5
+      },
+      "expected": {
+        "entities": {
+          "company": [
+            "Microsoft"
+          ],
+          "person": [
+            "Phil Knight"
+          ],
+          "product": [
+            "iPhone 15"
+          ],
+          "location": [
+            "Menlo Park"
+          ]
+        }
+      }
+    },
+    {
+      "input": {
+        "text": "Amazon unveiled Model Y today in Mountain View with Kenichiro Yoshida on stage.",
+        "labels": [
+          "company",
+          "person",
+          "product",
+          "location"
+        ],
+        "descriptions": {
+          "company": "Organization or business names"
+        },
+        "threshold": 0.5
+      },
+      "expected": {
+        "entities": {
+          "company": [
+            "Amazon"
+          ],
+          "person": [
+            "Kenichiro Yoshida"
+          ],
+          "product": [
+            "Model Y"
+          ],
+          "location": [
+            "Mountain View"
+          ]
+        }
+      }
+    },
+    {
+      "input": {
+        "text": "Santa Clara hosted the Meta event where Satya Nadella introduced iPhone 15.",
+        "labels": [
+          "company",
+          "person",
+          "product",
+          "location"
+        ],
+        "descriptions": {
+          "company": "Organization or business names"
+        },
+        "threshold": 0.5
+      },
+      "expected": {
+        "entities": {
+          "company": [
+            "Meta"
+          ],
+          "person": [
+            "Satya Nadella"
+          ],
+          "product": [
+            "iPhone 15"
+          ],
+          "location": [
+            "Santa Clara"
+          ]
+        }
+      }
+    },
+    {
+      "input": {
+        "text": "Tesla CEO Elon Musk announced Model Y in Austin.",
+        "labels": [
+          "company",
+          "person",
+          "product",
+          "location"
+        ],
+        "descriptions": {
+          "company": "Organization or business names"
+        },
+        "threshold": 0.5
+      },
+      "expected": {
+        "entities": {
+          "company": [
+            "Tesla"
+          ],
+          "person": [
+            "Elon Musk"
+          ],
+          "product": [
+            "Model Y"
+          ],
+          "location": [
+            "Austin"
+          ]
+        }
+      }
+    },
+    {
+      "input": {
+        "text": "At Redmond, Nike launched the new iPhone 15, said Pat Gelsinger.",
+        "labels": [
+          "company",
+          "person",
+          "product",
+          "location"
+        ],
+        "descriptions": {
+          "company": "Organization or business names"
+        },
+        "threshold": 0.5
+      },
+      "expected": {
+        "entities": {
+          "company": [
+            "Nike"
+          ],
+          "person": [
+            "Pat Gelsinger"
+          ],
+          "product": [
+            "iPhone 15"
+          ],
+          "location": [
+            "Redmond"
+          ]
+        }
+      }
+    },
+    {
+      "input": {
+        "text": "Sundar Pichai from Samsung showcased Model Y during a keynote in Tokyo.",
+        "labels": [
+          "company",
+          "person",
+          "product",
+          "location"
+        ],
+        "descriptions": {
+          "company": "Organization or business names"
+        },
+        "threshold": 0.5
+      },
+      "expected": {
+        "entities": {
+          "company": [
+            "Samsung"
+          ],
+          "person": [
+            "Sundar Pichai"
+          ],
+          "product": [
+            "Model Y"
+          ],
+          "location": [
+            "Tokyo"
+          ]
+        }
+      }
+    },
+    {
+      "input": {
+        "text": "Intel unveiled iPhone 15 today in Portland with Mark Zuckerberg on stage.",
+        "labels": [
+          "company",
+          "person",
+          "product",
+          "location"
+        ],
+        "descriptions": {
+          "company": "Organization or business names"
+        },
+        "threshold": 0.5
+      },
+      "expected": {
+        "entities": {
+          "company": [
+            "Intel"
+          ],
+          "person": [
+            "Mark Zuckerberg"
+          ],
+          "product": [
+            "iPhone 15"
+          ],
+          "location": [
+            "Portland"
+          ]
+        }
+      }
+    },
+    {
+      "input": {
+        "text": "Seattle hosted the Sony event where Jong-Hee Han introduced Model Y.",
+        "labels": [
+          "company",
+          "person",
+          "product",
+          "location"
+        ],
+        "descriptions": {
+          "company": "Organization or business names"
+        },
+        "threshold": 0.5
+      },
+      "expected": {
+        "entities": {
+          "company": [
+            "Sony"
+          ],
+          "person": [
+            "Jong-Hee Han"
+          ],
+          "product": [
+            "Model Y"
+          ],
+          "location": [
+            "Seattle"
+          ]
+        }
+      }
+    }
+  ],
+  "classification": [
+    {
+      "input": {
+        "text": "This phone is amazing and fast, I love it.",
+        "task_name": "sentiment",
+        "labels": [
+          "positive",
+          "negative",
+          "neutral"
+        ],
+        "threshold": 0.5,
+        "multi_label": false
+      },
+      "expected": {
+        "sentiment": "positive"
+      }
+    },
+    {
+      "input": {
+        "text": "Affordable price with solid performance.",
+        "task_name": "aspects",
+        "labels": [
+          "camera",
+          "battery",
+          "screen",
+          "price",
+          "performance"
+        ],
+        "threshold": 0.4,
+        "multi_label": true
+      },
+      "expected": {
+        "aspects": [
+          "performance",
+          "price"
+        ]
+      }
+    },
+    {
+      "input": {
+        "text": "It's okay, nothing special but not bad either.",
+        "task_name": "sentiment",
+        "labels": [
+          "positive",
+          "negative",
+          "neutral"
+        ],
+        "threshold": 0.5,
+        "multi_label": false
+      },
+      "expected": {
+        "sentiment": "neutral"
+      }
+    },
+    {
+      "input": {
+        "text": "The screen is dim but the battery lasts long.",
+        "task_name": "aspects",
+        "labels": [
+          "camera",
+          "battery",
+          "screen",
+          "price",
+          "performance"
+        ],
+        "threshold": 0.4,
+        "multi_label": true
+      },
+      "expected": {
+        "aspects": [
+          "battery"
+        ]
+      }
+    },
+    {
+      "input": {
+        "text": "The device is slow and frustrating to use.",
+        "task_name": "sentiment",
+        "labels": [
+          "positive",
+          "negative",
+          "neutral"
+        ],
+        "threshold": 0.5,
+        "multi_label": false
+      },
+      "expected": {
+        "sentiment": "negative"
+      }
+    },
+    {
+      "input": {
+        "text": "Great camera and screen but the battery is weak.",
+        "task_name": "aspects",
+        "labels": [
+          "camera",
+          "battery",
+          "screen",
+          "price",
+          "performance"
+        ],
+        "threshold": 0.4,
+        "multi_label": true
+      },
+      "expected": {
+        "aspects": [
+          "battery",
+          "screen"
+        ]
+      }
+    },
+    {
+      "input": {
+        "text": "The battery life is terrible and disappointing.",
+        "task_name": "sentiment",
+        "labels": [
+          "positive",
+          "negative",
+          "neutral"
+        ],
+        "threshold": 0.5,
+        "multi_label": false
+      },
+      "expected": {
+        "sentiment": "negative"
+      }
+    },
+    {
+      "input": {
+        "text": "Battery and camera are excellent, price is high.",
+        "task_name": "aspects",
+        "labels": [
+          "camera",
+          "battery",
+          "screen",
+          "price",
+          "performance"
+        ],
+        "threshold": 0.4,
+        "multi_label": true
+      },
+      "expected": {
+        "aspects": [
+          "camera",
+          "price",
+          "battery"
+        ]
+      }
+    },
+    {
+      "input": {
+        "text": "Outstanding performance with great screen quality.",
+        "task_name": "sentiment",
+        "labels": [
+          "positive",
+          "negative",
+          "neutral"
+        ],
+        "threshold": 0.5,
+        "multi_label": false
+      },
+      "expected": {
+        "sentiment": "positive"
+      }
+    },
+    {
+      "input": {
+        "text": "Love the camera, hate the price.",
+        "task_name": "aspects",
+        "labels": [
+          "camera",
+          "battery",
+          "screen",
+          "price",
+          "performance"
+        ],
+        "threshold": 0.4,
+        "multi_label": true
+      },
+      "expected": {
+        "aspects": [
+          "camera",
+          "price"
+        ]
+      }
+    },
+    {
+      "input": {
+        "text": "This phone is amazing and fast, I love it.",
+        "task_name": "sentiment",
+        "labels": [
+          "positive",
+          "negative",
+          "neutral"
+        ],
+        "threshold": 0.5,
+        "multi_label": false
+      },
+      "expected": {
+        "sentiment": "positive"
+      }
+    },
+    {
+      "input": {
+        "text": "Affordable price with solid performance.",
+        "task_name": "aspects",
+        "labels": [
+          "camera",
+          "battery",
+          "screen",
+          "price",
+          "performance"
+        ],
+        "threshold": 0.4,
+        "multi_label": true
+      },
+      "expected": {
+        "aspects": [
+          "performance",
+          "price"
+        ]
+      }
+    },
+    {
+      "input": {
+        "text": "It's okay, nothing special but not bad either.",
+        "task_name": "sentiment",
+        "labels": [
+          "positive",
+          "negative",
+          "neutral"
+        ],
+        "threshold": 0.5,
+        "multi_label": false
+      },
+      "expected": {
+        "sentiment": "neutral"
+      }
+    },
+    {
+      "input": {
+        "text": "The screen is dim but the battery lasts long.",
+        "task_name": "aspects",
+        "labels": [
+          "camera",
+          "battery",
+          "screen",
+          "price",
+          "performance"
+        ],
+        "threshold": 0.4,
+        "multi_label": true
+      },
+      "expected": {
+        "aspects": [
+          "battery"
+        ]
+      }
+    },
+    {
+      "input": {
+        "text": "The device is slow and frustrating to use.",
+        "task_name": "sentiment",
+        "labels": [
+          "positive",
+          "negative",
+          "neutral"
+        ],
+        "threshold": 0.5,
+        "multi_label": false
+      },
+      "expected": {
+        "sentiment": "negative"
+      }
+    },
+    {
+      "input": {
+        "text": "Great camera and screen but the battery is weak.",
+        "task_name": "aspects",
+        "labels": [
+          "camera",
+          "battery",
+          "screen",
+          "price",
+          "performance"
+        ],
+        "threshold": 0.4,
+        "multi_label": true
+      },
+      "expected": {
+        "aspects": [
+          "battery",
+          "screen"
+        ]
+      }
+    },
+    {
+      "input": {
+        "text": "The battery life is terrible and disappointing.",
+        "task_name": "sentiment",
+        "labels": [
+          "positive",
+          "negative",
+          "neutral"
+        ],
+        "threshold": 0.5,
+        "multi_label": false
+      },
+      "expected": {
+        "sentiment": "negative"
+      }
+    },
+    {
+      "input": {
+        "text": "Battery and camera are excellent, price is high.",
+        "task_name": "aspects",
+        "labels": [
+          "camera",
+          "battery",
+          "screen",
+          "price",
+          "performance"
+        ],
+        "threshold": 0.4,
+        "multi_label": true
+      },
+      "expected": {
+        "aspects": [
+          "camera",
+          "price",
+          "battery"
+        ]
+      }
+    },
+    {
+      "input": {
+        "text": "Outstanding performance with great screen quality.",
+        "task_name": "sentiment",
+        "labels": [
+          "positive",
+          "negative",
+          "neutral"
+        ],
+        "threshold": 0.5,
+        "multi_label": false
+      },
+      "expected": {
+        "sentiment": "positive"
+      }
+    },
+    {
+      "input": {
+        "text": "Love the camera, hate the price.",
+        "task_name": "aspects",
+        "labels": [
+          "camera",
+          "battery",
+          "screen",
+          "price",
+          "performance"
+        ],
+        "threshold": 0.4,
+        "multi_label": true
+      },
+      "expected": {
+        "aspects": [
+          "camera",
+          "price"
+        ]
+      }
+    },
+    {
+      "input": {
+        "text": "This phone is amazing and fast, I love it.",
+        "task_name": "sentiment",
+        "labels": [
+          "positive",
+          "negative",
+          "neutral"
+        ],
+        "threshold": 0.5,
+        "multi_label": false
+      },
+      "expected": {
+        "sentiment": "positive"
+      }
+    },
+    {
+      "input": {
+        "text": "Affordable price with solid performance.",
+        "task_name": "aspects",
+        "labels": [
+          "camera",
+          "battery",
+          "screen",
+          "price",
+          "performance"
+        ],
+        "threshold": 0.4,
+        "multi_label": true
+      },
+      "expected": {
+        "aspects": [
+          "performance",
+          "price"
+        ]
+      }
+    },
+    {
+      "input": {
+        "text": "It's okay, nothing special but not bad either.",
+        "task_name": "sentiment",
+        "labels": [
+          "positive",
+          "negative",
+          "neutral"
+        ],
+        "threshold": 0.5,
+        "multi_label": false
+      },
+      "expected": {
+        "sentiment": "neutral"
+      }
+    },
+    {
+      "input": {
+        "text": "The screen is dim but the battery lasts long.",
+        "task_name": "aspects",
+        "labels": [
+          "camera",
+          "battery",
+          "screen",
+          "price",
+          "performance"
+        ],
+        "threshold": 0.4,
+        "multi_label": true
+      },
+      "expected": {
+        "aspects": [
+          "battery"
+        ]
+      }
+    },
+    {
+      "input": {
+        "text": "The device is slow and frustrating to use.",
+        "task_name": "sentiment",
+        "labels": [
+          "positive",
+          "negative",
+          "neutral"
+        ],
+        "threshold": 0.5,
+        "multi_label": false
+      },
+      "expected": {
+        "sentiment": "negative"
+      }
+    },
+    {
+      "input": {
+        "text": "Great camera and screen but the battery is weak.",
+        "task_name": "aspects",
+        "labels": [
+          "camera",
+          "battery",
+          "screen",
+          "price",
+          "performance"
+        ],
+        "threshold": 0.4,
+        "multi_label": true
+      },
+      "expected": {
+        "aspects": [
+          "battery",
+          "screen"
+        ]
+      }
+    },
+    {
+      "input": {
+        "text": "The battery life is terrible and disappointing.",
+        "task_name": "sentiment",
+        "labels": [
+          "positive",
+          "negative",
+          "neutral"
+        ],
+        "threshold": 0.5,
+        "multi_label": false
+      },
+      "expected": {
+        "sentiment": "negative"
+      }
+    },
+    {
+      "input": {
+        "text": "Battery and camera are excellent, price is high.",
+        "task_name": "aspects",
+        "labels": [
+          "camera",
+          "battery",
+          "screen",
+          "price",
+          "performance"
+        ],
+        "threshold": 0.4,
+        "multi_label": true
+      },
+      "expected": {
+        "aspects": [
+          "camera",
+          "price",
+          "battery"
+        ]
+      }
+    },
+    {
+      "input": {
+        "text": "Outstanding performance with great screen quality.",
+        "task_name": "sentiment",
+        "labels": [
+          "positive",
+          "negative",
+          "neutral"
+        ],
+        "threshold": 0.5,
+        "multi_label": false
+      },
+      "expected": {
+        "sentiment": "positive"
+      }
+    },
+    {
+      "input": {
+        "text": "Love the camera, hate the price.",
+        "task_name": "aspects",
+        "labels": [
+          "camera",
+          "battery",
+          "screen",
+          "price",
+          "performance"
+        ],
+        "threshold": 0.4,
+        "multi_label": true
+      },
+      "expected": {
+        "aspects": [
+          "camera",
+          "price"
+        ]
+      }
+    },
+    {
+      "input": {
+        "text": "This phone is amazing and fast, I love it.",
+        "task_name": "sentiment",
+        "labels": [
+          "positive",
+          "negative",
+          "neutral"
+        ],
+        "threshold": 0.5,
+        "multi_label": false
+      },
+      "expected": {
+        "sentiment": "positive"
+      }
+    },
+    {
+      "input": {
+        "text": "Affordable price with solid performance.",
+        "task_name": "aspects",
+        "labels": [
+          "camera",
+          "battery",
+          "screen",
+          "price",
+          "performance"
+        ],
+        "threshold": 0.4,
+        "multi_label": true
+      },
+      "expected": {
+        "aspects": [
+          "performance",
+          "price"
+        ]
+      }
+    },
+    {
+      "input": {
+        "text": "It's okay, nothing special but not bad either.",
+        "task_name": "sentiment",
+        "labels": [
+          "positive",
+          "negative",
+          "neutral"
+        ],
+        "threshold": 0.5,
+        "multi_label": false
+      },
+      "expected": {
+        "sentiment": "neutral"
+      }
+    },
+    {
+      "input": {
+        "text": "The screen is dim but the battery lasts long.",
+        "task_name": "aspects",
+        "labels": [
+          "camera",
+          "battery",
+          "screen",
+          "price",
+          "performance"
+        ],
+        "threshold": 0.4,
+        "multi_label": true
+      },
+      "expected": {
+        "aspects": [
+          "battery"
+        ]
+      }
+    },
+    {
+      "input": {
+        "text": "The device is slow and frustrating to use.",
+        "task_name": "sentiment",
+        "labels": [
+          "positive",
+          "negative",
+          "neutral"
+        ],
+        "threshold": 0.5,
+        "multi_label": false
+      },
+      "expected": {
+        "sentiment": "negative"
+      }
+    },
+    {
+      "input": {
+        "text": "Great camera and screen but the battery is weak.",
+        "task_name": "aspects",
+        "labels": [
+          "camera",
+          "battery",
+          "screen",
+          "price",
+          "performance"
+        ],
+        "threshold": 0.4,
+        "multi_label": true
+      },
+      "expected": {
+        "aspects": [
+          "battery",
+          "screen"
+        ]
+      }
+    },
+    {
+      "input": {
+        "text": "The battery life is terrible and disappointing.",
+        "task_name": "sentiment",
+        "labels": [
+          "positive",
+          "negative",
+          "neutral"
+        ],
+        "threshold": 0.5,
+        "multi_label": false
+      },
+      "expected": {
+        "sentiment": "negative"
+      }
+    },
+    {
+      "input": {
+        "text": "Battery and camera are excellent, price is high.",
+        "task_name": "aspects",
+        "labels": [
+          "camera",
+          "battery",
+          "screen",
+          "price",
+          "performance"
+        ],
+        "threshold": 0.4,
+        "multi_label": true
+      },
+      "expected": {
+        "aspects": [
+          "camera",
+          "price",
+          "battery"
+        ]
+      }
+    },
+    {
+      "input": {
+        "text": "Outstanding performance with great screen quality.",
+        "task_name": "sentiment",
+        "labels": [
+          "positive",
+          "negative",
+          "neutral"
+        ],
+        "threshold": 0.5,
+        "multi_label": false
+      },
+      "expected": {
+        "sentiment": "positive"
+      }
+    },
+    {
+      "input": {
+        "text": "Love the camera, hate the price.",
+        "task_name": "aspects",
+        "labels": [
+          "camera",
+          "battery",
+          "screen",
+          "price",
+          "performance"
+        ],
+        "threshold": 0.4,
+        "multi_label": true
+      },
+      "expected": {
+        "aspects": [
+          "camera",
+          "price"
+        ]
+      }
+    },
+    {
+      "input": {
+        "text": "This phone is amazing and fast, I love it.",
+        "task_name": "sentiment",
+        "labels": [
+          "positive",
+          "negative",
+          "neutral"
+        ],
+        "threshold": 0.5,
+        "multi_label": false
+      },
+      "expected": {
+        "sentiment": "positive"
+      }
+    },
+    {
+      "input": {
+        "text": "Affordable price with solid performance.",
+        "task_name": "aspects",
+        "labels": [
+          "camera",
+          "battery",
+          "screen",
+          "price",
+          "performance"
+        ],
+        "threshold": 0.4,
+        "multi_label": true
+      },
+      "expected": {
+        "aspects": [
+          "performance",
+          "price"
+        ]
+      }
+    },
+    {
+      "input": {
+        "text": "It's okay, nothing special but not bad either.",
+        "task_name": "sentiment",
+        "labels": [
+          "positive",
+          "negative",
+          "neutral"
+        ],
+        "threshold": 0.5,
+        "multi_label": false
+      },
+      "expected": {
+        "sentiment": "neutral"
+      }
+    },
+    {
+      "input": {
+        "text": "The screen is dim but the battery lasts long.",
+        "task_name": "aspects",
+        "labels": [
+          "camera",
+          "battery",
+          "screen",
+          "price",
+          "performance"
+        ],
+        "threshold": 0.4,
+        "multi_label": true
+      },
+      "expected": {
+        "aspects": [
+          "battery"
+        ]
+      }
+    },
+    {
+      "input": {
+        "text": "The device is slow and frustrating to use.",
+        "task_name": "sentiment",
+        "labels": [
+          "positive",
+          "negative",
+          "neutral"
+        ],
+        "threshold": 0.5,
+        "multi_label": false
+      },
+      "expected": {
+        "sentiment": "negative"
+      }
+    },
+    {
+      "input": {
+        "text": "Great camera and screen but the battery is weak.",
+        "task_name": "aspects",
+        "labels": [
+          "camera",
+          "battery",
+          "screen",
+          "price",
+          "performance"
+        ],
+        "threshold": 0.4,
+        "multi_label": true
+      },
+      "expected": {
+        "aspects": [
+          "battery",
+          "screen"
+        ]
+      }
+    },
+    {
+      "input": {
+        "text": "The battery life is terrible and disappointing.",
+        "task_name": "sentiment",
+        "labels": [
+          "positive",
+          "negative",
+          "neutral"
+        ],
+        "threshold": 0.5,
+        "multi_label": false
+      },
+      "expected": {
+        "sentiment": "negative"
+      }
+    },
+    {
+      "input": {
+        "text": "Battery and camera are excellent, price is high.",
+        "task_name": "aspects",
+        "labels": [
+          "camera",
+          "battery",
+          "screen",
+          "price",
+          "performance"
+        ],
+        "threshold": 0.4,
+        "multi_label": true
+      },
+      "expected": {
+        "aspects": [
+          "camera",
+          "price",
+          "battery"
+        ]
+      }
+    },
+    {
+      "input": {
+        "text": "Outstanding performance with great screen quality.",
+        "task_name": "sentiment",
+        "labels": [
+          "positive",
+          "negative",
+          "neutral"
+        ],
+        "threshold": 0.5,
+        "multi_label": false
+      },
+      "expected": {
+        "sentiment": "positive"
+      }
+    },
+    {
+      "input": {
+        "text": "Love the camera, hate the price.",
+        "task_name": "aspects",
+        "labels": [
+          "camera",
+          "battery",
+          "screen",
+          "price",
+          "performance"
+        ],
+        "threshold": 0.4,
+        "multi_label": true
+      },
+      "expected": {
+        "aspects": [
+          "camera",
+          "price"
+        ]
+      }
+    },
+    {
+      "input": {
+        "text": "This phone is amazing and fast, I love it.",
+        "task_name": "sentiment",
+        "labels": [
+          "positive",
+          "negative",
+          "neutral"
+        ],
+        "threshold": 0.5,
+        "multi_label": false
+      },
+      "expected": {
+        "sentiment": "positive"
+      }
+    },
+    {
+      "input": {
+        "text": "Affordable price with solid performance.",
+        "task_name": "aspects",
+        "labels": [
+          "camera",
+          "battery",
+          "screen",
+          "price",
+          "performance"
+        ],
+        "threshold": 0.4,
+        "multi_label": true
+      },
+      "expected": {
+        "aspects": [
+          "performance",
+          "price"
+        ]
+      }
+    },
+    {
+      "input": {
+        "text": "It's okay, nothing special but not bad either.",
+        "task_name": "sentiment",
+        "labels": [
+          "positive",
+          "negative",
+          "neutral"
+        ],
+        "threshold": 0.5,
+        "multi_label": false
+      },
+      "expected": {
+        "sentiment": "neutral"
+      }
+    },
+    {
+      "input": {
+        "text": "The screen is dim but the battery lasts long.",
+        "task_name": "aspects",
+        "labels": [
+          "camera",
+          "battery",
+          "screen",
+          "price",
+          "performance"
+        ],
+        "threshold": 0.4,
+        "multi_label": true
+      },
+      "expected": {
+        "aspects": [
+          "battery"
+        ]
+      }
+    },
+    {
+      "input": {
+        "text": "The device is slow and frustrating to use.",
+        "task_name": "sentiment",
+        "labels": [
+          "positive",
+          "negative",
+          "neutral"
+        ],
+        "threshold": 0.5,
+        "multi_label": false
+      },
+      "expected": {
+        "sentiment": "negative"
+      }
+    },
+    {
+      "input": {
+        "text": "Great camera and screen but the battery is weak.",
+        "task_name": "aspects",
+        "labels": [
+          "camera",
+          "battery",
+          "screen",
+          "price",
+          "performance"
+        ],
+        "threshold": 0.4,
+        "multi_label": true
+      },
+      "expected": {
+        "aspects": [
+          "battery",
+          "screen"
+        ]
+      }
+    },
+    {
+      "input": {
+        "text": "The battery life is terrible and disappointing.",
+        "task_name": "sentiment",
+        "labels": [
+          "positive",
+          "negative",
+          "neutral"
+        ],
+        "threshold": 0.5,
+        "multi_label": false
+      },
+      "expected": {
+        "sentiment": "negative"
+      }
+    },
+    {
+      "input": {
+        "text": "Battery and camera are excellent, price is high.",
+        "task_name": "aspects",
+        "labels": [
+          "camera",
+          "battery",
+          "screen",
+          "price",
+          "performance"
+        ],
+        "threshold": 0.4,
+        "multi_label": true
+      },
+      "expected": {
+        "aspects": [
+          "camera",
+          "price",
+          "battery"
+        ]
+      }
+    },
+    {
+      "input": {
+        "text": "Outstanding performance with great screen quality.",
+        "task_name": "sentiment",
+        "labels": [
+          "positive",
+          "negative",
+          "neutral"
+        ],
+        "threshold": 0.5,
+        "multi_label": false
+      },
+      "expected": {
+        "sentiment": "positive"
+      }
+    },
+    {
+      "input": {
+        "text": "Love the camera, hate the price.",
+        "task_name": "aspects",
+        "labels": [
+          "camera",
+          "battery",
+          "screen",
+          "price",
+          "performance"
+        ],
+        "threshold": 0.4,
+        "multi_label": true
+      },
+      "expected": {
+        "aspects": [
+          "camera",
+          "price"
+        ]
+      }
+    },
+    {
+      "input": {
+        "text": "This phone is amazing and fast, I love it.",
+        "task_name": "sentiment",
+        "labels": [
+          "positive",
+          "negative",
+          "neutral"
+        ],
+        "threshold": 0.5,
+        "multi_label": false
+      },
+      "expected": {
+        "sentiment": "positive"
+      }
+    },
+    {
+      "input": {
+        "text": "Affordable price with solid performance.",
+        "task_name": "aspects",
+        "labels": [
+          "camera",
+          "battery",
+          "screen",
+          "price",
+          "performance"
+        ],
+        "threshold": 0.4,
+        "multi_label": true
+      },
+      "expected": {
+        "aspects": [
+          "performance",
+          "price"
+        ]
+      }
+    },
+    {
+      "input": {
+        "text": "It's okay, nothing special but not bad either.",
+        "task_name": "sentiment",
+        "labels": [
+          "positive",
+          "negative",
+          "neutral"
+        ],
+        "threshold": 0.5,
+        "multi_label": false
+      },
+      "expected": {
+        "sentiment": "neutral"
+      }
+    },
+    {
+      "input": {
+        "text": "The screen is dim but the battery lasts long.",
+        "task_name": "aspects",
+        "labels": [
+          "camera",
+          "battery",
+          "screen",
+          "price",
+          "performance"
+        ],
+        "threshold": 0.4,
+        "multi_label": true
+      },
+      "expected": {
+        "aspects": [
+          "battery"
+        ]
+      }
+    },
+    {
+      "input": {
+        "text": "The device is slow and frustrating to use.",
+        "task_name": "sentiment",
+        "labels": [
+          "positive",
+          "negative",
+          "neutral"
+        ],
+        "threshold": 0.5,
+        "multi_label": false
+      },
+      "expected": {
+        "sentiment": "negative"
+      }
+    },
+    {
+      "input": {
+        "text": "Great camera and screen but the battery is weak.",
+        "task_name": "aspects",
+        "labels": [
+          "camera",
+          "battery",
+          "screen",
+          "price",
+          "performance"
+        ],
+        "threshold": 0.4,
+        "multi_label": true
+      },
+      "expected": {
+        "aspects": [
+          "battery",
+          "screen"
+        ]
+      }
+    },
+    {
+      "input": {
+        "text": "The battery life is terrible and disappointing.",
+        "task_name": "sentiment",
+        "labels": [
+          "positive",
+          "negative",
+          "neutral"
+        ],
+        "threshold": 0.5,
+        "multi_label": false
+      },
+      "expected": {
+        "sentiment": "negative"
+      }
+    },
+    {
+      "input": {
+        "text": "Battery and camera are excellent, price is high.",
+        "task_name": "aspects",
+        "labels": [
+          "camera",
+          "battery",
+          "screen",
+          "price",
+          "performance"
+        ],
+        "threshold": 0.4,
+        "multi_label": true
+      },
+      "expected": {
+        "aspects": [
+          "camera",
+          "price",
+          "battery"
+        ]
+      }
+    },
+    {
+      "input": {
+        "text": "Outstanding performance with great screen quality.",
+        "task_name": "sentiment",
+        "labels": [
+          "positive",
+          "negative",
+          "neutral"
+        ],
+        "threshold": 0.5,
+        "multi_label": false
+      },
+      "expected": {
+        "sentiment": "positive"
+      }
+    },
+    {
+      "input": {
+        "text": "Love the camera, hate the price.",
+        "task_name": "aspects",
+        "labels": [
+          "camera",
+          "battery",
+          "screen",
+          "price",
+          "performance"
+        ],
+        "threshold": 0.4,
+        "multi_label": true
+      },
+      "expected": {
+        "aspects": [
+          "camera",
+          "price"
+        ]
+      }
+    },
+    {
+      "input": {
+        "text": "This phone is amazing and fast, I love it.",
+        "task_name": "sentiment",
+        "labels": [
+          "positive",
+          "negative",
+          "neutral"
+        ],
+        "threshold": 0.5,
+        "multi_label": false
+      },
+      "expected": {
+        "sentiment": "positive"
+      }
+    },
+    {
+      "input": {
+        "text": "Affordable price with solid performance.",
+        "task_name": "aspects",
+        "labels": [
+          "camera",
+          "battery",
+          "screen",
+          "price",
+          "performance"
+        ],
+        "threshold": 0.4,
+        "multi_label": true
+      },
+      "expected": {
+        "aspects": [
+          "performance",
+          "price"
+        ]
+      }
+    },
+    {
+      "input": {
+        "text": "It's okay, nothing special but not bad either.",
+        "task_name": "sentiment",
+        "labels": [
+          "positive",
+          "negative",
+          "neutral"
+        ],
+        "threshold": 0.5,
+        "multi_label": false
+      },
+      "expected": {
+        "sentiment": "neutral"
+      }
+    },
+    {
+      "input": {
+        "text": "The screen is dim but the battery lasts long.",
+        "task_name": "aspects",
+        "labels": [
+          "camera",
+          "battery",
+          "screen",
+          "price",
+          "performance"
+        ],
+        "threshold": 0.4,
+        "multi_label": true
+      },
+      "expected": {
+        "aspects": [
+          "battery"
+        ]
+      }
+    },
+    {
+      "input": {
+        "text": "The device is slow and frustrating to use.",
+        "task_name": "sentiment",
+        "labels": [
+          "positive",
+          "negative",
+          "neutral"
+        ],
+        "threshold": 0.5,
+        "multi_label": false
+      },
+      "expected": {
+        "sentiment": "negative"
+      }
+    },
+    {
+      "input": {
+        "text": "Great camera and screen but the battery is weak.",
+        "task_name": "aspects",
+        "labels": [
+          "camera",
+          "battery",
+          "screen",
+          "price",
+          "performance"
+        ],
+        "threshold": 0.4,
+        "multi_label": true
+      },
+      "expected": {
+        "aspects": [
+          "battery",
+          "screen"
+        ]
+      }
+    },
+    {
+      "input": {
+        "text": "The battery life is terrible and disappointing.",
+        "task_name": "sentiment",
+        "labels": [
+          "positive",
+          "negative",
+          "neutral"
+        ],
+        "threshold": 0.5,
+        "multi_label": false
+      },
+      "expected": {
+        "sentiment": "negative"
+      }
+    },
+    {
+      "input": {
+        "text": "Battery and camera are excellent, price is high.",
+        "task_name": "aspects",
+        "labels": [
+          "camera",
+          "battery",
+          "screen",
+          "price",
+          "performance"
+        ],
+        "threshold": 0.4,
+        "multi_label": true
+      },
+      "expected": {
+        "aspects": [
+          "camera",
+          "price",
+          "battery"
+        ]
+      }
+    },
+    {
+      "input": {
+        "text": "Outstanding performance with great screen quality.",
+        "task_name": "sentiment",
+        "labels": [
+          "positive",
+          "negative",
+          "neutral"
+        ],
+        "threshold": 0.5,
+        "multi_label": false
+      },
+      "expected": {
+        "sentiment": "positive"
+      }
+    },
+    {
+      "input": {
+        "text": "Love the camera, hate the price.",
+        "task_name": "aspects",
+        "labels": [
+          "camera",
+          "battery",
+          "screen",
+          "price",
+          "performance"
+        ],
+        "threshold": 0.4,
+        "multi_label": true
+      },
+      "expected": {
+        "aspects": [
+          "camera",
+          "price"
+        ]
+      }
+    },
+    {
+      "input": {
+        "text": "This phone is amazing and fast, I love it.",
+        "task_name": "sentiment",
+        "labels": [
+          "positive",
+          "negative",
+          "neutral"
+        ],
+        "threshold": 0.5,
+        "multi_label": false
+      },
+      "expected": {
+        "sentiment": "positive"
+      }
+    },
+    {
+      "input": {
+        "text": "Affordable price with solid performance.",
+        "task_name": "aspects",
+        "labels": [
+          "camera",
+          "battery",
+          "screen",
+          "price",
+          "performance"
+        ],
+        "threshold": 0.4,
+        "multi_label": true
+      },
+      "expected": {
+        "aspects": [
+          "performance",
+          "price"
+        ]
+      }
+    },
+    {
+      "input": {
+        "text": "It's okay, nothing special but not bad either.",
+        "task_name": "sentiment",
+        "labels": [
+          "positive",
+          "negative",
+          "neutral"
+        ],
+        "threshold": 0.5,
+        "multi_label": false
+      },
+      "expected": {
+        "sentiment": "neutral"
+      }
+    },
+    {
+      "input": {
+        "text": "The screen is dim but the battery lasts long.",
+        "task_name": "aspects",
+        "labels": [
+          "camera",
+          "battery",
+          "screen",
+          "price",
+          "performance"
+        ],
+        "threshold": 0.4,
+        "multi_label": true
+      },
+      "expected": {
+        "aspects": [
+          "battery"
+        ]
+      }
+    },
+    {
+      "input": {
+        "text": "The device is slow and frustrating to use.",
+        "task_name": "sentiment",
+        "labels": [
+          "positive",
+          "negative",
+          "neutral"
+        ],
+        "threshold": 0.5,
+        "multi_label": false
+      },
+      "expected": {
+        "sentiment": "negative"
+      }
+    },
+    {
+      "input": {
+        "text": "Great camera and screen but the battery is weak.",
+        "task_name": "aspects",
+        "labels": [
+          "camera",
+          "battery",
+          "screen",
+          "price",
+          "performance"
+        ],
+        "threshold": 0.4,
+        "multi_label": true
+      },
+      "expected": {
+        "aspects": [
+          "battery",
+          "screen"
+        ]
+      }
+    },
+    {
+      "input": {
+        "text": "The battery life is terrible and disappointing.",
+        "task_name": "sentiment",
+        "labels": [
+          "positive",
+          "negative",
+          "neutral"
+        ],
+        "threshold": 0.5,
+        "multi_label": false
+      },
+      "expected": {
+        "sentiment": "negative"
+      }
+    },
+    {
+      "input": {
+        "text": "Battery and camera are excellent, price is high.",
+        "task_name": "aspects",
+        "labels": [
+          "camera",
+          "battery",
+          "screen",
+          "price",
+          "performance"
+        ],
+        "threshold": 0.4,
+        "multi_label": true
+      },
+      "expected": {
+        "aspects": [
+          "camera",
+          "price",
+          "battery"
+        ]
+      }
+    },
+    {
+      "input": {
+        "text": "Outstanding performance with great screen quality.",
+        "task_name": "sentiment",
+        "labels": [
+          "positive",
+          "negative",
+          "neutral"
+        ],
+        "threshold": 0.5,
+        "multi_label": false
+      },
+      "expected": {
+        "sentiment": "positive"
+      }
+    },
+    {
+      "input": {
+        "text": "Love the camera, hate the price.",
+        "task_name": "aspects",
+        "labels": [
+          "camera",
+          "battery",
+          "screen",
+          "price",
+          "performance"
+        ],
+        "threshold": 0.4,
+        "multi_label": true
+      },
+      "expected": {
+        "aspects": [
+          "camera",
+          "price"
+        ]
+      }
+    },
+    {
+      "input": {
+        "text": "This phone is amazing and fast, I love it.",
+        "task_name": "sentiment",
+        "labels": [
+          "positive",
+          "negative",
+          "neutral"
+        ],
+        "threshold": 0.5,
+        "multi_label": false
+      },
+      "expected": {
+        "sentiment": "positive"
+      }
+    },
+    {
+      "input": {
+        "text": "Affordable price with solid performance.",
+        "task_name": "aspects",
+        "labels": [
+          "camera",
+          "battery",
+          "screen",
+          "price",
+          "performance"
+        ],
+        "threshold": 0.4,
+        "multi_label": true
+      },
+      "expected": {
+        "aspects": [
+          "performance",
+          "price"
+        ]
+      }
+    },
+    {
+      "input": {
+        "text": "It's okay, nothing special but not bad either.",
+        "task_name": "sentiment",
+        "labels": [
+          "positive",
+          "negative",
+          "neutral"
+        ],
+        "threshold": 0.5,
+        "multi_label": false
+      },
+      "expected": {
+        "sentiment": "neutral"
+      }
+    },
+    {
+      "input": {
+        "text": "The screen is dim but the battery lasts long.",
+        "task_name": "aspects",
+        "labels": [
+          "camera",
+          "battery",
+          "screen",
+          "price",
+          "performance"
+        ],
+        "threshold": 0.4,
+        "multi_label": true
+      },
+      "expected": {
+        "aspects": [
+          "battery"
+        ]
+      }
+    },
+    {
+      "input": {
+        "text": "The device is slow and frustrating to use.",
+        "task_name": "sentiment",
+        "labels": [
+          "positive",
+          "negative",
+          "neutral"
+        ],
+        "threshold": 0.5,
+        "multi_label": false
+      },
+      "expected": {
+        "sentiment": "negative"
+      }
+    },
+    {
+      "input": {
+        "text": "Great camera and screen but the battery is weak.",
+        "task_name": "aspects",
+        "labels": [
+          "camera",
+          "battery",
+          "screen",
+          "price",
+          "performance"
+        ],
+        "threshold": 0.4,
+        "multi_label": true
+      },
+      "expected": {
+        "aspects": [
+          "battery",
+          "screen"
+        ]
+      }
+    },
+    {
+      "input": {
+        "text": "The battery life is terrible and disappointing.",
+        "task_name": "sentiment",
+        "labels": [
+          "positive",
+          "negative",
+          "neutral"
+        ],
+        "threshold": 0.5,
+        "multi_label": false
+      },
+      "expected": {
+        "sentiment": "negative"
+      }
+    },
+    {
+      "input": {
+        "text": "Battery and camera are excellent, price is high.",
+        "task_name": "aspects",
+        "labels": [
+          "camera",
+          "battery",
+          "screen",
+          "price",
+          "performance"
+        ],
+        "threshold": 0.4,
+        "multi_label": true
+      },
+      "expected": {
+        "aspects": [
+          "camera",
+          "price",
+          "battery"
+        ]
+      }
+    },
+    {
+      "input": {
+        "text": "Outstanding performance with great screen quality.",
+        "task_name": "sentiment",
+        "labels": [
+          "positive",
+          "negative",
+          "neutral"
+        ],
+        "threshold": 0.5,
+        "multi_label": false
+      },
+      "expected": {
+        "sentiment": "positive"
+      }
+    },
+    {
+      "input": {
+        "text": "Love the camera, hate the price.",
+        "task_name": "aspects",
+        "labels": [
+          "camera",
+          "battery",
+          "screen",
+          "price",
+          "performance"
+        ],
+        "threshold": 0.4,
+        "multi_label": true
+      },
+      "expected": {
+        "aspects": [
+          "camera",
+          "price"
+        ]
+      }
+    }
+  ],
+  "json": [
+    {
+      "input": {
+        "text": "Product: iPhone 15 Pro. Storage: 128GB. Price: $799.",
+        "parent": "product",
+        "fields": [
+          "name::str::Full product name",
+          "storage::str::Storage capacity",
+          "price::str::Product price"
+        ],
+        "threshold": 0.4
+      },
+      "expected": {
+        "product": [
+          {
+            "name": "iPhone 15 Pro",
+            "storage": "128GB",
+            "price": "$799"
+          }
+        ]
+      }
+    },
+    {
+      "input": {
+        "text": "Product: Galaxy S24. Storage: 512GB. Price: $1499.",
+        "parent": "product",
+        "fields": [
+          "name::str::Full product name",
+          "storage::str::Storage capacity",
+          "price::str::Product price"
+        ],
+        "threshold": 0.4
+      },
+      "expected": {
+        "product": [
+          {
+            "name": "Galaxy S24",
+            "storage": "512GB",
+            "price": "$1499"
+          }
+        ]
+      }
+    },
+    {
+      "input": {
+        "text": "Product: Pixel 9 Pro. Storage: 64GB. Price: $799.",
+        "parent": "product",
+        "fields": [
+          "name::str::Full product name",
+          "storage::str::Storage capacity",
+          "price::str::Product price"
+        ],
+        "threshold": 0.4
+      },
+      "expected": {
+        "product": [
+          {
+            "name": "Pixel 9 Pro",
+            "storage": "64GB",
+            "price": "$799"
+          }
+        ]
+      }
+    },
+    {
+      "input": {
+        "text": "Product: Xperia 5. Storage: 256GB. Price: $1499.",
+        "parent": "product",
+        "fields": [
+          "name::str::Full product name",
+          "storage::str::Storage capacity",
+          "price::str::Product price"
+        ],
+        "threshold": 0.4
+      },
+      "expected": {
+        "product": [
+          {
+            "name": "Xperia 5",
+            "storage": "256GB",
+            "price": "$1499"
+          }
+        ]
+      }
+    },
+    {
+      "input": {
+        "text": "Product: OnePlus 12. Storage: 1TB. Price: $799.",
+        "parent": "product",
+        "fields": [
+          "name::str::Full product name",
+          "storage::str::Storage capacity",
+          "price::str::Product price"
+        ],
+        "threshold": 0.4
+      },
+      "expected": {
+        "product": [
+          {
+            "name": "OnePlus 12",
+            "storage": "1TB",
+            "price": "$799"
+          }
+        ]
+      }
+    },
+    {
+      "input": {
+        "text": "Product: ThinkPad X1. Storage: 128GB. Price: $1499.",
+        "parent": "product",
+        "fields": [
+          "name::str::Full product name",
+          "storage::str::Storage capacity",
+          "price::str::Product price"
+        ],
+        "threshold": 0.4
+      },
+      "expected": {
+        "product": [
+          {
+            "name": "ThinkPad X1",
+            "storage": "128GB",
+            "price": "$1499"
+          }
+        ]
+      }
+    },
+    {
+      "input": {
+        "text": "Product: MacBook Pro. Storage: 512GB. Price: $799.",
+        "parent": "product",
+        "fields": [
+          "name::str::Full product name",
+          "storage::str::Storage capacity",
+          "price::str::Product price"
+        ],
+        "threshold": 0.4
+      },
+      "expected": {
+        "product": [
+          {
+            "name": "MacBook Pro",
+            "storage": "512GB",
+            "price": "$799"
+          }
+        ]
+      }
+    },
+    {
+      "input": {
+        "text": "Product: Surface Laptop. Storage: 64GB. Price: $1499.",
+        "parent": "product",
+        "fields": [
+          "name::str::Full product name",
+          "storage::str::Storage capacity",
+          "price::str::Product price"
+        ],
+        "threshold": 0.4
+      },
+      "expected": {
+        "product": [
+          {
+            "name": "Surface Laptop",
+            "storage": "64GB",
+            "price": "$1499"
+          }
+        ]
+      }
+    },
+    {
+      "input": {
+        "text": "Product: iPad Air. Storage: 256GB. Price: $799.",
+        "parent": "product",
+        "fields": [
+          "name::str::Full product name",
+          "storage::str::Storage capacity",
+          "price::str::Product price"
+        ],
+        "threshold": 0.4
+      },
+      "expected": {
+        "product": [
+          {
+            "name": "iPad Air",
+            "storage": "256GB",
+            "price": "$799"
+          }
+        ]
+      }
+    },
+    {
+      "input": {
+        "text": "Product: Kindle Scribe. Storage: 1TB. Price: $1499.",
+        "parent": "product",
+        "fields": [
+          "name::str::Full product name",
+          "storage::str::Storage capacity",
+          "price::str::Product price"
+        ],
+        "threshold": 0.4
+      },
+      "expected": {
+        "product": [
+          {
+            "name": "Kindle Scribe",
+            "storage": "1TB",
+            "price": "$1499"
+          }
+        ]
+      }
+    },
+    {
+      "input": {
+        "text": "Product: iPhone 15 Pro. Storage: 128GB. Price: $799.",
+        "parent": "product",
+        "fields": [
+          "name::str::Full product name",
+          "storage::str::Storage capacity",
+          "price::str::Product price"
+        ],
+        "threshold": 0.4
+      },
+      "expected": {
+        "product": [
+          {
+            "name": "iPhone 15 Pro",
+            "storage": "128GB",
+            "price": "$799"
+          }
+        ]
+      }
+    },
+    {
+      "input": {
+        "text": "Product: Galaxy S24. Storage: 512GB. Price: $1499.",
+        "parent": "product",
+        "fields": [
+          "name::str::Full product name",
+          "storage::str::Storage capacity",
+          "price::str::Product price"
+        ],
+        "threshold": 0.4
+      },
+      "expected": {
+        "product": [
+          {
+            "name": "Galaxy S24",
+            "storage": "512GB",
+            "price": "$1499"
+          }
+        ]
+      }
+    },
+    {
+      "input": {
+        "text": "Product: Pixel 9 Pro. Storage: 64GB. Price: $799.",
+        "parent": "product",
+        "fields": [
+          "name::str::Full product name",
+          "storage::str::Storage capacity",
+          "price::str::Product price"
+        ],
+        "threshold": 0.4
+      },
+      "expected": {
+        "product": [
+          {
+            "name": "Pixel 9 Pro",
+            "storage": "64GB",
+            "price": "$799"
+          }
+        ]
+      }
+    },
+    {
+      "input": {
+        "text": "Product: Xperia 5. Storage: 256GB. Price: $1499.",
+        "parent": "product",
+        "fields": [
+          "name::str::Full product name",
+          "storage::str::Storage capacity",
+          "price::str::Product price"
+        ],
+        "threshold": 0.4
+      },
+      "expected": {
+        "product": [
+          {
+            "name": "Xperia 5",
+            "storage": "256GB",
+            "price": "$1499"
+          }
+        ]
+      }
+    },
+    {
+      "input": {
+        "text": "Product: OnePlus 12. Storage: 1TB. Price: $799.",
+        "parent": "product",
+        "fields": [
+          "name::str::Full product name",
+          "storage::str::Storage capacity",
+          "price::str::Product price"
+        ],
+        "threshold": 0.4
+      },
+      "expected": {
+        "product": [
+          {
+            "name": "OnePlus 12",
+            "storage": "1TB",
+            "price": "$799"
+          }
+        ]
+      }
+    },
+    {
+      "input": {
+        "text": "Product: ThinkPad X1. Storage: 128GB. Price: $1499.",
+        "parent": "product",
+        "fields": [
+          "name::str::Full product name",
+          "storage::str::Storage capacity",
+          "price::str::Product price"
+        ],
+        "threshold": 0.4
+      },
+      "expected": {
+        "product": [
+          {
+            "name": "ThinkPad X1",
+            "storage": "128GB",
+            "price": "$1499"
+          }
+        ]
+      }
+    },
+    {
+      "input": {
+        "text": "Product: MacBook Pro. Storage: 512GB. Price: $799.",
+        "parent": "product",
+        "fields": [
+          "name::str::Full product name",
+          "storage::str::Storage capacity",
+          "price::str::Product price"
+        ],
+        "threshold": 0.4
+      },
+      "expected": {
+        "product": [
+          {
+            "name": "MacBook Pro",
+            "storage": "512GB",
+            "price": "$799"
+          }
+        ]
+      }
+    },
+    {
+      "input": {
+        "text": "Product: Surface Laptop. Storage: 64GB. Price: $1499.",
+        "parent": "product",
+        "fields": [
+          "name::str::Full product name",
+          "storage::str::Storage capacity",
+          "price::str::Product price"
+        ],
+        "threshold": 0.4
+      },
+      "expected": {
+        "product": [
+          {
+            "name": "Surface Laptop",
+            "storage": "64GB",
+            "price": "$1499"
+          }
+        ]
+      }
+    },
+    {
+      "input": {
+        "text": "Product: iPad Air. Storage: 256GB. Price: $799.",
+        "parent": "product",
+        "fields": [
+          "name::str::Full product name",
+          "storage::str::Storage capacity",
+          "price::str::Product price"
+        ],
+        "threshold": 0.4
+      },
+      "expected": {
+        "product": [
+          {
+            "name": "iPad Air",
+            "storage": "256GB",
+            "price": "$799"
+          }
+        ]
+      }
+    },
+    {
+      "input": {
+        "text": "Product: Kindle Scribe. Storage: 1TB. Price: $1499.",
+        "parent": "product",
+        "fields": [
+          "name::str::Full product name",
+          "storage::str::Storage capacity",
+          "price::str::Product price"
+        ],
+        "threshold": 0.4
+      },
+      "expected": {
+        "product": [
+          {
+            "name": "Kindle Scribe",
+            "storage": "1TB",
+            "price": "$1499"
+          }
+        ]
+      }
+    },
+    {
+      "input": {
+        "text": "Product: iPhone 15 Pro. Storage: 128GB. Price: $799.",
+        "parent": "product",
+        "fields": [
+          "name::str::Full product name",
+          "storage::str::Storage capacity",
+          "price::str::Product price"
+        ],
+        "threshold": 0.4
+      },
+      "expected": {
+        "product": [
+          {
+            "name": "iPhone 15 Pro",
+            "storage": "128GB",
+            "price": "$799"
+          }
+        ]
+      }
+    },
+    {
+      "input": {
+        "text": "Product: Galaxy S24. Storage: 512GB. Price: $1499.",
+        "parent": "product",
+        "fields": [
+          "name::str::Full product name",
+          "storage::str::Storage capacity",
+          "price::str::Product price"
+        ],
+        "threshold": 0.4
+      },
+      "expected": {
+        "product": [
+          {
+            "name": "Galaxy S24",
+            "storage": "512GB",
+            "price": "$1499"
+          }
+        ]
+      }
+    },
+    {
+      "input": {
+        "text": "Product: Pixel 9 Pro. Storage: 64GB. Price: $799.",
+        "parent": "product",
+        "fields": [
+          "name::str::Full product name",
+          "storage::str::Storage capacity",
+          "price::str::Product price"
+        ],
+        "threshold": 0.4
+      },
+      "expected": {
+        "product": [
+          {
+            "name": "Pixel 9 Pro",
+            "storage": "64GB",
+            "price": "$799"
+          }
+        ]
+      }
+    },
+    {
+      "input": {
+        "text": "Product: Xperia 5. Storage: 256GB. Price: $1499.",
+        "parent": "product",
+        "fields": [
+          "name::str::Full product name",
+          "storage::str::Storage capacity",
+          "price::str::Product price"
+        ],
+        "threshold": 0.4
+      },
+      "expected": {
+        "product": [
+          {
+            "name": "Xperia 5",
+            "storage": "256GB",
+            "price": "$1499"
+          }
+        ]
+      }
+    },
+    {
+      "input": {
+        "text": "Product: OnePlus 12. Storage: 1TB. Price: $799.",
+        "parent": "product",
+        "fields": [
+          "name::str::Full product name",
+          "storage::str::Storage capacity",
+          "price::str::Product price"
+        ],
+        "threshold": 0.4
+      },
+      "expected": {
+        "product": [
+          {
+            "name": "OnePlus 12",
+            "storage": "1TB",
+            "price": "$799"
+          }
+        ]
+      }
+    },
+    {
+      "input": {
+        "text": "Product: ThinkPad X1. Storage: 128GB. Price: $1499.",
+        "parent": "product",
+        "fields": [
+          "name::str::Full product name",
+          "storage::str::Storage capacity",
+          "price::str::Product price"
+        ],
+        "threshold": 0.4
+      },
+      "expected": {
+        "product": [
+          {
+            "name": "ThinkPad X1",
+            "storage": "128GB",
+            "price": "$1499"
+          }
+        ]
+      }
+    },
+    {
+      "input": {
+        "text": "Product: MacBook Pro. Storage: 512GB. Price: $799.",
+        "parent": "product",
+        "fields": [
+          "name::str::Full product name",
+          "storage::str::Storage capacity",
+          "price::str::Product price"
+        ],
+        "threshold": 0.4
+      },
+      "expected": {
+        "product": [
+          {
+            "name": "MacBook Pro",
+            "storage": "512GB",
+            "price": "$799"
+          }
+        ]
+      }
+    },
+    {
+      "input": {
+        "text": "Product: Surface Laptop. Storage: 64GB. Price: $1499.",
+        "parent": "product",
+        "fields": [
+          "name::str::Full product name",
+          "storage::str::Storage capacity",
+          "price::str::Product price"
+        ],
+        "threshold": 0.4
+      },
+      "expected": {
+        "product": [
+          {
+            "name": "Surface Laptop",
+            "storage": "64GB",
+            "price": "$1499"
+          }
+        ]
+      }
+    },
+    {
+      "input": {
+        "text": "Product: iPad Air. Storage: 256GB. Price: $799.",
+        "parent": "product",
+        "fields": [
+          "name::str::Full product name",
+          "storage::str::Storage capacity",
+          "price::str::Product price"
+        ],
+        "threshold": 0.4
+      },
+      "expected": {
+        "product": [
+          {
+            "name": "iPad Air",
+            "storage": "256GB",
+            "price": "$799"
+          }
+        ]
+      }
+    },
+    {
+      "input": {
+        "text": "Product: Kindle Scribe. Storage: 1TB. Price: $1499.",
+        "parent": "product",
+        "fields": [
+          "name::str::Full product name",
+          "storage::str::Storage capacity",
+          "price::str::Product price"
+        ],
+        "threshold": 0.4
+      },
+      "expected": {
+        "product": [
+          {
+            "name": "Kindle Scribe",
+            "storage": "1TB",
+            "price": "$1499"
+          }
+        ]
+      }
+    },
+    {
+      "input": {
+        "text": "Product: iPhone 15 Pro. Storage: 128GB. Price: $799.",
+        "parent": "product",
+        "fields": [
+          "name::str::Full product name",
+          "storage::str::Storage capacity",
+          "price::str::Product price"
+        ],
+        "threshold": 0.4
+      },
+      "expected": {
+        "product": [
+          {
+            "name": "iPhone 15 Pro",
+            "storage": "128GB",
+            "price": "$799"
+          }
+        ]
+      }
+    },
+    {
+      "input": {
+        "text": "Product: Galaxy S24. Storage: 512GB. Price: $1499.",
+        "parent": "product",
+        "fields": [
+          "name::str::Full product name",
+          "storage::str::Storage capacity",
+          "price::str::Product price"
+        ],
+        "threshold": 0.4
+      },
+      "expected": {
+        "product": [
+          {
+            "name": "Galaxy S24",
+            "storage": "512GB",
+            "price": "$1499"
+          }
+        ]
+      }
+    },
+    {
+      "input": {
+        "text": "Product: Pixel 9 Pro. Storage: 64GB. Price: $799.",
+        "parent": "product",
+        "fields": [
+          "name::str::Full product name",
+          "storage::str::Storage capacity",
+          "price::str::Product price"
+        ],
+        "threshold": 0.4
+      },
+      "expected": {
+        "product": [
+          {
+            "name": "Pixel 9 Pro",
+            "storage": "64GB",
+            "price": "$799"
+          }
+        ]
+      }
+    },
+    {
+      "input": {
+        "text": "Product: Xperia 5. Storage: 256GB. Price: $1499.",
+        "parent": "product",
+        "fields": [
+          "name::str::Full product name",
+          "storage::str::Storage capacity",
+          "price::str::Product price"
+        ],
+        "threshold": 0.4
+      },
+      "expected": {
+        "product": [
+          {
+            "name": "Xperia 5",
+            "storage": "256GB",
+            "price": "$1499"
+          }
+        ]
+      }
+    },
+    {
+      "input": {
+        "text": "Product: OnePlus 12. Storage: 1TB. Price: $799.",
+        "parent": "product",
+        "fields": [
+          "name::str::Full product name",
+          "storage::str::Storage capacity",
+          "price::str::Product price"
+        ],
+        "threshold": 0.4
+      },
+      "expected": {
+        "product": [
+          {
+            "name": "OnePlus 12",
+            "storage": "1TB",
+            "price": "$799"
+          }
+        ]
+      }
+    },
+    {
+      "input": {
+        "text": "Product: ThinkPad X1. Storage: 128GB. Price: $1499.",
+        "parent": "product",
+        "fields": [
+          "name::str::Full product name",
+          "storage::str::Storage capacity",
+          "price::str::Product price"
+        ],
+        "threshold": 0.4
+      },
+      "expected": {
+        "product": [
+          {
+            "name": "ThinkPad X1",
+            "storage": "128GB",
+            "price": "$1499"
+          }
+        ]
+      }
+    },
+    {
+      "input": {
+        "text": "Product: MacBook Pro. Storage: 512GB. Price: $799.",
+        "parent": "product",
+        "fields": [
+          "name::str::Full product name",
+          "storage::str::Storage capacity",
+          "price::str::Product price"
+        ],
+        "threshold": 0.4
+      },
+      "expected": {
+        "product": [
+          {
+            "name": "MacBook Pro",
+            "storage": "512GB",
+            "price": "$799"
+          }
+        ]
+      }
+    },
+    {
+      "input": {
+        "text": "Product: Surface Laptop. Storage: 64GB. Price: $1499.",
+        "parent": "product",
+        "fields": [
+          "name::str::Full product name",
+          "storage::str::Storage capacity",
+          "price::str::Product price"
+        ],
+        "threshold": 0.4
+      },
+      "expected": {
+        "product": [
+          {
+            "name": "Surface Laptop",
+            "storage": "64GB",
+            "price": "$1499"
+          }
+        ]
+      }
+    },
+    {
+      "input": {
+        "text": "Product: iPad Air. Storage: 256GB. Price: $799.",
+        "parent": "product",
+        "fields": [
+          "name::str::Full product name",
+          "storage::str::Storage capacity",
+          "price::str::Product price"
+        ],
+        "threshold": 0.4
+      },
+      "expected": {
+        "product": [
+          {
+            "name": "iPad Air",
+            "storage": "256GB",
+            "price": "$799"
+          }
+        ]
+      }
+    },
+    {
+      "input": {
+        "text": "Product: Kindle Scribe. Storage: 1TB. Price: $1499.",
+        "parent": "product",
+        "fields": [
+          "name::str::Full product name",
+          "storage::str::Storage capacity",
+          "price::str::Product price"
+        ],
+        "threshold": 0.4
+      },
+      "expected": {
+        "product": [
+          {
+            "name": "Kindle Scribe",
+            "storage": "1TB",
+            "price": "$1499"
+          }
+        ]
+      }
+    },
+    {
+      "input": {
+        "text": "Product: iPhone 15 Pro. Storage: 128GB. Price: $799.",
+        "parent": "product",
+        "fields": [
+          "name::str::Full product name",
+          "storage::str::Storage capacity",
+          "price::str::Product price"
+        ],
+        "threshold": 0.4
+      },
+      "expected": {
+        "product": [
+          {
+            "name": "iPhone 15 Pro",
+            "storage": "128GB",
+            "price": "$799"
+          }
+        ]
+      }
+    },
+    {
+      "input": {
+        "text": "Product: Galaxy S24. Storage: 512GB. Price: $1499.",
+        "parent": "product",
+        "fields": [
+          "name::str::Full product name",
+          "storage::str::Storage capacity",
+          "price::str::Product price"
+        ],
+        "threshold": 0.4
+      },
+      "expected": {
+        "product": [
+          {
+            "name": "Galaxy S24",
+            "storage": "512GB",
+            "price": "$1499"
+          }
+        ]
+      }
+    },
+    {
+      "input": {
+        "text": "Product: Pixel 9 Pro. Storage: 64GB. Price: $799.",
+        "parent": "product",
+        "fields": [
+          "name::str::Full product name",
+          "storage::str::Storage capacity",
+          "price::str::Product price"
+        ],
+        "threshold": 0.4
+      },
+      "expected": {
+        "product": [
+          {
+            "name": "Pixel 9 Pro",
+            "storage": "64GB",
+            "price": "$799"
+          }
+        ]
+      }
+    },
+    {
+      "input": {
+        "text": "Product: Xperia 5. Storage: 256GB. Price: $1499.",
+        "parent": "product",
+        "fields": [
+          "name::str::Full product name",
+          "storage::str::Storage capacity",
+          "price::str::Product price"
+        ],
+        "threshold": 0.4
+      },
+      "expected": {
+        "product": [
+          {
+            "name": "Xperia 5",
+            "storage": "256GB",
+            "price": "$1499"
+          }
+        ]
+      }
+    },
+    {
+      "input": {
+        "text": "Product: OnePlus 12. Storage: 1TB. Price: $799.",
+        "parent": "product",
+        "fields": [
+          "name::str::Full product name",
+          "storage::str::Storage capacity",
+          "price::str::Product price"
+        ],
+        "threshold": 0.4
+      },
+      "expected": {
+        "product": [
+          {
+            "name": "OnePlus 12",
+            "storage": "1TB",
+            "price": "$799"
+          }
+        ]
+      }
+    },
+    {
+      "input": {
+        "text": "Product: ThinkPad X1. Storage: 128GB. Price: $1499.",
+        "parent": "product",
+        "fields": [
+          "name::str::Full product name",
+          "storage::str::Storage capacity",
+          "price::str::Product price"
+        ],
+        "threshold": 0.4
+      },
+      "expected": {
+        "product": [
+          {
+            "name": "ThinkPad X1",
+            "storage": "128GB",
+            "price": "$1499"
+          }
+        ]
+      }
+    },
+    {
+      "input": {
+        "text": "Product: MacBook Pro. Storage: 512GB. Price: $799.",
+        "parent": "product",
+        "fields": [
+          "name::str::Full product name",
+          "storage::str::Storage capacity",
+          "price::str::Product price"
+        ],
+        "threshold": 0.4
+      },
+      "expected": {
+        "product": [
+          {
+            "name": "MacBook Pro",
+            "storage": "512GB",
+            "price": "$799"
+          }
+        ]
+      }
+    },
+    {
+      "input": {
+        "text": "Product: Surface Laptop. Storage: 64GB. Price: $1499.",
+        "parent": "product",
+        "fields": [
+          "name::str::Full product name",
+          "storage::str::Storage capacity",
+          "price::str::Product price"
+        ],
+        "threshold": 0.4
+      },
+      "expected": {
+        "product": [
+          {
+            "name": "Surface Laptop",
+            "storage": "64GB",
+            "price": "$1499"
+          }
+        ]
+      }
+    },
+    {
+      "input": {
+        "text": "Product: iPad Air. Storage: 256GB. Price: $799.",
+        "parent": "product",
+        "fields": [
+          "name::str::Full product name",
+          "storage::str::Storage capacity",
+          "price::str::Product price"
+        ],
+        "threshold": 0.4
+      },
+      "expected": {
+        "product": [
+          {
+            "name": "iPad Air",
+            "storage": "256GB",
+            "price": "$799"
+          }
+        ]
+      }
+    },
+    {
+      "input": {
+        "text": "Product: Kindle Scribe. Storage: 1TB. Price: $1499.",
+        "parent": "product",
+        "fields": [
+          "name::str::Full product name",
+          "storage::str::Storage capacity",
+          "price::str::Product price"
+        ],
+        "threshold": 0.4
+      },
+      "expected": {
+        "product": [
+          {
+            "name": "Kindle Scribe",
+            "storage": "1TB",
+            "price": "$1499"
+          }
+        ]
+      }
+    },
+    {
+      "input": {
+        "text": "Product: iPhone 15 Pro. Storage: 128GB. Price: $799.",
+        "parent": "product",
+        "fields": [
+          "name::str::Full product name",
+          "storage::str::Storage capacity",
+          "price::str::Product price"
+        ],
+        "threshold": 0.4
+      },
+      "expected": {
+        "product": [
+          {
+            "name": "iPhone 15 Pro",
+            "storage": "128GB",
+            "price": "$799"
+          }
+        ]
+      }
+    },
+    {
+      "input": {
+        "text": "Product: Galaxy S24. Storage: 512GB. Price: $1499.",
+        "parent": "product",
+        "fields": [
+          "name::str::Full product name",
+          "storage::str::Storage capacity",
+          "price::str::Product price"
+        ],
+        "threshold": 0.4
+      },
+      "expected": {
+        "product": [
+          {
+            "name": "Galaxy S24",
+            "storage": "512GB",
+            "price": "$1499"
+          }
+        ]
+      }
+    },
+    {
+      "input": {
+        "text": "Product: Pixel 9 Pro. Storage: 64GB. Price: $799.",
+        "parent": "product",
+        "fields": [
+          "name::str::Full product name",
+          "storage::str::Storage capacity",
+          "price::str::Product price"
+        ],
+        "threshold": 0.4
+      },
+      "expected": {
+        "product": [
+          {
+            "name": "Pixel 9 Pro",
+            "storage": "64GB",
+            "price": "$799"
+          }
+        ]
+      }
+    },
+    {
+      "input": {
+        "text": "Product: Xperia 5. Storage: 256GB. Price: $1499.",
+        "parent": "product",
+        "fields": [
+          "name::str::Full product name",
+          "storage::str::Storage capacity",
+          "price::str::Product price"
+        ],
+        "threshold": 0.4
+      },
+      "expected": {
+        "product": [
+          {
+            "name": "Xperia 5",
+            "storage": "256GB",
+            "price": "$1499"
+          }
+        ]
+      }
+    },
+    {
+      "input": {
+        "text": "Product: OnePlus 12. Storage: 1TB. Price: $799.",
+        "parent": "product",
+        "fields": [
+          "name::str::Full product name",
+          "storage::str::Storage capacity",
+          "price::str::Product price"
+        ],
+        "threshold": 0.4
+      },
+      "expected": {
+        "product": [
+          {
+            "name": "OnePlus 12",
+            "storage": "1TB",
+            "price": "$799"
+          }
+        ]
+      }
+    },
+    {
+      "input": {
+        "text": "Product: ThinkPad X1. Storage: 128GB. Price: $1499.",
+        "parent": "product",
+        "fields": [
+          "name::str::Full product name",
+          "storage::str::Storage capacity",
+          "price::str::Product price"
+        ],
+        "threshold": 0.4
+      },
+      "expected": {
+        "product": [
+          {
+            "name": "ThinkPad X1",
+            "storage": "128GB",
+            "price": "$1499"
+          }
+        ]
+      }
+    },
+    {
+      "input": {
+        "text": "Product: MacBook Pro. Storage: 512GB. Price: $799.",
+        "parent": "product",
+        "fields": [
+          "name::str::Full product name",
+          "storage::str::Storage capacity",
+          "price::str::Product price"
+        ],
+        "threshold": 0.4
+      },
+      "expected": {
+        "product": [
+          {
+            "name": "MacBook Pro",
+            "storage": "512GB",
+            "price": "$799"
+          }
+        ]
+      }
+    },
+    {
+      "input": {
+        "text": "Product: Surface Laptop. Storage: 64GB. Price: $1499.",
+        "parent": "product",
+        "fields": [
+          "name::str::Full product name",
+          "storage::str::Storage capacity",
+          "price::str::Product price"
+        ],
+        "threshold": 0.4
+      },
+      "expected": {
+        "product": [
+          {
+            "name": "Surface Laptop",
+            "storage": "64GB",
+            "price": "$1499"
+          }
+        ]
+      }
+    },
+    {
+      "input": {
+        "text": "Product: iPad Air. Storage: 256GB. Price: $799.",
+        "parent": "product",
+        "fields": [
+          "name::str::Full product name",
+          "storage::str::Storage capacity",
+          "price::str::Product price"
+        ],
+        "threshold": 0.4
+      },
+      "expected": {
+        "product": [
+          {
+            "name": "iPad Air",
+            "storage": "256GB",
+            "price": "$799"
+          }
+        ]
+      }
+    },
+    {
+      "input": {
+        "text": "Product: Kindle Scribe. Storage: 1TB. Price: $1499.",
+        "parent": "product",
+        "fields": [
+          "name::str::Full product name",
+          "storage::str::Storage capacity",
+          "price::str::Product price"
+        ],
+        "threshold": 0.4
+      },
+      "expected": {
+        "product": [
+          {
+            "name": "Kindle Scribe",
+            "storage": "1TB",
+            "price": "$1499"
+          }
+        ]
+      }
+    },
+    {
+      "input": {
+        "text": "Product: iPhone 15 Pro. Storage: 128GB. Price: $799.",
+        "parent": "product",
+        "fields": [
+          "name::str::Full product name",
+          "storage::str::Storage capacity",
+          "price::str::Product price"
+        ],
+        "threshold": 0.4
+      },
+      "expected": {
+        "product": [
+          {
+            "name": "iPhone 15 Pro",
+            "storage": "128GB",
+            "price": "$799"
+          }
+        ]
+      }
+    },
+    {
+      "input": {
+        "text": "Product: Galaxy S24. Storage: 512GB. Price: $1499.",
+        "parent": "product",
+        "fields": [
+          "name::str::Full product name",
+          "storage::str::Storage capacity",
+          "price::str::Product price"
+        ],
+        "threshold": 0.4
+      },
+      "expected": {
+        "product": [
+          {
+            "name": "Galaxy S24",
+            "storage": "512GB",
+            "price": "$1499"
+          }
+        ]
+      }
+    },
+    {
+      "input": {
+        "text": "Product: Pixel 9 Pro. Storage: 64GB. Price: $799.",
+        "parent": "product",
+        "fields": [
+          "name::str::Full product name",
+          "storage::str::Storage capacity",
+          "price::str::Product price"
+        ],
+        "threshold": 0.4
+      },
+      "expected": {
+        "product": [
+          {
+            "name": "Pixel 9 Pro",
+            "storage": "64GB",
+            "price": "$799"
+          }
+        ]
+      }
+    },
+    {
+      "input": {
+        "text": "Product: Xperia 5. Storage: 256GB. Price: $1499.",
+        "parent": "product",
+        "fields": [
+          "name::str::Full product name",
+          "storage::str::Storage capacity",
+          "price::str::Product price"
+        ],
+        "threshold": 0.4
+      },
+      "expected": {
+        "product": [
+          {
+            "name": "Xperia 5",
+            "storage": "256GB",
+            "price": "$1499"
+          }
+        ]
+      }
+    },
+    {
+      "input": {
+        "text": "Product: OnePlus 12. Storage: 1TB. Price: $799.",
+        "parent": "product",
+        "fields": [
+          "name::str::Full product name",
+          "storage::str::Storage capacity",
+          "price::str::Product price"
+        ],
+        "threshold": 0.4
+      },
+      "expected": {
+        "product": [
+          {
+            "name": "OnePlus 12",
+            "storage": "1TB",
+            "price": "$799"
+          }
+        ]
+      }
+    },
+    {
+      "input": {
+        "text": "Product: ThinkPad X1. Storage: 128GB. Price: $1499.",
+        "parent": "product",
+        "fields": [
+          "name::str::Full product name",
+          "storage::str::Storage capacity",
+          "price::str::Product price"
+        ],
+        "threshold": 0.4
+      },
+      "expected": {
+        "product": [
+          {
+            "name": "ThinkPad X1",
+            "storage": "128GB",
+            "price": "$1499"
+          }
+        ]
+      }
+    },
+    {
+      "input": {
+        "text": "Product: MacBook Pro. Storage: 512GB. Price: $799.",
+        "parent": "product",
+        "fields": [
+          "name::str::Full product name",
+          "storage::str::Storage capacity",
+          "price::str::Product price"
+        ],
+        "threshold": 0.4
+      },
+      "expected": {
+        "product": [
+          {
+            "name": "MacBook Pro",
+            "storage": "512GB",
+            "price": "$799"
+          }
+        ]
+      }
+    },
+    {
+      "input": {
+        "text": "Product: Surface Laptop. Storage: 64GB. Price: $1499.",
+        "parent": "product",
+        "fields": [
+          "name::str::Full product name",
+          "storage::str::Storage capacity",
+          "price::str::Product price"
+        ],
+        "threshold": 0.4
+      },
+      "expected": {
+        "product": [
+          {
+            "name": "Surface Laptop",
+            "storage": "64GB",
+            "price": "$1499"
+          }
+        ]
+      }
+    },
+    {
+      "input": {
+        "text": "Product: iPad Air. Storage: 256GB. Price: $799.",
+        "parent": "product",
+        "fields": [
+          "name::str::Full product name",
+          "storage::str::Storage capacity",
+          "price::str::Product price"
+        ],
+        "threshold": 0.4
+      },
+      "expected": {
+        "product": [
+          {
+            "name": "iPad Air",
+            "storage": "256GB",
+            "price": "$799"
+          }
+        ]
+      }
+    },
+    {
+      "input": {
+        "text": "Product: Kindle Scribe. Storage: 1TB. Price: $1499.",
+        "parent": "product",
+        "fields": [
+          "name::str::Full product name",
+          "storage::str::Storage capacity",
+          "price::str::Product price"
+        ],
+        "threshold": 0.4
+      },
+      "expected": {
+        "product": [
+          {
+            "name": "Kindle Scribe",
+            "storage": "1TB",
+            "price": "$1499"
+          }
+        ]
+      }
+    },
+    {
+      "input": {
+        "text": "Product: iPhone 15 Pro. Storage: 128GB. Price: $799.",
+        "parent": "product",
+        "fields": [
+          "name::str::Full product name",
+          "storage::str::Storage capacity",
+          "price::str::Product price"
+        ],
+        "threshold": 0.4
+      },
+      "expected": {
+        "product": [
+          {
+            "name": "iPhone 15 Pro",
+            "storage": "128GB",
+            "price": "$799"
+          }
+        ]
+      }
+    },
+    {
+      "input": {
+        "text": "Product: Galaxy S24. Storage: 512GB. Price: $1499.",
+        "parent": "product",
+        "fields": [
+          "name::str::Full product name",
+          "storage::str::Storage capacity",
+          "price::str::Product price"
+        ],
+        "threshold": 0.4
+      },
+      "expected": {
+        "product": [
+          {
+            "name": "Galaxy S24",
+            "storage": "512GB",
+            "price": "$1499"
+          }
+        ]
+      }
+    },
+    {
+      "input": {
+        "text": "Product: Pixel 9 Pro. Storage: 64GB. Price: $799.",
+        "parent": "product",
+        "fields": [
+          "name::str::Full product name",
+          "storage::str::Storage capacity",
+          "price::str::Product price"
+        ],
+        "threshold": 0.4
+      },
+      "expected": {
+        "product": [
+          {
+            "name": "Pixel 9 Pro",
+            "storage": "64GB",
+            "price": "$799"
+          }
+        ]
+      }
+    },
+    {
+      "input": {
+        "text": "Product: Xperia 5. Storage: 256GB. Price: $1499.",
+        "parent": "product",
+        "fields": [
+          "name::str::Full product name",
+          "storage::str::Storage capacity",
+          "price::str::Product price"
+        ],
+        "threshold": 0.4
+      },
+      "expected": {
+        "product": [
+          {
+            "name": "Xperia 5",
+            "storage": "256GB",
+            "price": "$1499"
+          }
+        ]
+      }
+    },
+    {
+      "input": {
+        "text": "Product: OnePlus 12. Storage: 1TB. Price: $799.",
+        "parent": "product",
+        "fields": [
+          "name::str::Full product name",
+          "storage::str::Storage capacity",
+          "price::str::Product price"
+        ],
+        "threshold": 0.4
+      },
+      "expected": {
+        "product": [
+          {
+            "name": "OnePlus 12",
+            "storage": "1TB",
+            "price": "$799"
+          }
+        ]
+      }
+    },
+    {
+      "input": {
+        "text": "Product: ThinkPad X1. Storage: 128GB. Price: $1499.",
+        "parent": "product",
+        "fields": [
+          "name::str::Full product name",
+          "storage::str::Storage capacity",
+          "price::str::Product price"
+        ],
+        "threshold": 0.4
+      },
+      "expected": {
+        "product": [
+          {
+            "name": "ThinkPad X1",
+            "storage": "128GB",
+            "price": "$1499"
+          }
+        ]
+      }
+    },
+    {
+      "input": {
+        "text": "Product: MacBook Pro. Storage: 512GB. Price: $799.",
+        "parent": "product",
+        "fields": [
+          "name::str::Full product name",
+          "storage::str::Storage capacity",
+          "price::str::Product price"
+        ],
+        "threshold": 0.4
+      },
+      "expected": {
+        "product": [
+          {
+            "name": "MacBook Pro",
+            "storage": "512GB",
+            "price": "$799"
+          }
+        ]
+      }
+    },
+    {
+      "input": {
+        "text": "Product: Surface Laptop. Storage: 64GB. Price: $1499.",
+        "parent": "product",
+        "fields": [
+          "name::str::Full product name",
+          "storage::str::Storage capacity",
+          "price::str::Product price"
+        ],
+        "threshold": 0.4
+      },
+      "expected": {
+        "product": [
+          {
+            "name": "Surface Laptop",
+            "storage": "64GB",
+            "price": "$1499"
+          }
+        ]
+      }
+    },
+    {
+      "input": {
+        "text": "Product: iPad Air. Storage: 256GB. Price: $799.",
+        "parent": "product",
+        "fields": [
+          "name::str::Full product name",
+          "storage::str::Storage capacity",
+          "price::str::Product price"
+        ],
+        "threshold": 0.4
+      },
+      "expected": {
+        "product": [
+          {
+            "name": "iPad Air",
+            "storage": "256GB",
+            "price": "$799"
+          }
+        ]
+      }
+    },
+    {
+      "input": {
+        "text": "Product: Kindle Scribe. Storage: 1TB. Price: $1499.",
+        "parent": "product",
+        "fields": [
+          "name::str::Full product name",
+          "storage::str::Storage capacity",
+          "price::str::Product price"
+        ],
+        "threshold": 0.4
+      },
+      "expected": {
+        "product": [
+          {
+            "name": "Kindle Scribe",
+            "storage": "1TB",
+            "price": "$1499"
+          }
+        ]
+      }
+    },
+    {
+      "input": {
+        "text": "Product: iPhone 15 Pro. Storage: 128GB. Price: $799.",
+        "parent": "product",
+        "fields": [
+          "name::str::Full product name",
+          "storage::str::Storage capacity",
+          "price::str::Product price"
+        ],
+        "threshold": 0.4
+      },
+      "expected": {
+        "product": [
+          {
+            "name": "iPhone 15 Pro",
+            "storage": "128GB",
+            "price": "$799"
+          }
+        ]
+      }
+    },
+    {
+      "input": {
+        "text": "Product: Galaxy S24. Storage: 512GB. Price: $1499.",
+        "parent": "product",
+        "fields": [
+          "name::str::Full product name",
+          "storage::str::Storage capacity",
+          "price::str::Product price"
+        ],
+        "threshold": 0.4
+      },
+      "expected": {
+        "product": [
+          {
+            "name": "Galaxy S24",
+            "storage": "512GB",
+            "price": "$1499"
+          }
+        ]
+      }
+    },
+    {
+      "input": {
+        "text": "Product: Pixel 9 Pro. Storage: 64GB. Price: $799.",
+        "parent": "product",
+        "fields": [
+          "name::str::Full product name",
+          "storage::str::Storage capacity",
+          "price::str::Product price"
+        ],
+        "threshold": 0.4
+      },
+      "expected": {
+        "product": [
+          {
+            "name": "Pixel 9 Pro",
+            "storage": "64GB",
+            "price": "$799"
+          }
+        ]
+      }
+    },
+    {
+      "input": {
+        "text": "Product: Xperia 5. Storage: 256GB. Price: $1499.",
+        "parent": "product",
+        "fields": [
+          "name::str::Full product name",
+          "storage::str::Storage capacity",
+          "price::str::Product price"
+        ],
+        "threshold": 0.4
+      },
+      "expected": {
+        "product": [
+          {
+            "name": "Xperia 5",
+            "storage": "256GB",
+            "price": "$1499"
+          }
+        ]
+      }
+    },
+    {
+      "input": {
+        "text": "Product: OnePlus 12. Storage: 1TB. Price: $799.",
+        "parent": "product",
+        "fields": [
+          "name::str::Full product name",
+          "storage::str::Storage capacity",
+          "price::str::Product price"
+        ],
+        "threshold": 0.4
+      },
+      "expected": {
+        "product": [
+          {
+            "name": "OnePlus 12",
+            "storage": "1TB",
+            "price": "$799"
+          }
+        ]
+      }
+    },
+    {
+      "input": {
+        "text": "Product: ThinkPad X1. Storage: 128GB. Price: $1499.",
+        "parent": "product",
+        "fields": [
+          "name::str::Full product name",
+          "storage::str::Storage capacity",
+          "price::str::Product price"
+        ],
+        "threshold": 0.4
+      },
+      "expected": {
+        "product": [
+          {
+            "name": "ThinkPad X1",
+            "storage": "128GB",
+            "price": "$1499"
+          }
+        ]
+      }
+    },
+    {
+      "input": {
+        "text": "Product: MacBook Pro. Storage: 512GB. Price: $799.",
+        "parent": "product",
+        "fields": [
+          "name::str::Full product name",
+          "storage::str::Storage capacity",
+          "price::str::Product price"
+        ],
+        "threshold": 0.4
+      },
+      "expected": {
+        "product": [
+          {
+            "name": "MacBook Pro",
+            "storage": "512GB",
+            "price": "$799"
+          }
+        ]
+      }
+    },
+    {
+      "input": {
+        "text": "Product: Surface Laptop. Storage: 64GB. Price: $1499.",
+        "parent": "product",
+        "fields": [
+          "name::str::Full product name",
+          "storage::str::Storage capacity",
+          "price::str::Product price"
+        ],
+        "threshold": 0.4
+      },
+      "expected": {
+        "product": [
+          {
+            "name": "Surface Laptop",
+            "storage": "64GB",
+            "price": "$1499"
+          }
+        ]
+      }
+    },
+    {
+      "input": {
+        "text": "Product: iPad Air. Storage: 256GB. Price: $799.",
+        "parent": "product",
+        "fields": [
+          "name::str::Full product name",
+          "storage::str::Storage capacity",
+          "price::str::Product price"
+        ],
+        "threshold": 0.4
+      },
+      "expected": {
+        "product": [
+          {
+            "name": "iPad Air",
+            "storage": "256GB",
+            "price": "$799"
+          }
+        ]
+      }
+    },
+    {
+      "input": {
+        "text": "Product: Kindle Scribe. Storage: 1TB. Price: $1499.",
+        "parent": "product",
+        "fields": [
+          "name::str::Full product name",
+          "storage::str::Storage capacity",
+          "price::str::Product price"
+        ],
+        "threshold": 0.4
+      },
+      "expected": {
+        "product": [
+          {
+            "name": "Kindle Scribe",
+            "storage": "1TB",
+            "price": "$1499"
+          }
+        ]
+      }
+    },
+    {
+      "input": {
+        "text": "Product: iPhone 15 Pro. Storage: 128GB. Price: $799.",
+        "parent": "product",
+        "fields": [
+          "name::str::Full product name",
+          "storage::str::Storage capacity",
+          "price::str::Product price"
+        ],
+        "threshold": 0.4
+      },
+      "expected": {
+        "product": [
+          {
+            "name": "iPhone 15 Pro",
+            "storage": "128GB",
+            "price": "$799"
+          }
+        ]
+      }
+    },
+    {
+      "input": {
+        "text": "Product: Galaxy S24. Storage: 512GB. Price: $1499.",
+        "parent": "product",
+        "fields": [
+          "name::str::Full product name",
+          "storage::str::Storage capacity",
+          "price::str::Product price"
+        ],
+        "threshold": 0.4
+      },
+      "expected": {
+        "product": [
+          {
+            "name": "Galaxy S24",
+            "storage": "512GB",
+            "price": "$1499"
+          }
+        ]
+      }
+    },
+    {
+      "input": {
+        "text": "Product: Pixel 9 Pro. Storage: 64GB. Price: $799.",
+        "parent": "product",
+        "fields": [
+          "name::str::Full product name",
+          "storage::str::Storage capacity",
+          "price::str::Product price"
+        ],
+        "threshold": 0.4
+      },
+      "expected": {
+        "product": [
+          {
+            "name": "Pixel 9 Pro",
+            "storage": "64GB",
+            "price": "$799"
+          }
+        ]
+      }
+    },
+    {
+      "input": {
+        "text": "Product: Xperia 5. Storage: 256GB. Price: $1499.",
+        "parent": "product",
+        "fields": [
+          "name::str::Full product name",
+          "storage::str::Storage capacity",
+          "price::str::Product price"
+        ],
+        "threshold": 0.4
+      },
+      "expected": {
+        "product": [
+          {
+            "name": "Xperia 5",
+            "storage": "256GB",
+            "price": "$1499"
+          }
+        ]
+      }
+    },
+    {
+      "input": {
+        "text": "Product: OnePlus 12. Storage: 1TB. Price: $799.",
+        "parent": "product",
+        "fields": [
+          "name::str::Full product name",
+          "storage::str::Storage capacity",
+          "price::str::Product price"
+        ],
+        "threshold": 0.4
+      },
+      "expected": {
+        "product": [
+          {
+            "name": "OnePlus 12",
+            "storage": "1TB",
+            "price": "$799"
+          }
+        ]
+      }
+    },
+    {
+      "input": {
+        "text": "Product: ThinkPad X1. Storage: 128GB. Price: $1499.",
+        "parent": "product",
+        "fields": [
+          "name::str::Full product name",
+          "storage::str::Storage capacity",
+          "price::str::Product price"
+        ],
+        "threshold": 0.4
+      },
+      "expected": {
+        "product": [
+          {
+            "name": "ThinkPad X1",
+            "storage": "128GB",
+            "price": "$1499"
+          }
+        ]
+      }
+    },
+    {
+      "input": {
+        "text": "Product: MacBook Pro. Storage: 512GB. Price: $799.",
+        "parent": "product",
+        "fields": [
+          "name::str::Full product name",
+          "storage::str::Storage capacity",
+          "price::str::Product price"
+        ],
+        "threshold": 0.4
+      },
+      "expected": {
+        "product": [
+          {
+            "name": "MacBook Pro",
+            "storage": "512GB",
+            "price": "$799"
+          }
+        ]
+      }
+    },
+    {
+      "input": {
+        "text": "Product: Surface Laptop. Storage: 64GB. Price: $1499.",
+        "parent": "product",
+        "fields": [
+          "name::str::Full product name",
+          "storage::str::Storage capacity",
+          "price::str::Product price"
+        ],
+        "threshold": 0.4
+      },
+      "expected": {
+        "product": [
+          {
+            "name": "Surface Laptop",
+            "storage": "64GB",
+            "price": "$1499"
+          }
+        ]
+      }
+    },
+    {
+      "input": {
+        "text": "Product: iPad Air. Storage: 256GB. Price: $799.",
+        "parent": "product",
+        "fields": [
+          "name::str::Full product name",
+          "storage::str::Storage capacity",
+          "price::str::Product price"
+        ],
+        "threshold": 0.4
+      },
+      "expected": {
+        "product": [
+          {
+            "name": "iPad Air",
+            "storage": "256GB",
+            "price": "$799"
+          }
+        ]
+      }
+    },
+    {
+      "input": {
+        "text": "Product: Kindle Scribe. Storage: 1TB. Price: $1499.",
+        "parent": "product",
+        "fields": [
+          "name::str::Full product name",
+          "storage::str::Storage capacity",
+          "price::str::Product price"
+        ],
+        "threshold": 0.4
+      },
+      "expected": {
+        "product": [
+          {
+            "name": "Kindle Scribe",
+            "storage": "1TB",
+            "price": "$1499"
+          }
+        ]
+      }
+    }
+  ]
+}

@@ -48,9 +48,10 @@ module Gliner
       return nil if spans.empty?
 
       sorted = spans.sort_by { |s| [-s.score, (s.end - s.start), s.text.length] }
-      best = sorted[0]
+      best = sorted.first
       best_score = best.score
       near = sorted.take_while { |s| (best_score - s.score) <= SCORE_SIMILARITY_THRESHOLD }
+
       near.min_by { |s| [(s.end - s.start), -s.score, s.text.length] } || best
     end
 
@@ -87,9 +88,11 @@ module Gliner
     def build_span(prepared, start_word, end_word, score)
       char_start = prepared.start_map[start_word]
       char_end = prepared.end_map[end_word]
+
       return nil if char_start.nil? || char_end.nil?
 
       text_span = prepared.original_text[char_start...char_end].to_s.strip
+
       return nil if text_span.empty?
 
       Span.new(text: text_span, score: score, start: char_start, end: char_end)
@@ -101,10 +104,12 @@ module Gliner
 
       result = { 'text' => span.text }
       result['confidence'] = span.score if include_confidence
+
       if include_spans
         result['start'] = span.start
         result['end'] = span.end
       end
+
       result
     end
   end

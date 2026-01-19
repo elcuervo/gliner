@@ -26,14 +26,18 @@ module Gliner
       normalized_choices = choices.map { |choice| normalize_choice(choice) }
       matched = spans.select { |span| normalized_choices.include?(normalize_choice(span.text)) }
 
-      matched.empty? ? spans : matched
+      return spans if matched.empty?
+
+      matched
     end
 
     def build_structure_instances(parsed_fields, spans_by_label, include_confidence:, include_spans:)
       anchor_field = anchor_field_for(parsed_fields)
+
       return [{}] if anchor_field.nil?
 
       anchors = spans_by_label.fetch(anchor_field[:name], [])
+
       if anchors.empty?
         return [format_structure_object(parsed_fields, spans_by_label,
                                         include_confidence: include_confidence,
@@ -41,6 +45,7 @@ module Gliner
       end
 
       instance_spans = build_instance_spans(anchors, spans_by_label)
+
       format_instances(parsed_fields, instance_spans,
                        include_confidence: include_confidence,
                        include_spans: include_spans)

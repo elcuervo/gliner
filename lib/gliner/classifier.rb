@@ -15,6 +15,7 @@ module Gliner
 
     def format_classification(scores, labels:, multi_label:, include_confidence:, cls_threshold:)
       label_scores = sorted_label_scores(scores, labels)
+
       return format_multi_label(label_scores, cls_threshold, include_confidence) if multi_label
 
       format_single_label(label_scores.first, include_confidence)
@@ -43,18 +44,21 @@ module Gliner
     end
 
     def sorted_label_scores(scores, labels)
-      scores.each_with_index.map { |score, i| [labels.fetch(i), score] }
-            .sort_by { |(_label, score)| -score }
+      scores
+        .each_with_index.map { |score, i| [labels.fetch(i), score] }
+        .sort_by { |(_label, score)| -score }
     end
 
     def format_multi_label(label_scores, cls_threshold, include_confidence)
       chosen = label_scores.select { |(_label, score)| score >= cls_threshold }
       chosen = [label_scores.first] if chosen.empty? && label_scores.first
+
       chosen.map { |label, score| format_label(label, score, include_confidence) }
     end
 
     def format_single_label(label_score, include_confidence)
       label, score = label_score
+
       format_label(label, score, include_confidence)
     end
 
