@@ -3,22 +3,35 @@ name: tests
 on:
   push:
     branches: ["main"]
-
   pull_request:
 
 jobs:
   test:
-    runs-on: ubuntu-slim
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
 
-      - uses: ruby/setup-ruby@v1
+      - uses: cachix/install-nix-action@v27
         with:
-          ruby-version: "3.2"
-          bundler-cache: true
+          extra_nix_config: |
+            experimental-features = nix-command flakes
+
+      - name: Show environment
+        run: |
+          nix develop . --command bash -lc "uname -a"
+          nix develop . --command bash -lc "ruby -v"
+          nix develop . --command bash -lc "bundle -v"
+          nix develop . --command bash -lc "bundle env"
+          nix develop . --command bash -lc "bundle config"
+          nix develop . --command bash -lc "gem list | grep -E 'onnxruntime|tokenizers' || true"
+          nix develop . --command bash -lc "bundle exec ruby -e \"require 'gliner'; puts \\\"gliner #{Gliner::VERSION}\\\"\" || true"
+          nix develop . --command bash -lc "bundle exec ruby -e \"require 'onnxruntime'; puts \\\"onnxruntime gem #{OnnxRuntime::VERSION}\\\"; puts \\\"onnxruntime lib #{OnnxRuntime.lib_version}\\\"; p OnnxRuntime.ffi_lib\" || true"
+
+      - name: Install gems
+        run: nix develop . --command bundle install
 
       - name: Run unit tests
-        run: bundle exec rspec
+        run: nix develop . --command bash -lc "bundle exec rspec"
 
       - name: Run integration tests
-        run: bundle exec rake spec:integration
+        run: nix develop . --command bash -lc "bundle exec rake spec:integration"
