@@ -8,8 +8,6 @@ on:
 
 jobs:
   test:
-    env:
-      GLINER_DETERMINISTIC: "1"
     strategy:
       fail-fast: false
       matrix:
@@ -46,5 +44,6 @@ jobs:
 
       - name: Run integration tests
         env:
-          GLINER_MODEL_FILE: model.onnx
+          GLINER_REPO_ID: 0riginalGandalf/gliner2-multi-v1-int8
+          GLINER_MODEL_FILE: model_int8.onnx
         run: nix develop . --command bash -lc "bundle exec rake spec:integration"

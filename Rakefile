@@ -14,7 +14,7 @@ namespace :model do
 
   desc 'Downloads a test model to tmp/ (REPO_ID=... MODEL_FILE=model_int8.onnx)'
   task :pull do
-    repo_id = ENV['REPO_ID'] || DEFAULT_REPO_ID
+    repo_id = ENV['GLINER_REPO_ID'] || ENV['REPO_ID'] || DEFAULT_REPO_ID
     model_file = ENV['MODEL_FILE'] || ENV['GLINER_MODEL_FILE'] || DEFAULT_MODEL_FILE
 
     dir = File.expand_path("tmp/models/#{repo_id.tr('/', '__')}", __dir__)

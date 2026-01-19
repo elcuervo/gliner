@@ -5,7 +5,7 @@ require 'fileutils'
 require 'httpx'
 
 describe 'Gliner Integration', if: ENV.key?('GLINER_INTEGRATION') do
-  REPO_ID = 'cuerbot/gliner2-multi-v1'
+  DEFAULT_REPO_ID = 'cuerbot/gliner2-multi-v1'
 
   describe 'real model inference' do
     context 'with entities extraction' do
@@ -126,18 +126,23 @@ describe 'Gliner Integration', if: ENV.key?('GLINER_INTEGRATION') do
     model_file = ENV.fetch('GLINER_MODEL_FILE', 'model_int8.onnx')
     return [from_env, model_file] if from_env && !from_env.empty?
 
-    dir = File.expand_path("../tmp/#{REPO_ID.tr('/', '__')}", __dir__)
+    repo_id = fetch_repo_id
+    dir = File.expand_path("../tmp/#{repo_id.tr('/', '__')}", __dir__)
     FileUtils.mkdir_p(dir)
 
-    download(hf_resolve_url('tokenizer.json').to_s, File.join(dir, 'tokenizer.json'))
-    download(hf_resolve_url('config.json').to_s, File.join(dir, 'config.json'))
-    download(hf_resolve_url(model_file).to_s, File.join(dir, model_file))
+    download(hf_resolve_url(repo_id, 'tokenizer.json').to_s, File.join(dir, 'tokenizer.json'))
+    download(hf_resolve_url(repo_id, 'config.json').to_s, File.join(dir, 'config.json'))
+    download(hf_resolve_url(repo_id, model_file).to_s, File.join(dir, model_file))
 
     [dir, model_file]
   end
 
-  def hf_resolve_url(filename)
-    "https://huggingface.co/#{REPO_ID}/resolve/main/#{filename}"
+  def fetch_repo_id
+    ENV.fetch('GLINER_REPO_ID', ENV.fetch('REPO_ID', DEFAULT_REPO_ID))
+  end
+
+  def hf_resolve_url(repo_id, filename)
+    "https://huggingface.co/#{repo_id}/resolve/main/#{filename}"
   end
 
   def download(url, dest)
