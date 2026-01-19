@@ -16,6 +16,11 @@ gem "gliner"
 ```ruby
 require "gliner"
 
+Gliner.configure do |config|
+  config.threshold = 0.2
+end
+This sets the default threshold for entity and structured extraction unless you pass `threshold:` per call.
+
 Gliner.load("path/to/gliner2-multi-v1")
 
 text = "Apple CEO Tim Cook announced iPhone 15 in Cupertino yesterday."

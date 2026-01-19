@@ -22,12 +22,13 @@ namespace :model do
 
     base = "https://huggingface.co/#{repo_id}/resolve/main"
     files = ['tokenizer.json', 'config.json', model_file]
+    client = HTTPX.plugin(:follow_redirects).with(max_redirects: 5)
 
     files.each do |file|
       dest = File.join(dir, file)
       next if File.exist?(dest) && File.size?(dest)
 
-      response = HTTPX.get("#{base}/#{file}")
+      response = client.get("#{base}/#{file}")
       raise "Download failed: #{base}/#{file} (status: #{response.status})" unless response.status.between?(200, 299)
 
       File.binwrite(dest, response.body.to_s)

@@ -83,7 +83,7 @@ module Gliner
           parsed[:labels],
           label_positions,
           prepared,
-          threshold: options.fetch(:threshold, 0.5)
+          threshold: options.fetch(:threshold, Gliner.config.threshold)
         )
       end
     end

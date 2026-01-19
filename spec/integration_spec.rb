@@ -141,7 +141,7 @@ describe 'Gliner Integration', if: ENV.key?('GLINER_INTEGRATION') do
 
   def download(url, dest)
     return if File.exist?(dest) && File.size?(dest)
-    response = HTTPX.get(url)
+    response = HTTPX.plugin(:follow_redirects).with(max_redirects: 5).get(url)
     raise "Download failed: #{url} (status: #{response.status})" unless response.status.between?(200, 299)
 
     File.binwrite(dest, response.body.to_s)

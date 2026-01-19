@@ -100,7 +100,7 @@ module Gliner
     end
 
     def extract_entities(text, entity_types, **options)
-      threshold = options.fetch(:threshold, 0.5)
+      threshold = options.fetch(:threshold, Gliner.config.threshold)
       include_confidence = options.fetch(:include_confidence, false)
       include_spans = options.fetch(:include_spans, false)
 
@@ -125,7 +125,7 @@ module Gliner
     end
 
     def extract_json(text, structures, **options)
-      threshold = options.fetch(:threshold, 0.5)
+      threshold = options.fetch(:threshold, Gliner.config.threshold)
       include_confidence = options.fetch(:include_confidence, false)
       include_spans = options.fetch(:include_spans, false)
 
