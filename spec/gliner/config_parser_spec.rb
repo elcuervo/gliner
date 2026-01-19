@@ -16,26 +16,23 @@ describe Gliner::ConfigParser do
     end
 
     it 'parses hash with descriptions' do
-      result = parser.parse_entity_types({
-                                           'company' => 'Company or organization names',
-                                           'person' => 'Person names'
-                                         })
+      entities = { 'company' => 'Company or organization names', 'person' => 'Person names' }
+      result = parser.parse_entity_types(entities)
 
       expect(result[:labels]).to eq(%w[company person])
-      expect(result[:descriptions]).to eq({
-                                            'company' => 'Company or organization names',
-                                            'person' => 'Person names'
-                                          })
+      expect(result[:descriptions]).to eq(entities)
     end
 
     it 'parses hash with full config' do
-      result = parser.parse_entity_types({
-                                           'email' => {
-                                             'description' => 'Email addresses',
-                                             'dtype' => 'str',
-                                             'threshold' => 0.9
-                                           }
-                                         })
+      entities = {
+        email: {
+          description: 'Email addresses',
+          dtype: 'str',
+          threshold: 0.9
+        }
+      }
+
+      result = parser.parse_entity_types(entities)
 
       expect(result[:labels]).to eq(['email'])
       expect(result[:descriptions]).to eq({ 'email' => 'Email addresses' })
@@ -54,11 +51,13 @@ describe Gliner::ConfigParser do
     end
 
     it 'parses multi-label config' do
-      result = parser.parse_classification_task('aspects', {
-                                                  'labels' => %w[camera battery screen],
-                                                  'multi_label' => true,
-                                                  'cls_threshold' => 0.4
-                                                })
+      classify = {
+        labels: %w[camera battery screen],
+        multi_label: true,
+        cls_threshold: 0.4
+      }
+
+      result = parser.parse_classification_task('aspects', classify)
 
       expect(result[:labels]).to eq(%w[camera battery screen])
       expect(result[:multi_label]).to be true
@@ -68,10 +67,12 @@ describe Gliner::ConfigParser do
 
   describe '#build_prompt' do
     it 'builds prompt with descriptions' do
-      prompt = parser.build_prompt('entities', {
-                                     'company' => 'Organization names',
-                                     'person' => 'Full names of people'
-                                   })
+      entities = {
+        company: 'Organization names',
+        person: 'Full names of people'
+      }
+
+      prompt = parser.build_prompt('entities', entities)
 
       expect(prompt).to include('entities')
       expect(prompt).to include('[DESCRIPTION] company: Organization names')

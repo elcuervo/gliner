@@ -77,18 +77,20 @@ describe Gliner::StructuredExtractor do
           Gliner::Span.new(text: 'Jan 5', score: 0.9, start: 0, end: 5),
           Gliner::Span.new(text: 'Jan 6', score: 0.8, start: 40, end: 45)
         ],
+
         'merchant' => [
           Gliner::Span.new(text: 'Starbucks', score: 0.9, start: 7, end: 16),
           Gliner::Span.new(text: 'Amazon', score: 0.7, start: 47, end: 53)
         ],
+
         'amount' => [
           Gliner::Span.new(text: '$5.50', score: 0.9, start: 17, end: 22),
           Gliner::Span.new(text: '$156.99', score: 0.8, start: 54, end: 61)
         ]
       }
 
-      instances = structured_extractor.build_structure_instances(parsed_fields, spans_by_label,
-                                                                 include_confidence: false, include_spans: false)
+      instances = structured_extractor
+        .build_structure_instances(parsed_fields, spans_by_label, include_confidence: false, include_spans: false)
 
       expect(instances.length).to eq(2)
       expect(instances[0]).to eq({ 'date' => 'Jan 5', 'merchant' => 'Starbucks', 'amount' => '$5.50' })
