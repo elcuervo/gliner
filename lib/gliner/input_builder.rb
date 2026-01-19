@@ -8,33 +8,25 @@ module Gliner
     end
 
     def prepare(text, schema_tokens, already_normalized: false)
-      normalized_text = already_normalized ? text.to_s : @text_processor.normalize_text(text)
+      normalized_text = normalize_text(text, already_normalized: already_normalized)
       words, start_map, end_map = @text_processor.split_words(normalized_text)
-      combined_tokens = schema_tokens + ['[SEP_TEXT]'] + words
-
-      encoded = @text_processor.encode_pretokenized(combined_tokens)
-      input_ids = encoded[:ids]
-      word_ids = encoded[:word_ids]
-
-      truncated = truncate_inputs(input_ids, word_ids, max_len: @max_seq_len)
-      input_ids = truncated[:input_ids]
-      word_ids = truncated[:word_ids]
+      input_ids, word_ids = encode_tokens(schema_tokens, words)
+      input_ids, word_ids = truncate_inputs(input_ids, word_ids, max_len: @max_seq_len)
 
       text_start_index = schema_tokens.length + 1
-      full_text_len = words.length
-      effective_text_len = infer_effective_text_len(word_ids, text_start_index, full_text_len)
+      text_len = infer_effective_text_len(word_ids, text_start_index, words.length)
 
-      PreparedInput.new(
+      context = {
         input_ids: input_ids,
         word_ids: word_ids,
-        attention_mask: Array.new(input_ids.length, 1),
-        words_mask: build_words_mask(word_ids, text_start_index),
-        pos_to_word_index: build_pos_to_word_index(word_ids, text_start_index),
+        text_start_index: text_start_index,
         start_map: start_map,
         end_map: end_map,
         original_text: normalized_text,
-        text_len: effective_text_len
-      )
+        text_len: text_len
+      }
+
+      build_prepared_input(context)
     end
 
     def schema_tokens_for(prompt:, labels:, label_prefix:)
@@ -51,10 +43,38 @@ module Gliner
 
     private
 
-    def truncate_inputs(input_ids, word_ids, max_len:)
-      return { input_ids: input_ids, word_ids: word_ids } if input_ids.length <= max_len
+    def normalize_text(text, already_normalized:)
+      already_normalized ? text.to_s : @text_processor.normalize_text(text)
+    end
 
-      { input_ids: input_ids.take(max_len), word_ids: word_ids.take(max_len) }
+    def encode_tokens(schema_tokens, words)
+      combined_tokens = schema_tokens + ['[SEP_TEXT]'] + words
+      encoded = @text_processor.encode_pretokenized(combined_tokens)
+      [encoded[:ids], encoded[:word_ids]]
+    end
+
+    def truncate_inputs(input_ids, word_ids, max_len:)
+      return [input_ids, word_ids] if input_ids.length <= max_len
+
+      [input_ids.take(max_len), word_ids.take(max_len)]
+    end
+
+    def build_prepared_input(context)
+      input_ids = context.fetch(:input_ids)
+      word_ids = context.fetch(:word_ids)
+      text_start_index = context.fetch(:text_start_index)
+
+      PreparedInput.new(
+        input_ids: input_ids,
+        word_ids: word_ids,
+        attention_mask: Array.new(input_ids.length, 1),
+        words_mask: build_words_mask(word_ids, text_start_index),
+        pos_to_word_index: build_pos_to_word_index(word_ids, text_start_index),
+        start_map: context.fetch(:start_map),
+        end_map: context.fetch(:end_map),
+        original_text: context.fetch(:original_text),
+        text_len: context.fetch(:text_len)
+      )
     end
 
     def build_words_mask(word_ids, text_start_index)

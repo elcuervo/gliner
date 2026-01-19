@@ -1,18 +1,10 @@
 # frozen_string_literal: true
 
+require 'gliner/inference/request'
+require 'gliner/inference/io_validator'
+
 module Gliner
   class Inference
-    Request = Data.define(
-      :input_ids,
-      :attention_mask,
-      :words_mask,
-      :text_lengths,
-      :task_type,
-      :label_positions,
-      :label_mask,
-      :want_cls
-    )
-
     TASK_TYPE_ENTITIES = 0
     TASK_TYPE_CLASSIFICATION = 1
     TASK_TYPE_JSON = 2
@@ -24,35 +16,17 @@ module Gliner
 
     def initialize(session)
       @session = session
-      validate_io!
+      validation = IOValidator.call(session)
+      @input_names = validation.input_names
+      @output_name = validation.output_name
+      @label_index_mode = validation.label_index_mode
+      @has_cls_logits = validation.has_cls_logits
     end
 
     def run(request)
-      text_lengths = Array(request.text_lengths).flatten
-
-      inputs = {
-        input_ids: [request.input_ids],
-        attention_mask: [request.attention_mask],
-        words_mask: [request.words_mask],
-        text_lengths: text_lengths,
-        task_type: [request.task_type],
-        label_positions: [request.label_positions],
-        label_mask: [request.label_mask]
-      }
-
-      if @input_names&.include?('token_type_ids')
-        inputs[:token_type_ids] = [Array.new(request.input_ids.length, 0)]
-      end
-
-      inputs.select! { |name, _| @input_names.include?(name.to_s) } if @input_names
-
-      output_names = [@output_name]
-      output_names << 'cls_logits' if request.want_cls && @has_cls_logits
-      out = @session.run(output_names, inputs)
-
-      return { logits: out.fetch(0), cls_logits: out.fetch(1) } if output_names.length > 1
-
-      out.fetch(0)
+      outputs = output_names_for(request)
+      out = @session.run(outputs, build_inputs(request))
+      format_outputs(out, outputs)
     end
 
     def label_positions_for(word_ids, label_count)
@@ -77,8 +51,8 @@ module Gliner
       end
     end
 
-    def sigmoid(x)
-      1.0 / (1.0 + Math.exp(-x))
+    def sigmoid(value)
+      1.0 / (1.0 + Math.exp(-value))
     end
 
     def softmax(values)
@@ -90,32 +64,47 @@ module Gliner
 
     private
 
-    def validate_io!
-      @input_names = @session.inputs.map { |i| i[:name] }
+    def build_inputs(request)
+      inputs = base_inputs(request)
+      add_token_type_ids(inputs, request)
+      filter_inputs(inputs)
+    end
 
-      output_names = @session.outputs.map { |o| o[:name] }
+    def base_inputs(request)
+      {
+        input_ids: [request.input_ids],
+        attention_mask: [request.attention_mask],
+        words_mask: [request.words_mask],
+        text_lengths: Array(request.text_lengths).flatten,
+        task_type: [request.task_type],
+        label_positions: [request.label_positions],
+        label_mask: [request.label_mask]
+      }
+    end
 
-      @has_cls_logits = output_names.include?('cls_logits')
+    def add_token_type_ids(inputs, request)
+      return inputs unless @input_names&.include?('token_type_ids')
 
-      if output_names.include?('logits')
-        @output_name = 'logits'
-        @label_index_mode = :label_index
+      inputs[:token_type_ids] = [Array.new(request.input_ids.length, 0)]
+      inputs
+    end
 
-        expected_inputs = %w[input_ids attention_mask words_mask text_lengths task_type label_positions label_mask]
-        missing = expected_inputs - @input_names
+    def filter_inputs(inputs)
+      return inputs unless @input_names
 
-        raise Error, "Model missing inputs: #{missing.join(', ')}" unless missing.empty?
-      elsif output_names.include?('span_logits')
-        @output_name = 'span_logits'
-        @label_index_mode = :label_position
+      inputs.select { |name, _| @input_names.include?(name.to_s) }
+    end
 
-        expected_inputs = %w[input_ids attention_mask]
-        missing = expected_inputs - @input_names
+    def output_names_for(request)
+      output_names = [@output_name]
+      output_names << 'cls_logits' if request.want_cls && @has_cls_logits
+      output_names
+    end
 
-        raise Error, "Model missing inputs: #{missing.join(', ')}" unless missing.empty?
-      else
-        raise Error, 'Model missing output: logits or span_logits'
-      end
+    def format_outputs(out, output_names)
+      return { logits: out.fetch(0), cls_logits: out.fetch(1) } if output_names.length > 1
+
+      out.fetch(0)
     end
   end
 end

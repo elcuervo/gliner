@@ -46,7 +46,7 @@ module Gliner
 
           {
             labels: labels,
-            multi_label: !config_hash['multi_label'].nil?,
+            multi_label: config_hash['multi_label'] ? true : false,
             cls_threshold: threshold(config_hash['cls_threshold']),
             label_descs: label_descs
           }

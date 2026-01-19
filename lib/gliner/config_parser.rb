@@ -6,7 +6,6 @@ require 'gliner/config/field_spec'
 
 module Gliner
   class ConfigParser
-
     def parse_entity_types(entity_types)
       Config::EntityTypes.parse(entity_types)
     end

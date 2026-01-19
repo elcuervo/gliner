@@ -29,41 +29,62 @@ module Gliner
       end
 
       def process_output(logits, parsed, prepared, options)
-        threshold = options.fetch(:threshold, 0.5)
-        include_confidence = options.fetch(:include_confidence, false)
-        include_spans = options.fetch(:include_spans, false)
+        settings = entity_settings(options)
+        label_positions = label_positions_for(prepared, parsed, settings)
+        spans_by_label = extract_spans(logits, parsed, prepared, label_positions, settings)
 
-        label_positions = options.fetch(:label_positions) do
-          inference.label_positions_for(prepared.word_ids, parsed[:labels].length)
-        end
+        { 'entities' => format_entities(parsed, spans_by_label, settings) }
+      end
 
-        spans_by_label = @span_extractor.extract_spans_by_label(
+      private
+
+      def entity_settings(options)
+        {
+          threshold: options.fetch(:threshold, 0.5),
+          include_confidence: options.fetch(:include_confidence, false),
+          include_spans: options.fetch(:include_spans, false),
+          label_positions: options[:label_positions]
+        }
+      end
+
+      def label_positions_for(prepared, parsed, settings)
+        settings[:label_positions] || inference.label_positions_for(prepared.word_ids, parsed[:labels].length)
+      end
+
+      def extract_spans(logits, parsed, prepared, label_positions, settings)
+        @span_extractor.extract_spans_by_label(
           logits,
           parsed[:labels],
           label_positions,
           prepared,
-          threshold: threshold,
+          threshold: settings[:threshold],
           thresholds_by_label: parsed[:thresholds]
         )
+      end
 
-        entities = {}
-        parsed[:labels].each do |label|
+      def format_entities(parsed, spans_by_label, settings)
+        parsed[:labels].each_with_object({}) do |label, entities|
           spans = spans_by_label.fetch(label)
           dtype = parsed[:dtypes].fetch(label, :list)
 
-          entities[label] =
-            if dtype == :str
-              @span_extractor.format_single_span(
-                @span_extractor.choose_best_span(spans),
-                include_confidence: include_confidence,
-                include_spans: include_spans
-              )
-            else
-              @span_extractor.format_spans(spans, include_confidence: include_confidence, include_spans: include_spans)
-            end
+          entities[label] = format_entity_value(spans, dtype, settings)
         end
+      end
 
-        { 'entities' => entities }
+      def format_entity_value(spans, dtype, settings)
+        if dtype == :str
+          @span_extractor.format_single_span(
+            @span_extractor.choose_best_span(spans),
+            include_confidence: settings[:include_confidence],
+            include_spans: settings[:include_spans]
+          )
+        else
+          @span_extractor.format_spans(
+            spans,
+            include_confidence: settings[:include_confidence],
+            include_spans: settings[:include_spans]
+          )
+        end
       end
     end
   end

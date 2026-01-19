@@ -38,19 +38,35 @@ module Gliner
           name = label.to_s
           state[:labels] << name
 
+          return if config.nil?
+
           case config
           when String
-            state[:descriptions][name] = config
+            apply_description(state, name, config)
           when Hash
-            config_hash = config.transform_keys(&:to_s)
-            description = config_hash['description']
-            state[:descriptions][name] = description.to_s if description
-            dtype = config_hash['dtype']
-            state[:dtypes][name] = dtype.to_s == 'str' ? :str : :list if dtype
-            state[:thresholds][name] = Float(config_hash['threshold']) if config_hash.key?('threshold')
+            apply_hash_config(state, name, config)
           else
-            state[:descriptions][name] = config.to_s
+            apply_description(state, name, config.to_s)
           end
+        end
+
+        def apply_hash_config(state, name, config)
+          config_hash = config.transform_keys(&:to_s)
+          apply_description(state, name, config_hash['description']) if config_hash['description']
+          apply_dtype(state, name, config_hash['dtype']) if config_hash['dtype']
+          apply_threshold(state, name, config_hash['threshold']) if config_hash.key?('threshold')
+        end
+
+        def apply_description(state, name, description)
+          state[:descriptions][name] = description
+        end
+
+        def apply_dtype(state, name, dtype)
+          state[:dtypes][name] = dtype.to_s == 'str' ? :str : :list
+        end
+
+        def apply_threshold(state, name, threshold)
+          state[:thresholds][name] = Float(threshold)
         end
       end
     end

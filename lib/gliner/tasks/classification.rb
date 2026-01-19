@@ -12,13 +12,7 @@ module Gliner
       def parse_config(input)
         raise Error, 'classification config must be a Hash' unless input.is_a?(Hash)
 
-        name = input[:name] || input['name']
-        task_config = input[:config] || input['config']
-
-        name, task_config = input.first if name.nil? && task_config.nil? && input.length == 1
-
-        raise Error, 'classification config must include :name and :config' if name.nil? || task_config.nil?
-
+        name, task_config = extract_task_config(input)
         parsed = config_parser.parse_classification_task(name, task_config)
         parsed.merge(name: name.to_s)
       end
@@ -48,23 +42,7 @@ module Gliner
         threshold_override = options[:threshold]
         cls_threshold = threshold_override.nil? ? parsed[:cls_threshold] : threshold_override
 
-        scores =
-          if logits.is_a?(Hash) && logits.key?(:cls_logits)
-            cls_logits = Array(logits.fetch(:cls_logits).fetch(0))
-            parsed[:multi_label] ? cls_logits.map { |value| inference.sigmoid(value) } : inference.softmax(cls_logits)
-          else
-            label_positions = options.fetch(:label_positions) do
-              inference.label_positions_for(prepared.word_ids, parsed[:labels].length)
-            end
-
-            @classifier.classification_scores(
-              logits,
-              parsed[:labels],
-              label_positions,
-              prepared
-            )
-          end
-
+        scores = classification_scores(logits, parsed, prepared, options)
         @classifier.format_classification(
           scores,
           labels: parsed[:labels],
@@ -81,6 +59,42 @@ module Gliner
           parsed_config = { name: task_name, config: task_config }
           results[task_name.to_s] = pipeline.execute(self, text, parsed_config, **options)
         end
+      end
+
+      private
+
+      def extract_task_config(input)
+        name = input[:name] || input['name']
+        task_config = input[:config] || input['config']
+
+        return [name, task_config] if name && task_config
+        return input.first if name.nil? && task_config.nil? && input.length == 1
+
+        raise Error, 'classification config must include :name and :config'
+      end
+
+      def classification_scores(logits, parsed, prepared, options)
+        return cls_scores(logits, parsed) if cls_logits?(logits)
+
+        label_positions = options.fetch(:label_positions) do
+          inference.label_positions_for(prepared.word_ids, parsed[:labels].length)
+        end
+
+        @classifier.classification_scores(
+          logits,
+          parsed[:labels],
+          label_positions,
+          prepared
+        )
+      end
+
+      def cls_logits?(logits)
+        logits.is_a?(Hash) && logits.key?(:cls_logits)
+      end
+
+      def cls_scores(logits, parsed)
+        cls_logits = Array(logits.fetch(:cls_logits).fetch(0))
+        parsed[:multi_label] ? cls_logits.map { |value| inference.sigmoid(value) } : inference.softmax(cls_logits)
       end
     end
   end

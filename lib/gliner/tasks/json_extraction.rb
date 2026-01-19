@@ -13,13 +13,7 @@ module Gliner
       def parse_config(input)
         raise Error, 'structure config must be a Hash' unless input.is_a?(Hash)
 
-        name = input[:name] || input['name']
-        fields = input[:fields] || input['fields']
-
-        name, fields = input.first if name.nil? && fields.nil? && input.length == 1
-
-        raise Error, 'structure config must include :name and :fields' if name.nil? || fields.nil?
-
+        name, fields = extract_structure_config(input)
         parsed_fields = Array(fields).map { |spec| config_parser.parse_field_spec(spec.to_s) }
 
         {
@@ -51,19 +45,9 @@ module Gliner
       end
 
       def process_output(logits, parsed, prepared, options)
-        label_positions = options.fetch(:label_positions) do
-          inference.label_positions_for(prepared.word_ids, parsed[:labels].length)
-        end
-
-        spans_by_label = @span_extractor.extract_spans_by_label(
-          logits,
-          parsed[:labels],
-          label_positions,
-          prepared,
-          threshold: options.fetch(:threshold, 0.5)
-        )
-
+        spans_by_label = extract_spans(logits, parsed, prepared, options)
         filtered_spans = @structured_extractor.apply_choice_filters(spans_by_label, parsed[:parsed_fields])
+
         @structured_extractor.build_structure_instances(
           parsed[:parsed_fields],
           filtered_spans,
@@ -79,6 +63,32 @@ module Gliner
           parsed_config = { name: parent, fields: fields }
           results[parent.to_s] = pipeline.execute(self, text, parsed_config, **options)
         end
+      end
+
+      private
+
+      def extract_structure_config(input)
+        name = input[:name] || input['name']
+        fields = input[:fields] || input['fields']
+
+        return [name, fields] if name && fields
+        return input.first if name.nil? && fields.nil? && input.length == 1
+
+        raise Error, 'structure config must include :name and :fields'
+      end
+
+      def extract_spans(logits, parsed, prepared, options)
+        label_positions = options.fetch(:label_positions) do
+          inference.label_positions_for(prepared.word_ids, parsed[:labels].length)
+        end
+
+        @span_extractor.extract_spans_by_label(
+          logits,
+          parsed[:labels],
+          label_positions,
+          prepared,
+          threshold: options.fetch(:threshold, 0.5)
+        )
       end
     end
   end

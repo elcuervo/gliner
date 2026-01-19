@@ -23,17 +23,11 @@ module Gliner
     DEFAULT_MAX_SEQ_LEN = 512
 
     def self.from_dir(dir, file: 'model_int8.onnx')
-      raise Error, "Model directory not found: #{dir}" unless Dir.exist?(dir)
-
-      config_path = File.join(dir, 'config.json')
-      config = File.exist?(config_path) ? JSON.parse(File.read(config_path)) : {}
-
-      model_path = File.join(dir, file)
-      tokenizer_path = File.join(dir, 'tokenizer.json')
-
+      ensure_model_dir!(dir)
+      config = load_config(dir)
       new(
-        model_path: model_path,
-        tokenizer_path: tokenizer_path,
+        model_path: File.join(dir, file),
+        tokenizer_path: File.join(dir, 'tokenizer.json'),
         max_width: config.fetch('max_width', DEFAULT_MAX_WIDTH),
         max_seq_len: config.fetch('max_seq_len', DEFAULT_MAX_SEQ_LEN)
       )
@@ -45,11 +39,9 @@ module Gliner
       @max_width = Integer(max_width)
       @max_seq_len = Integer(max_seq_len)
 
-      raise Error, "Model file not found: #{@model_path}" unless File.exist?(@model_path)
-      raise Error, "Tokenizer file not found: #{@tokenizer_path}" unless File.exist?(@tokenizer_path)
-
-      tokenizer = Tokenizers.from_file(@tokenizer_path)
-      session = OnnxRuntime::InferenceSession.new(@model_path)
+      validate_paths!
+      tokenizer = load_tokenizer
+      session = load_session
 
       @text_processor = TextProcessor.new(tokenizer)
       @inference = Inference.new(session)
@@ -111,7 +103,11 @@ module Gliner
     # @param include_spans [Boolean] Include character positions (default: false)
     # @return [Hash] Extracted entities
     #
-    def extract_entities(text, entity_types, threshold: 0.5, format_results: true, include_confidence: false, include_spans: false)
+    def extract_entities(text, entity_types, **options)
+      threshold = options.fetch(:threshold, 0.5)
+      include_confidence = options.fetch(:include_confidence, false)
+      include_spans = options.fetch(:include_spans, false)
+
       pipeline.execute(
         entity_task,
         text,
@@ -139,11 +135,14 @@ module Gliner
     # @param include_confidence [Boolean] Include confidence scores (default: false)
     # @return [Hash] Classification results
     #
-    def classify_text(text, tasks, threshold: nil, format_results: true, include_confidence: false, include_spans: false)
-      options = { include_confidence: include_confidence }
-      options[:threshold] = threshold unless threshold.nil?
+    def classify_text(text, tasks, **options)
+      include_confidence = options.fetch(:include_confidence, false)
+      threshold = options[:threshold]
 
-      classification_task.execute_all(pipeline, text, tasks, **options)
+      task_options = { include_confidence: include_confidence }
+      task_options[:threshold] = threshold unless threshold.nil?
+
+      classification_task.execute_all(pipeline, text, tasks, **task_options)
     end
 
     # Extract structured data from text
@@ -162,7 +161,11 @@ module Gliner
     # @param include_spans [Boolean] Include character positions (default: false)
     # @return [Hash] Extracted structured data
     #
-    def extract_json(text, structures, threshold: 0.5, format_results: true, include_confidence: false, include_spans: false)
+    def extract_json(text, structures, **options)
+      threshold = options.fetch(:threshold, 0.5)
+      include_confidence = options.fetch(:include_confidence, false)
+      include_spans = options.fetch(:include_spans, false)
+
       json_task.execute_all(
         pipeline,
         text,
@@ -171,6 +174,32 @@ module Gliner
         include_confidence: include_confidence,
         include_spans: include_spans
       )
+    end
+
+    def self.ensure_model_dir!(dir)
+      raise Error, "Model directory not found: #{dir}" unless Dir.exist?(dir)
+    end
+    private_class_method :ensure_model_dir!
+
+    def self.load_config(dir)
+      config_path = File.join(dir, 'config.json')
+      File.exist?(config_path) ? JSON.parse(File.read(config_path)) : {}
+    end
+    private_class_method :load_config
+
+    private
+
+    def validate_paths!
+      raise Error, "Model file not found: #{@model_path}" unless File.exist?(@model_path)
+      raise Error, "Tokenizer file not found: #{@tokenizer_path}" unless File.exist?(@tokenizer_path)
+    end
+
+    def load_tokenizer
+      Tokenizers.from_file(@tokenizer_path)
+    end
+
+    def load_session
+      OnnxRuntime::InferenceSession.new(@model_path)
     end
   end
 end

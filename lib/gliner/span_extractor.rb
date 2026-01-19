@@ -10,21 +10,15 @@ module Gliner
     end
 
     def extract_spans_by_label(logits, labels, label_positions, prepared, threshold: 0.5, thresholds_by_label: nil)
-      out = {}
-
-      labels.each_with_index do |label, label_index|
-        label_threshold = threshold
-        label_threshold = thresholds_by_label.fetch(label.to_s) if thresholds_by_label&.key?(label.to_s)
-
+      labels.each_with_index.with_object({}) do |(label, label_index), out|
         out[label.to_s] = find_spans_for_label(
           logits: logits,
           label_index: label_index,
           label_positions: label_positions,
           prepared: prepared,
-          threshold: label_threshold
+          threshold: threshold_for(label, threshold, thresholds_by_label)
         )
       end
-      out
     end
 
     def find_spans_for_label(logits:, label_index:, label_positions:, prepared:, threshold:)
@@ -42,14 +36,8 @@ module Gliner
           score = @inference.sigmoid(@inference.label_logit(logits, pos, width, label_index, label_positions))
           next if score < threshold
 
-          char_start = prepared.start_map[start_word]
-          char_end = prepared.end_map[end_word]
-          next if char_start.nil? || char_end.nil?
-
-          text_span = prepared.original_text[char_start...char_end].to_s.strip
-          next if text_span.empty?
-
-          spans << Span.new(text: text_span, score: score, start: char_start, end: char_end)
+          span = build_span(prepared, start_word, end_word, score)
+          spans << span if span
         end
       end
 
@@ -89,6 +77,23 @@ module Gliner
     end
 
     private
+
+    def threshold_for(label, default_threshold, thresholds_by_label)
+      return default_threshold unless thresholds_by_label&.key?(label.to_s)
+
+      thresholds_by_label.fetch(label.to_s)
+    end
+
+    def build_span(prepared, start_word, end_word, score)
+      char_start = prepared.start_map[start_word]
+      char_end = prepared.end_map[end_word]
+      return nil if char_start.nil? || char_end.nil?
+
+      text_span = prepared.original_text[char_start...char_end].to_s.strip
+      return nil if text_span.empty?
+
+      Span.new(text: text_span, score: score, start: char_start, end: char_end)
+    end
 
     def format_span(span, include_confidence:, include_spans:)
       return nil if span.nil?

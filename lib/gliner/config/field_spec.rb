@@ -6,15 +6,9 @@ module Gliner
       class << self
         def parse(spec)
           name, *parts = spec.split('::')
-          field = {
-            name: name.to_s,
-            dtype: :list,
-            description: nil,
-            choices: nil,
-            dtype_explicit: false
-          }
+          field = build_field(name)
 
-          parts.each { |part| apply_part(field, part) }
+          parts.each { |part| apply_part(field, part.to_s) }
           field.delete(:dtype_explicit)
           field
         end
@@ -28,22 +22,34 @@ module Gliner
 
         private
 
-        def apply_part(field, part)
-          part = part.to_s
+        def build_field(name)
+          {
+            name: name.to_s,
+            dtype: :list,
+            description: nil,
+            choices: nil,
+            dtype_explicit: false
+          }
+        end
 
-          case part
-          when 'str'
-            set_dtype(field, :str)
-          when 'list'
-            set_dtype(field, :list)
-          else
-            if bracketed_list?(part)
-              field[:choices] = parse_choices(part)
-              field[:dtype] = :str unless field[:dtype_explicit]
-            else
-              append_description(field, part)
-            end
-          end
+        def apply_part(field, part)
+          return apply_dtype_part(field, part) if dtype_part?(part)
+          return apply_choice_part(field, part) if bracketed_list?(part)
+
+          append_description(field, part)
+        end
+
+        def dtype_part?(part)
+          %w[str list].include?(part)
+        end
+
+        def apply_dtype_part(field, part)
+          set_dtype(field, part == 'str' ? :str : :list)
+        end
+
+        def apply_choice_part(field, part)
+          field[:choices] = parse_choices(part)
+          field[:dtype] = :str unless field[:dtype_explicit]
         end
 
         def set_dtype(field, dtype)

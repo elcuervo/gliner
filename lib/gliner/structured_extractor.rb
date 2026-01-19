@@ -10,12 +10,11 @@ module Gliner
       filtered = spans_by_label.transform_values(&:dup)
 
       parsed_fields.each do |field|
-        choices = field[:choices]
-        next if choices.nil? || choices.empty?
+        next unless field[:choices]&.any?
 
         label = field[:name]
         spans = filtered.fetch(label, [])
-        filtered[label] = filter_spans_by_choices(spans, choices)
+        filtered[label] = filter_spans_by_choices(spans, field[:choices])
       end
 
       filtered
@@ -31,33 +30,20 @@ module Gliner
     end
 
     def build_structure_instances(parsed_fields, spans_by_label, include_confidence:, include_spans:)
-      anchor_field = parsed_fields.find { |f| f[:dtype] == :str } || parsed_fields.first
-
+      anchor_field = anchor_field_for(parsed_fields)
       return [{}] if anchor_field.nil?
 
       anchors = spans_by_label.fetch(anchor_field[:name], [])
-
       if anchors.empty?
         return [format_structure_object(parsed_fields, spans_by_label,
                                         include_confidence: include_confidence,
                                         include_spans: include_spans)]
       end
 
-      anchors_sorted = anchors.sort_by(&:start)
-      instance_spans = anchors_sorted.map { Hash.new { |h, k| h[k] = [] } }
-
-      spans_by_label.each do |label, spans|
-        spans.each do |span|
-          anchor_index = anchors_sorted.rindex { |anchor| anchor.start <= span.start } || 0
-          instance_spans[anchor_index][label] << span
-        end
-      end
-
-      instance_spans.map do |field_spans|
-        format_structure_object(parsed_fields, field_spans,
-                                include_confidence: include_confidence,
-                                include_spans: include_spans)
-      end
+      instance_spans = build_instance_spans(anchors, spans_by_label)
+      format_instances(parsed_fields, instance_spans,
+                       include_confidence: include_confidence,
+                       include_spans: include_spans)
     end
 
     def format_structure_object(parsed_fields, spans_by_label, include_confidence:, include_spans:)
@@ -79,6 +65,32 @@ module Gliner
     end
 
     private
+
+    def anchor_field_for(parsed_fields)
+      parsed_fields.find { |field| field[:dtype] == :str } || parsed_fields.first
+    end
+
+    def build_instance_spans(anchors, spans_by_label)
+      anchors_sorted = anchors.sort_by(&:start)
+      instance_spans = anchors_sorted.map { Hash.new { |hash, key| hash[key] = [] } }
+
+      spans_by_label.each do |label, spans|
+        spans.each do |span|
+          anchor_index = anchors_sorted.rindex { |anchor| anchor.start <= span.start } || 0
+          instance_spans[anchor_index][label] << span
+        end
+      end
+
+      instance_spans
+    end
+
+    def format_instances(parsed_fields, instance_spans, include_confidence:, include_spans:)
+      instance_spans.map do |field_spans|
+        format_structure_object(parsed_fields, field_spans,
+                                include_confidence: include_confidence,
+                                include_spans: include_spans)
+      end
+    end
 
     def normalize_choice(value)
       value.to_s.strip.downcase
