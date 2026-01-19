@@ -11,7 +11,7 @@ Gem::Specification.new do |spec|
   spec.description = 'Basic Ruby inference wrapper for the GLiNER2 ONNX model.'
   spec.homepage = 'https://github.com/elcuervo/gliner'
   spec.license = 'MIT'
-  spec.required_ruby_version = '>= 3.2'
+  spec.required_ruby_version = '>= 3.3'
 
   spec.files = Dir.glob('lib/**/*') + Dir.glob('bin/*') + %w[README.md LICENSE gliner.gemspec]
   spec.require_paths = ['lib']
