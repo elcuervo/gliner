@@ -23,20 +23,24 @@ module Gliner
 
     def find_spans_for_label(logits:, label_index:, label_positions:, prepared:, threshold:)
       spans = []
+      seq_len = logits.first.length
 
-      seq_len = logits[0].length
       (0...seq_len).each do |pos|
         start_word = prepared.pos_to_word_index[pos]
+
         next if start_word.nil?
 
         (0...@max_width).each do |width|
           end_word = start_word + width
+
           next if end_word >= prepared.text_len
 
           score = @inference.sigmoid(@inference.label_logit(logits, pos, width, label_index, label_positions))
+
           next if score < threshold
 
           span = build_span(prepared, start_word, end_word, score)
+
           spans << span if span
         end
       end

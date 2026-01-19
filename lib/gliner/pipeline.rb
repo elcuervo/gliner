@@ -21,7 +21,9 @@ module Gliner
     private
 
     def prepare_text(task, text)
-      task.normalize_text? ? @text_processor.normalize_text(text) : text.to_s
+      return  @text_processor.normalize_text(text) if task.normalize_text?
+
+      text.to_s
     end
 
     def prepare_input(task, prepared_text, parsed, labels)

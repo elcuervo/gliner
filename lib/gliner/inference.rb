@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-require 'gliner/inference/request'
 require 'gliner/inference/io_validator'
 
 module Gliner
@@ -12,11 +11,24 @@ module Gliner
     SCHEMA_PREFIX_LENGTH = 4
     LABEL_SPACING = 2
 
+    Request = Data.define(
+      :input_ids,
+      :attention_mask,
+      :words_mask,
+      :text_lengths,
+      :task_type,
+      :label_positions,
+      :label_mask,
+      :want_cls
+    )
+
     attr_reader :label_index_mode, :has_cls_logits
 
     def initialize(session)
       @session = session
+
       validation = IOValidator.call(session)
+
       @input_names = validation.input_names
       @output_name = validation.output_name
       @label_index_mode = validation.label_index_mode
