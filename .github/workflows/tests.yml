@@ -16,17 +16,6 @@ jobs:
           extra_nix_config: |
             experimental-features = nix-command flakes
 
-      - name: Show environment
-        run: |
-          nix develop . --command bash -lc "uname -a"
-          nix develop . --command bash -lc "ruby -v"
-          nix develop . --command bash -lc "bundle -v"
-          nix develop . --command bash -lc "bundle env"
-          nix develop . --command bash -lc "bundle config"
-          nix develop . --command bash -lc "gem list | grep -E 'onnxruntime|tokenizers' || true"
-          nix develop . --command bash -lc "bundle exec ruby -e \"require 'gliner'; puts \\\"gliner #{Gliner::VERSION}\\\"\" || true"
-          nix develop . --command bash -lc "bundle exec ruby -e \"require 'onnxruntime'; puts \\\"onnxruntime gem #{OnnxRuntime::VERSION}\\\"; puts \\\"onnxruntime lib #{OnnxRuntime.lib_version}\\\"; p OnnxRuntime.ffi_lib\" || true"
-
       - name: Install gems
         run: nix develop . --command bundle install
 
