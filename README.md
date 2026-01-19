@@ -1,11 +1,8 @@
-# gliner (Ruby)
+# Gliner
+
+![](https://images.unsplash.com/photo-1625768376503-68d2495d78c5?q=80&w=2225&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D)
 
 Minimal Ruby inference wrapper for the **GLiNER2** ONNX model using:
-
-- `tokenizers` (https://github.com/ankane/tokenizers-ruby)
-- `onnxruntime` (https://github.com/ankane/onnxruntime-ruby)
-
-This gem does **not** ship model weights. Download an ONNX export + tokenizer files separately, then load from a local directory.
 
 ## Install
 
@@ -13,7 +10,8 @@ This gem does **not** ship model weights. Download an ONNX export + tokenizer fi
 gem "gliner"
 ```
 
-## Usage (entities)
+## Usage
+### entities
 
 ```ruby
 require "gliner"
@@ -45,7 +43,7 @@ model = Gliner[labels]
 pp model["Email John Doe at john@example.com.", threshold: 0.5]
 ```
 
-## Usage (classification)
+### classification
 
 ```ruby
 model = Gliner.classify[
@@ -63,7 +61,7 @@ Expected shape:
 {"sentiment"=>"negative"}
 ```
 
-## Usage (structured extraction)
+### structured extraction
 
 ```ruby
 text = "iPhone 15 Pro Max with 256GB storage, A17 Pro chip, priced at $1199."
@@ -104,7 +102,7 @@ This implementation expects a directory containing:
 
 One publicly available ONNX export is `cuerbot/gliner2-multi-v1` on Hugging Face.
 
-## Integration test (real model)
+## Integration test
 
 Downloads a public ONNX export and runs a real inference:
 
@@ -124,7 +122,7 @@ To reuse an existing local download:
 GLINER_MODEL_DIR=/path/to/model_dir rake test:integration
 ```
 
-## Console (REPL)
+## Console
 
 Start an IRB session with the gem loaded:
 
@@ -137,7 +135,7 @@ If you omit `MODEL_DIR`, the console auto-downloads a public test model (configu
 ```bash
 rake console
 # or:
-GLINER_REPO_ID=cuerbot/gliner2-multi-v1GLINER_MODEL_FILE=model_int8.onnx rake console
+GLINER_REPO_ID=cuerbot/gliner2-multi-v1 GLINER_MODEL_FILE=model_int8.onnx rake console
 ```
 
 Or:

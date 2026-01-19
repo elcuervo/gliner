@@ -99,22 +99,6 @@ module Gliner
       )
     end
 
-    # Extract named entities from text
-    #
-    # Supports:
-    # - Array: ["company", "person"]
-    # - Hash: {"company"=>"desc", "person"=>"desc"}
-    # - Hash config: {"email"=>{"description"=>"...", "dtype"=>"str", "threshold"=>0.9}}
-    #
-    # Returns: {"entities" => {"label" => ["span", ...], ...}}
-    #
-    # @param text [String] Input text
-    # @param entity_types [Array, Hash] Entity types configuration
-    # @param threshold [Float, nil] Optional override for task cls_threshold
-    # @param include_confidence [Boolean] Include confidence scores (default: false)
-    # @param include_spans [Boolean] Include character positions (default: false)
-    # @return [Hash] Extracted entities
-    #
     def extract_entities(text, entity_types, **options)
       threshold = options.fetch(:threshold, 0.5)
       include_confidence = options.fetch(:include_confidence, false)
@@ -130,23 +114,6 @@ module Gliner
       )
     end
 
-    # Classify text into one or more categories
-    #
-    # Supports:
-    # - {"sentiment" => ["positive","negative","neutral"]}
-    # - {"aspects" => {"labels"=>[...], "multi_label"=>true, "cls_threshold"=>0.4}}
-    # - {"sentiment" => {"labels"=>{"positive"=>"desc", ...}}}
-    #
-    # Returns:
-    # - Single-label: {"sentiment"=>"negative"}
-    # - Multi-label: {"aspects"=>["camera","price"]}
-    #
-    # @param text [String] Input text
-    # @param tasks [Hash] Classification tasks configuration
-    # @param threshold [Float] Confidence threshold (default: 0.5)
-    # @param include_confidence [Boolean] Include confidence scores (default: false)
-    # @return [Hash] Classification results
-    #
     def classify_text(text, tasks, **options)
       include_confidence = options.fetch(:include_confidence, false)
       threshold = options[:threshold]
@@ -157,22 +124,6 @@ module Gliner
       classification_task.execute_all(pipeline, text, tasks, **task_options)
     end
 
-    # Extract structured data from text
-    #
-    # Supports field specs like:
-    #   "name::str::Full product name and model"
-    #   "category::[food|transport|shopping]::str"
-    #
-    # Returns:
-    #   {"product"=>[{"name"=>"...", ...}]}
-    #
-    # @param text [String] Input text
-    # @param structures [Hash] Structure definitions
-    # @param threshold [Float] Confidence threshold (default: 0.5)
-    # @param include_confidence [Boolean] Include confidence scores (default: false)
-    # @param include_spans [Boolean] Include character positions (default: false)
-    # @return [Hash] Extracted structured data
-    #
     def extract_json(text, structures, **options)
       threshold = options.fetch(:threshold, 0.5)
       include_confidence = options.fetch(:include_confidence, false)
