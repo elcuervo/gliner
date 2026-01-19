@@ -10,8 +10,8 @@ describe 'Gliner Integration', if: ENV.key?('GLINER_INTEGRATION') do
   describe 'real model inference' do
     context 'with entities extraction' do
       it 'extracts entities correctly' do
-        model_dir = ensure_model_dir!
-        Gliner.load(model_dir)
+        model_dir, model_file = ensure_model_dir!
+        Gliner.load(model_dir, file: model_file)
 
         text = 'Apple CEO Tim Cook announced iPhone 15 in Cupertino yesterday.'
         labels = {
@@ -34,8 +34,8 @@ describe 'Gliner Integration', if: ENV.key?('GLINER_INTEGRATION') do
 
     context 'with text classification' do
       it 'classifies sentiment correctly' do
-        model_dir = ensure_model_dir!
-        Gliner.load(model_dir)
+        model_dir, model_file = ensure_model_dir!
+        Gliner.load(model_dir, file: model_file)
 
         text = 'This laptop has amazing performance but terrible battery life!'
         schema = { 'sentiment' => %w[positive negative neutral] }
@@ -48,8 +48,8 @@ describe 'Gliner Integration', if: ENV.key?('GLINER_INTEGRATION') do
 
     context 'with structured extraction' do
       it 'extracts JSON structure correctly' do
-        model_dir = ensure_model_dir!
-        Gliner.load(model_dir)
+        model_dir, model_file = ensure_model_dir!
+        Gliner.load(model_dir, file: model_file)
 
         text = 'iPhone 15 Pro Max with 256GB storage, A17 Pro chip, priced at $1199.'
         complex_schema = {
@@ -71,8 +71,8 @@ describe 'Gliner Integration', if: ENV.key?('GLINER_INTEGRATION') do
       end
 
       it 'supports choices and multiple instances' do
-        model_dir = ensure_model_dir!
-        Gliner.load(model_dir)
+        model_dir, model_file = ensure_model_dir!
+        Gliner.load(model_dir, file: model_file)
 
         text = <<~TEXT
           Transaction 1
@@ -123,16 +123,17 @@ describe 'Gliner Integration', if: ENV.key?('GLINER_INTEGRATION') do
 
   def ensure_model_dir!
     from_env = ENV.fetch('GLINER_MODEL_DIR', nil)
-    return from_env if from_env && !from_env.empty?
+    model_file = ENV.fetch('GLINER_MODEL_FILE', 'model_int8.onnx')
+    return [from_env, model_file] if from_env && !from_env.empty?
 
     dir = File.expand_path("../tmp/#{REPO_ID.tr('/', '__')}", __dir__)
     FileUtils.mkdir_p(dir)
 
     download(hf_resolve_url('tokenizer.json').to_s, File.join(dir, 'tokenizer.json'))
     download(hf_resolve_url('config.json').to_s, File.join(dir, 'config.json'))
-    download(hf_resolve_url('model_int8.onnx').to_s, File.join(dir, 'model_int8.onnx'))
+    download(hf_resolve_url(model_file).to_s, File.join(dir, model_file))
 
-    dir
+    [dir, model_file]
   end
 
   def hf_resolve_url(filename)
