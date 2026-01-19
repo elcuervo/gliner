@@ -27,7 +27,7 @@ module Gliner
     def initialize(session)
       @session = session
 
-      validation = IOValidator.call(session)
+      validation = IOValidator[session]
 
       @input_names = validation.input_names
       @output_name = validation.output_name

@@ -6,6 +6,8 @@ module Gliner
 
     class IOValidator
       class << self
+        def [](session) = call(session)
+
         def call(session)
           input_names = session.inputs.map { |input| input[:name] }
           output_names = session.outputs.map { |output| output[:name] }
