@@ -2,8 +2,6 @@
 
 ![](https://images.unsplash.com/photo-1625768376503-68d2495d78c5?q=80&w=2225&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D)
 
-Minimal Ruby inference wrapper for the **GLiNER2** ONNX model using:
-
 ## Install
 
 ```ruby
@@ -11,7 +9,8 @@ gem "gliner"
 ```
 
 ## Usage
-### entities
+
+### Entities
 
 ```ruby
 require "gliner"
@@ -48,7 +47,7 @@ model = Gliner[labels]
 pp model["Email John Doe at john@example.com.", threshold: 0.5]
 ```
 
-### classification
+### Classification
 
 ```ruby
 model = Gliner.classify[
@@ -66,7 +65,7 @@ Expected shape:
 {"sentiment"=>"negative"}
 ```
 
-### structured extraction
+### Structured extraction
 
 ```ruby
 text = "iPhone 15 Pro Max with 256GB storage, A17 Pro chip, priced at $1199."
