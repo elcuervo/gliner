@@ -21,7 +21,7 @@ module Gliner
     private
 
     def prepare_text(task, text)
-      return  @text_processor.normalize_text(text) if task.normalize_text?
+      return @text_processor.normalize_text(text) if task.normalize_text?
 
       text.to_s
     end

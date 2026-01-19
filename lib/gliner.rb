@@ -34,9 +34,7 @@ module Gliner
       load(dir, file: file)
     end
 
-    def model=(model)
-      @model = model
-    end
+    attr_writer :model
 
     def model
       @model ||= model_from_env
@@ -53,7 +51,7 @@ module Gliner
     private
 
     def model_from_env
-      dir = ENV['GLINER_MODEL_DIR']
+      dir = ENV.fetch('GLINER_MODEL_DIR', nil)
       return nil if dir.nil? || dir.empty?
 
       file = ENV['GLINER_MODEL_FILE'] || 'model_int8.onnx'

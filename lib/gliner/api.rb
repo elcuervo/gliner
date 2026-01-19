@@ -4,14 +4,17 @@ module Gliner
   module API
     class << self
       def compile(model, config)
-        if structured_config?(config)
-          StructuredRunner.new(model, config)
-        else
-          EntityRunner.new(model, config)
-        end
+        runner(config)
+          .new(model, config)
       end
 
       private
+
+      def runner(config)
+        return StructuredRunner if structured_config?(config)
+
+        EntityRunner
+      end
 
       def structured_config?(config)
         return false unless config.is_a?(Hash)
