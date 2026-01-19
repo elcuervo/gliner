@@ -8,33 +8,18 @@ on:
 
 jobs:
   test:
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - ruby: "4.0"
-            os: ubuntu-22.04
-
-          - ruby: 3.4
-            os: ubuntu-22.04
-
-          - ruby: 3.2
-            os: ubuntu-22.04
-
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v6
 
-      - uses: cachix/install-nix-action@v27
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
         with:
-          extra_nix_config: |
-            experimental-features = nix-command flakes
-
-      - name: Install gems
-        run: nix develop . --command bundle install
+          ruby-version: "3.4"
+          bundler-cache: true
 
       - name: Run unit tests
-        run: nix develop . --command bash -lc "bundle exec rspec"
+        run: bundle exec rspec
 
       - name: Run integration tests
-        run: nix develop . --command bash -lc "bundle exec rake spec:integration"
+        run: bundle exec rake spec:integration
