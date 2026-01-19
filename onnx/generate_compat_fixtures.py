@@ -48,10 +48,54 @@ def run_torch_logits(wrapper: SpanLogitsWrapper, inputs):
 
 
 def generate_entities_cases(n: int) -> List[Dict]:
-    companies = ["Apple", "Google", "Microsoft", "Amazon", "Meta", "Tesla", "Nike", "Samsung", "Intel", "Sony"]
-    people = ["Tim Cook", "Sundar Pichai", "Satya Nadella", "Andy Jassy", "Mark Zuckerberg", "Elon Musk", "Phil Knight", "Jong-Hee Han", "Pat Gelsinger", "Kenichiro Yoshida"]
-    products = ["iPhone 15", "Pixel 9", "Surface Pro", "Echo Show", "Quest 3", "Model Y", "Air Max", "Galaxy S24", "Core i9", "PlayStation 5"]
-    locations = ["Cupertino", "Mountain View", "Redmond", "Seattle", "Menlo Park", "Austin", "Portland", "Seoul", "Santa Clara", "Tokyo"]
+    companies = [
+        "Apple",
+        "Google",
+        "Microsoft",
+        "Amazon",
+        "Meta",
+        "Tesla",
+        "Nike",
+        "Samsung",
+        "Intel",
+        "Sony",
+    ]
+    people = [
+        "Tim Cook",
+        "Sundar Pichai",
+        "Satya Nadella",
+        "Andy Jassy",
+        "Mark Zuckerberg",
+        "Elon Musk",
+        "Phil Knight",
+        "Jong-Hee Han",
+        "Pat Gelsinger",
+        "Kenichiro Yoshida",
+    ]
+    products = [
+        "iPhone 15",
+        "Pixel 9",
+        "Surface Pro",
+        "Echo Show",
+        "Quest 3",
+        "Model Y",
+        "Air Max",
+        "Galaxy S24",
+        "Core i9",
+        "PlayStation 5",
+    ]
+    locations = [
+        "Cupertino",
+        "Mountain View",
+        "Redmond",
+        "Seattle",
+        "Menlo Park",
+        "Austin",
+        "Portland",
+        "Seoul",
+        "Santa Clara",
+        "Tokyo",
+    ]
     templates = [
         "{company} CEO {person} announced {product} in {location}.",
         "At {location}, {company} launched the new {product}, said {person}.",
@@ -70,12 +114,14 @@ def generate_entities_cases(n: int) -> List[Dict]:
             product=products[(idx * 5) % len(products)],
             location=locations[(idx * 7) % len(locations)],
         )
-        cases.append({
-            "text": text,
-            "labels": labels,
-            "descriptions": descriptions,
-            "threshold": 0.5,
-        })
+        cases.append(
+            {
+                "text": text,
+                "labels": labels,
+                "descriptions": descriptions,
+                "threshold": 0.5,
+            }
+        )
     return cases
 
 
@@ -99,27 +145,42 @@ def generate_classification_cases(n: int) -> List[Dict]:
     for idx in range(n):
         if idx % 2 == 0:
             text = sentiment_texts[idx % len(sentiment_texts)]
-            cases.append({
-                "text": text,
-                "task_name": "sentiment",
-                "labels": ["positive", "negative", "neutral"],
-                "threshold": 0.5,
-                "multi_label": False,
-            })
+            cases.append(
+                {
+                    "text": text,
+                    "task_name": "sentiment",
+                    "labels": ["positive", "negative", "neutral"],
+                    "threshold": 0.5,
+                    "multi_label": False,
+                }
+            )
         else:
             text = aspect_texts[idx % len(aspect_texts)]
-            cases.append({
-                "text": text,
-                "task_name": "aspects",
-                "labels": ["camera", "battery", "screen", "price", "performance"],
-                "threshold": 0.4,
-                "multi_label": True,
-            })
+            cases.append(
+                {
+                    "text": text,
+                    "task_name": "aspects",
+                    "labels": ["camera", "battery", "screen", "price", "performance"],
+                    "threshold": 0.4,
+                    "multi_label": True,
+                }
+            )
     return cases
 
 
 def generate_json_cases(n: int) -> List[Dict]:
-    names = ["iPhone 15 Pro", "Galaxy S24", "Pixel 9 Pro", "Xperia 5", "OnePlus 12", "ThinkPad X1", "MacBook Pro", "Surface Laptop", "iPad Air", "Kindle Scribe"]
+    names = [
+        "iPhone 15 Pro",
+        "Galaxy S24",
+        "Pixel 9 Pro",
+        "Xperia 5",
+        "OnePlus 12",
+        "ThinkPad X1",
+        "MacBook Pro",
+        "Surface Laptop",
+        "iPad Air",
+        "Kindle Scribe",
+    ]
     storages = ["128GB", "256GB", "512GB", "1TB", "64GB"]
     prices = ["$799", "$999", "$1199", "$1499", "$699", "$899"]
     fields = [
@@ -135,12 +196,14 @@ def generate_json_cases(n: int) -> List[Dict]:
             storage=storages[(idx * 2) % len(storages)],
             price=prices[(idx * 3) % len(prices)],
         )
-        cases.append({
-            "text": text,
-            "parent": "product",
-            "fields": fields,
-            "threshold": 0.4,
-        })
+        cases.append(
+            {
+                "text": text,
+                "parent": "product",
+                "fields": fields,
+                "threshold": 0.4,
+            }
+        )
     return cases
 
 
@@ -158,7 +221,9 @@ def main() -> None:
     tokenizer = AutoTokenizer.from_pretrained(repo_id)
     config = load_config(model_dir) if model_dir else {}
     max_width = config.get("max_width", getattr(extractor, "max_width", 8))
-    max_seq_len = config.get("max_seq_len", getattr(extractor.encoder.config, "max_position_embeddings", 512))
+    max_seq_len = config.get(
+        "max_seq_len", getattr(extractor.encoder.config, "max_position_embeddings", 512)
+    )
     decoder = SpanLogitsDecoder(tokenizer, max_width=max_width, max_seq_len=max_seq_len)
 
     entities_cases = generate_entities_cases(100)
@@ -180,16 +245,22 @@ def main() -> None:
     for case in entities_cases:
         prompt = decoder.build_prompt("entities", case["descriptions"])
         schema_tokens = decoder.schema_tokens_for(prompt, case["labels"], "[E]")
-        prepared = decoder.prepare_inputs(case["text"], schema_tokens, len(case["labels"]))
+        prepared = decoder.prepare_inputs(
+            case["text"], schema_tokens, len(case["labels"])
+        )
         inputs = build_inputs(prepared, task_type_val=0, num_labels=len(case["labels"]))
         logits = run_torch_logits(wrapper, inputs)
-        expected = decoder.extract_entities(logits, prepared, case["labels"], case["threshold"])
+        expected = decoder.extract_entities(
+            logits, prepared, case["labels"], case["threshold"]
+        )
         fixtures["entities"].append({"input": case, "expected": expected})
 
     for case in classification_cases:
         prompt = decoder.build_prompt(case["task_name"], {})
         schema_tokens = decoder.schema_tokens_for(prompt, case["labels"], "[L]")
-        prepared = decoder.prepare_inputs(case["text"], schema_tokens, len(case["labels"]))
+        prepared = decoder.prepare_inputs(
+            case["text"], schema_tokens, len(case["labels"])
+        )
         inputs = build_inputs(prepared, task_type_val=1, num_labels=len(case["labels"]))
         logits = run_torch_logits(wrapper, inputs)
         expected = decoder.classify_text(
@@ -206,7 +277,9 @@ def main() -> None:
         prompt = decoder.build_prompt(case["parent"], {})
         labels = [field.split("::")[0] for field in case["fields"]]
         schema_tokens = decoder.schema_tokens_for(prompt, labels, "[C]")
-        prepared = decoder.prepare_inputs(case["text"], schema_tokens, len(case["fields"]))
+        prepared = decoder.prepare_inputs(
+            case["text"], schema_tokens, len(case["fields"])
+        )
         inputs = build_inputs(prepared, task_type_val=2, num_labels=len(case["fields"]))
         logits = run_torch_logits(wrapper, inputs)
         expected = decoder.extract_json(
