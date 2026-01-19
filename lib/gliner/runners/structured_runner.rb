@@ -8,8 +8,8 @@ module Gliner
       end
 
       def [](text, **options)
-        @tasks.each_with_object({}) do |(name, task), out|
-          out[name] = task.call(text, **options)
+        @tasks.transform_values do |task|
+          task.call(text, **options)
         end
       end
 
