@@ -52,8 +52,10 @@ module Gliner
       @config ||= Configuration.new
     end
 
-    def load(dir, file: 'model_int8.onnx')
-      self.model = Model.from_dir(dir, file: file)
+    def load(dir, file: nil)
+      file ||= config.model_file
+
+      self.model = Model.from_dir(dir, file: file || 'model_int8.onnx')
     end
 
     def model
@@ -78,7 +80,10 @@ module Gliner
       dir = config.model_dir
       return nil if dir.nil? || dir.empty?
 
-      Model.from_dir(dir)
+      file = config.model_file
+      return Model.from_dir(dir) if file.nil? || file.empty?
+
+      Model.from_dir(dir, file: file)
     end
 
     def model_from_env

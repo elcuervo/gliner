@@ -18,6 +18,7 @@ require "gliner"
 Gliner.configure do |config|
   config.threshold = 0.2
   config.model_dir = "/path/to/gliner2-multi-v1"
+  config.model_file = "model.onnx"
 end
 
 Gliner.load("path/to/gliner2-multi-v1")
@@ -105,12 +106,14 @@ This implementation expects a directory containing:
 - (optional) `config.json` with `max_width` and `max_seq_len`
 
 One publicly available ONNX export is `cuerbot/gliner2-multi-v1` on Hugging Face.
+By default, `model_int8.onnx` is used; set `config.model_file` or `GLINER_MODEL_FILE` to override.
 
 You can also configure the model directory in code:
 
 ```ruby
 Gliner.configure do |config|
   config.model_dir = "/path/to/model_dir"
+  config.model_file = "model_int8.onnx"
 end
 ```
 
