@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'gliner/options'
+
 module Gliner
   class StructuredExtractor
     def initialize(span_extractor)
@@ -31,27 +33,19 @@ module Gliner
       matched
     end
 
-    def build_structure_instances(parsed_fields, spans_by_label, include_confidence:, include_spans:)
+    def build_structure_instances(parsed_fields, spans_by_label, opts)
+      format_opts = normalize_format_options(opts)
       anchor_field = anchor_field_for(parsed_fields)
-
-      return [{}] if anchor_field.nil?
+      return [{}] unless anchor_field
 
       anchors = spans_by_label.fetch(anchor_field[:name], [])
-
-      if anchors.empty?
-        return [format_structure_object(parsed_fields, spans_by_label,
-                                        include_confidence: include_confidence,
-                                        include_spans: include_spans)]
-      end
+      return [format_structure_object(parsed_fields, spans_by_label, format_opts)] if anchors.empty?
 
       instance_spans = build_instance_spans(anchors, spans_by_label)
-
-      format_instances(parsed_fields, instance_spans,
-                       include_confidence: include_confidence,
-                       include_spans: include_spans)
+      format_instances(parsed_fields, instance_spans, format_opts)
     end
 
-    def format_structure_object(parsed_fields, spans_by_label, include_confidence:, include_spans:)
+    def format_structure_object(parsed_fields, spans_by_label, opts)
       obj = {}
 
       parsed_fields.each do |field|
@@ -60,9 +54,9 @@ module Gliner
 
         if field[:dtype] == :str
           best = @span_extractor.choose_best_span(spans)
-          obj[key] = @span_extractor.format_single_span(best, include_confidence: include_confidence, include_spans: include_spans)
+          obj[key] = @span_extractor.format_single_span(best, opts)
         else
-          obj[key] = @span_extractor.format_spans(spans, include_confidence: include_confidence, include_spans: include_spans)
+          obj[key] = @span_extractor.format_spans(spans, opts)
         end
       end
 
@@ -89,16 +83,18 @@ module Gliner
       instance_spans
     end
 
-    def format_instances(parsed_fields, instance_spans, include_confidence:, include_spans:)
+    def format_instances(parsed_fields, instance_spans, opts)
       instance_spans.map do |field_spans|
-        format_structure_object(parsed_fields, field_spans,
-                                include_confidence: include_confidence,
-                                include_spans: include_spans)
+        format_structure_object(parsed_fields, field_spans, opts)
       end
     end
 
     def normalize_choice(value)
       value.to_s.strip.downcase
+    end
+
+    def normalize_format_options(opts)
+      opts.is_a?(FormatOptions) ? opts : FormatOptions.from(opts)
     end
   end
 end

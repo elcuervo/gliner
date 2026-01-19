@@ -142,29 +142,9 @@ describe 'Gliner Integration', if: ENV.key?('GLINER_INTEGRATION') do
 
   def download(url, dest)
     return if File.exist?(dest) && File.size?(dest)
-
-    temp_dest = "#{dest}.partial"
-    resume_from = File.exist?(temp_dest) ? File.size(temp_dest) : 0
-
-    http = HTTPX.plugin(:retries).with(
-      max_retries: 3,
-      retry_after: 1,
-      timeout: { operation_timeout: 300 }
-    )
-
-    headers = {}
-    headers['Range'] = "bytes=#{resume_from}-" if resume_from > 0
-
-    response = http.get(url, headers: headers)
-
+    response = HTTPX.get(url)
     raise "Download failed: #{url} (status: #{response.status})" unless response.status.between?(200, 299)
 
-    mode = resume_from > 0 && response.status == 206 ? 'ab' : 'wb'
-    File.open(temp_dest, mode) { |f| f.write(response.body.to_s) }
-
-    File.rename(temp_dest, dest)
-  rescue StandardError => e
-    File.delete(temp_dest) if File.exist?(temp_dest) && resume_from.zero?
-    raise "Download failed: #{url} - #{e.message}"
+    File.binwrite(dest, response.body.to_s)
   end
 end

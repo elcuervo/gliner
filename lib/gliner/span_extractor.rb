@@ -1,7 +1,12 @@
 # frozen_string_literal: true
 
+require 'gliner/concerns/position_iteration'
+require 'gliner/options'
+
 module Gliner
   class SpanExtractor
+    include PositionIteration
+
     SCORE_SIMILARITY_THRESHOLD = 0.02
 
     def initialize(inference, max_width:)
@@ -22,30 +27,14 @@ module Gliner
     end
 
     def find_spans_for_label(logits:, label_index:, label_positions:, prepared:, threshold:)
-      spans = []
       seq_len = logits.first.length
 
-      (0...seq_len).each do |pos|
-        start_word = prepared.pos_to_word_index[pos]
+      each_position_width(seq_len, prepared, @max_width).filter_map do |pos, start_word, width|
+        score = calculate_span_score(logits, pos, width, label_index, label_positions)
+        next if score < threshold
 
-        next if start_word.nil?
-
-        (0...@max_width).each do |width|
-          end_word = start_word + width
-
-          next if end_word >= prepared.text_len
-
-          score = @inference.sigmoid(@inference.label_logit(logits, pos, width, label_index, label_positions))
-
-          next if score < threshold
-
-          span = build_span(prepared, start_word, end_word, score)
-
-          spans << span if span
-        end
+        build_span(prepared, start_word, start_word + width, score)
       end
-
-      spans
     end
 
     def choose_best_span(spans)
@@ -54,16 +43,16 @@ module Gliner
       sorted = spans.sort_by { |s| [-s.score, (s.end - s.start), s.text.length] }
       best = sorted.first
       best_score = best.score
-      near = sorted.take_while { |s| (best_score - s.score) <= SCORE_SIMILARITY_THRESHOLD }
+      near = spans_within_threshold(sorted, best_score)
 
       near.min_by { |s| [(s.end - s.start), -s.score, s.text.length] } || best
     end
 
-    def format_single_span(span, include_confidence:, include_spans:)
-      format_span(span, include_confidence: include_confidence, include_spans: include_spans)
+    def format_single_span(span, opts)
+      format_span(span, opts)
     end
 
-    def format_spans(spans, include_confidence:, include_spans:)
+    def format_spans(spans, opts)
       return [] if spans.empty?
 
       sorted = spans.sort_by { |s| -s.score }
@@ -76,12 +65,19 @@ module Gliner
         selected << span
       end
 
-      selected.map do |span|
-        format_span(span, include_confidence: include_confidence, include_spans: include_spans)
-      end
+      selected.map { |span| format_span(span, opts) }
     end
 
     private
+
+    def calculate_span_score(logits, pos, width, label_index, label_positions)
+      logit = @inference.label_logit(logits, pos, width, label_index, label_positions)
+      @inference.sigmoid(logit)
+    end
+
+    def spans_within_threshold(sorted_spans, best_score)
+      sorted_spans.take_while { |span| (best_score - span.score) <= SCORE_SIMILARITY_THRESHOLD }
+    end
 
     def threshold_for(label, default_threshold, thresholds_by_label)
       return default_threshold unless thresholds_by_label&.key?(label.to_s)
@@ -102,19 +98,25 @@ module Gliner
       Span.new(text: text_span, score: score, start: char_start, end: char_end)
     end
 
-    def format_span(span, include_confidence:, include_spans:)
+    def format_span(span, opts)
       return nil if span.nil?
-      return span.text unless include_confidence || include_spans
+
+      format_opts = normalize_format_options(opts)
+      return span.text unless format_opts.include_confidence || format_opts.include_spans
 
       result = { 'text' => span.text }
-      result['confidence'] = span.score if include_confidence
+      result['confidence'] = span.score if format_opts.include_confidence
 
-      if include_spans
+      if format_opts.include_spans
         result['start'] = span.start
         result['end'] = span.end
       end
 
       result
+    end
+
+    def normalize_format_options(opts)
+      opts.is_a?(FormatOptions) ? opts : FormatOptions.from(opts)
     end
   end
 end

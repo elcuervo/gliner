@@ -2,6 +2,8 @@
 
 module Gliner
   class InputBuilder
+    require 'set'
+
     def initialize(text_processor, max_seq_len:)
       @text_processor = text_processor
       @max_seq_len = max_seq_len
@@ -64,12 +66,14 @@ module Gliner
       word_ids = context.fetch(:word_ids)
       text_start_index = context.fetch(:text_start_index)
 
+      word_analysis = analyze_words(word_ids, text_start_index)
+
       PreparedInput.new(
         input_ids: input_ids,
         word_ids: word_ids,
         attention_mask: Array.new(input_ids.length, 1),
-        words_mask: build_words_mask(word_ids, text_start_index),
-        pos_to_word_index: build_pos_to_word_index(word_ids, text_start_index),
+        words_mask: word_analysis[:mask],
+        pos_to_word_index: word_analysis[:index_map],
         start_map: context.fetch(:start_map),
         end_map: context.fetch(:end_map),
         original_text: context.fetch(:original_text),
@@ -77,32 +81,29 @@ module Gliner
       )
     end
 
-    def build_words_mask(word_ids, text_start_index)
+    def analyze_words(word_ids, text_start_index)
       mask = Array.new(word_ids.length, 0)
+      index_map = Array.new(word_ids.length)
       last_word_id = nil
+      seen = Set.new
 
       word_ids.each_with_index do |word_id, i|
-        next if word_id.nil?
+        next unless word_id
 
-        if word_id != last_word_id
-          mask[i] = 1 if word_id >= text_start_index
+        # Build mask (word boundaries)
+        if word_id != last_word_id && word_id >= text_start_index
+          mask[i] = 1
           last_word_id = word_id
         end
-      end
-      mask
-    end
 
-    def build_pos_to_word_index(word_ids, text_start_index)
-      index_map = Array.new(word_ids.length)
-      seen = {}
-      word_ids.each_with_index do |word_id, i|
-        next if word_id.nil?
-        next if seen.key?(word_id)
-
-        seen[word_id] = true
-        index_map[i] = word_id - text_start_index if word_id >= text_start_index
+        # Build index map (first occurrence)
+        unless seen.include?(word_id)
+          seen << word_id
+          index_map[i] = word_id - text_start_index if word_id >= text_start_index
+        end
       end
-      index_map
+
+      { mask: mask, index_map: index_map }
     end
 
     def infer_effective_text_len(word_ids, text_start_index, full_text_len)

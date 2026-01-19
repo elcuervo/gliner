@@ -9,14 +9,8 @@ Gem::Specification.new do |spec|
 
   spec.summary = 'Schema-based information extraction (GLiNER2) via ONNX Runtime'
   spec.description = 'Basic Ruby inference wrapper for the GLiNER2 ONNX model.'
-  spec.homepage = 'TODO'
   spec.license = 'MIT'
   spec.required_ruby_version = '>= 3.2'
-
-  spec.metadata['homepage_uri'] = spec.homepage
-  spec.metadata['source_code_uri'] = spec.homepage
-  spec.metadata['changelog_uri'] = 'TODO'
-  spec.metadata['rubygems_mfa_required'] = 'true'
 
   spec.files = Dir.glob('lib/**/*') + Dir.glob('bin/*') + %w[README.md LICENSE gliner.gemspec]
   spec.require_paths = ['lib']

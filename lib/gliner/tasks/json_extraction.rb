@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'gliner/options'
+
 module Gliner
   module Tasks
     class JsonExtraction < Task
@@ -47,13 +49,9 @@ module Gliner
       def process_output(logits, parsed, prepared, options)
         spans_by_label = extract_spans(logits, parsed, prepared, options)
         filtered_spans = @structured_extractor.apply_choice_filters(spans_by_label, parsed[:parsed_fields])
+        format_opts = FormatOptions.from(options)
 
-        @structured_extractor.build_structure_instances(
-          parsed[:parsed_fields],
-          filtered_spans,
-          include_confidence: options.fetch(:include_confidence, false),
-          include_spans: options.fetch(:include_spans, false)
-        )
+        @structured_extractor.build_structure_instances(parsed[:parsed_fields], filtered_spans, format_opts)
       end
 
       def execute_all(pipeline, text, structures_config, **options)

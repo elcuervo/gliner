@@ -7,9 +7,11 @@ rescue LoadError
 end
 
 require "gliner"
+require "fileutils"
+require "httpx"
 require "irb"
 
-DEFAULT_REPO_ID = "cuerbot/gliner2-multi-v1-int8"
+DEFAULT_REPO_ID = "cuerbot/gliner2-multi-v1"
 DEFAULT_MODEL_FILE = "model_int8.onnx"
 
 def ensure_model_dir!(repo_id:, model_file:)
@@ -22,25 +24,17 @@ def ensure_model_dir!(repo_id:, model_file:)
   files.each do |file|
     dest = File.join(dir, file)
     next if File.exist?(dest) && File.size?(dest)
-
-    ok = system(
-      "curl",
-      "--fail",
-      "--location",
-      "--retry",
-      "3",
-      "--retry-delay",
-      "1",
-      "--continue-at",
-      "-",
-      "--output",
-      dest,
-      "#{base}/#{file}"
-    )
-    raise "Download failed: #{base}/#{file}" unless ok
+    download("#{base}/#{file}", dest)
   end
 
   dir
+end
+
+def download(url, dest)
+  response = HTTPX.get(url)
+  raise "Download failed: #{url} (status: #{response.status})" unless response.status.between?(200, 299)
+
+  File.binwrite(dest, response.body.to_s)
 end
 
 model_dir = ARGV[0] || ENV["GLINER_MODEL_DIR"]
@@ -53,7 +47,7 @@ else
   begin
     require "fileutils"
     model_dir = ensure_model_dir!(repo_id: repo_id, model_file: model_file)
-    $gliner_model = Gliner::Model.from_dir(model_dir, model_filename: model_file)
+    $gliner_model = Gliner::Model.from_dir(model_dir, file: model_file)
   rescue => e
     warn "No model loaded (auto-download failed: #{e.class}: #{e.message})"
     warn "Set GLINER_MODEL_DIR to a local model dir, or set GLINER_REPO_ID/GLINER_MODEL_FILE for auto-download."

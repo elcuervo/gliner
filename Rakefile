@@ -2,13 +2,14 @@
 
 require 'rspec/core/rake_task'
 require 'fileutils'
+require 'httpx'
 
 RSpec::Core::RakeTask.new(:spec)
 
 task default: :spec
 
 namespace :model do
-  DEFAULT_REPO_ID = 'cuerbot/gliner2-multi-v1-int8'
+  DEFAULT_REPO_ID = 'cuerbot/gliner2-multi-v1'
   DEFAULT_MODEL_FILE = 'model_int8.onnx'
 
   desc 'Downloads a test model to tmp/ (REPO_ID=... MODEL_FILE=model_int8.onnx)'
@@ -26,20 +27,10 @@ namespace :model do
       dest = File.join(dir, file)
       next if File.exist?(dest) && File.size?(dest)
 
-      sh(
-        'curl',
-        '--fail',
-        '--location',
-        '--retry',
-        '3',
-        '--retry-delay',
-        '1',
-        '--continue-at',
-        '-',
-        '--output',
-        dest,
-        "#{base}/#{file}"
-      )
+      response = HTTPX.get("#{base}/#{file}")
+      raise "Download failed: #{base}/#{file} (status: #{response.status})" unless response.status.between?(200, 299)
+
+      File.binwrite(dest, response.body.to_s)
     end
 
     puts "Downloaded model to: #{dir}"
