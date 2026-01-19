@@ -120,6 +120,5 @@ module Gliner
 
       out.fetch(0)
     end
-
   end
 end

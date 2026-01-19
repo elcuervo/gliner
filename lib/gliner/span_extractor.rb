@@ -100,7 +100,7 @@ module Gliner
     def format_span(span, opts)
       return nil if span.nil?
 
-      format_opts = normalize_format_options(opts)
+      format_opts = FormatOptions.from(opts)
       return span.text unless format_opts.include_confidence || format_opts.include_spans
 
       result = { 'text' => span.text }
@@ -112,10 +112,6 @@ module Gliner
       end
 
       result
-    end
-
-    def normalize_format_options(opts)
-      opts.is_a?(FormatOptions) ? opts : FormatOptions.from(opts)
     end
   end
 end

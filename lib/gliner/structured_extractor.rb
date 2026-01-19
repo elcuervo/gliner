@@ -32,7 +32,7 @@ module Gliner
     end
 
     def build_structure_instances(parsed_fields, spans_by_label, opts)
-      format_opts = normalize_format_options(opts)
+      format_opts = FormatOptions.from(opts)
       anchor_field = anchor_field_for(parsed_fields)
       return [{}] unless anchor_field
 
@@ -89,10 +89,6 @@ module Gliner
 
     def normalize_choice(value)
       value.to_s.strip.downcase
-    end
-
-    def normalize_format_options(opts)
-      opts.is_a?(FormatOptions) ? opts : FormatOptions.from(opts)
     end
   end
 end

@@ -29,10 +29,12 @@ module Gliner
   end
 
   FormatOptions = Data.define(:include_confidence, :include_spans) do
-    def self.from(hash)
+    def self.from(input)
+      return input if input.is_a?(FormatOptions)
+
       new(
-        include_confidence: hash.fetch(:include_confidence, false),
-        include_spans: hash.fetch(:include_spans, false)
+        include_confidence: input.fetch(:include_confidence, false),
+        include_spans: input.fetch(:include_spans, false)
       )
     end
   end
@@ -42,10 +44,6 @@ module Gliner
 
     def load(dir, file: 'model_int8.onnx')
       self.model = Model.from_dir(dir, file: file)
-    end
-
-    def from_dir(dir, file: 'model_int8.onnx')
-      load(dir, file: file)
     end
 
     def model
