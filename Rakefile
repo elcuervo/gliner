@@ -55,3 +55,17 @@ task :console do
   args << model_dir if model_dir && !model_dir.empty?
   sh(*args)
 end
+
+namespace :gem do
+  desc 'Build the gem'
+  task :build do
+    sh 'gem', 'build', 'gliner.gemspec'
+  end
+
+  desc 'Build and push the gem to RubyGems'
+  task push: :build do
+    require_relative 'lib/gliner/version'
+    gem_file = "gliner-#{Gliner::VERSION}.gem"
+    sh 'gem', 'push', gem_file
+  end
+end
