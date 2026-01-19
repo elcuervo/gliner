@@ -130,7 +130,7 @@ describe 'Gliner Integration', if: ENV.key?('GLINER_INTEGRATION') do
 
     download(hf_resolve_url('tokenizer.json').to_s, File.join(dir, 'tokenizer.json'))
     download(hf_resolve_url('config.json').to_s, File.join(dir, 'config.json'))
-    download(hf_resolve_url('model_int8.onnx').to_s, File.join(dir, 'model_int8.onnx'))
+    download(hf_resolve_url('model.onnx').to_s, File.join(dir, 'model.onnx'))
 
     dir
   end
