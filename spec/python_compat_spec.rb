@@ -2,14 +2,12 @@
 
 require 'spec_helper'
 require 'json'
-require 'fileutils'
 
 RSpec.describe 'Python compatibility', if: ENV.key?('GLINER_INTEGRATION') do
   let(:fixtures_path) { File.join(__dir__, 'fixtures', 'python_compat.json') }
   let(:fixtures) { JSON.parse(File.read(fixtures_path)) }
-  let(:repo_id) { ENV.fetch('GLINER_REPO_ID', fixtures.dig('meta', 'repo_id') || 'fastino/gliner2-multi-v1') }
   let(:model_file) { ENV.fetch('GLINER_MODEL_FILE', fixtures.dig('meta', 'model_file') || 'model.onnx') }
-  let(:model_dir) { ENV['GLINER_MODEL_DIR'] || existing_fixture_dir || ensure_model_dir!(repo_id, model_file) }
+  let(:model_dir) { ENV['GLINER_MODEL_DIR'] || existing_fixture_dir || raise('Missing GLINER_MODEL_DIR or fixture model_dir') }
   let(:model) { Gliner::Model.from_dir(model_dir, file: model_file) }
 
   def entity_types_for(input)
@@ -78,32 +76,4 @@ RSpec.describe 'Python compatibility', if: ENV.key?('GLINER_INTEGRATION') do
     return dir if File.exist?(File.join(dir, model_file))
   end
 
-  def ensure_model_dir!(repo_id, model_file)
-    dir = File.expand_path("../.context/onnx/#{repo_id.tr('/', '__')}", __dir__)
-    model_path = File.join(dir, model_file)
-    return dir if File.exist?(model_path)
-
-    FileUtils.mkdir_p(dir)
-    export_onnx(repo_id, dir, model_file)
-    dir
-  end
-
-  def export_onnx(repo_id, dir, model_file)
-    python = File.expand_path('../.context/pyenv/bin/python', __dir__)
-    unless File.exist?(python)
-      raise "Python venv not found at #{python}. Run the fixture generator to create it."
-    end
-
-    args = [
-      python,
-      File.expand_path('../onnx/export.py', __dir__),
-      '--model-id', repo_id,
-      '--output-dir', dir,
-      '--no-validate',
-      '--no-validate-extraction'
-    ]
-    args << '--no-quantize' unless model_file == 'model_int8.onnx'
-
-    system(*args) or raise "ONNX export failed for #{repo_id}"
-  end
 end

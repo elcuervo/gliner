@@ -2,16 +2,14 @@ import json
 import os
 import random
 from datetime import datetime, timezone
-from pathlib import Path
 from typing import Dict, List, Sequence
 
-import numpy as np
-import onnxruntime as ort
 import torch
+from gliner2 import GLiNER2
 from transformers import AutoTokenizer
 
 from decoder import SpanLogitsDecoder
-from export import ExportConfig, export
+from model import SpanLogitsWrapper
 
 
 def load_config(model_dir: str) -> Dict[str, int]:
@@ -22,7 +20,7 @@ def load_config(model_dir: str) -> Dict[str, int]:
         return json.load(f)
 
 
-def build_inputs(prepared, task_type_val: int, num_labels: int, include_token_type_ids: bool):
+def build_inputs(prepared, task_type_val: int, num_labels: int):
     words_mask = torch.tensor(
         [1 if idx is not None else 0 for idx in prepared.pos_to_word_index],
         dtype=torch.long,
@@ -40,27 +38,13 @@ def build_inputs(prepared, task_type_val: int, num_labels: int, include_token_ty
         label_positions,
         label_mask,
     )
-    if include_token_type_ids:
-        inputs = inputs + (torch.zeros_like(prepared.input_ids),)
     return inputs
 
 
-def run_ort(session: ort.InferenceSession, inputs, include_token_type_ids: bool):
-    input_ids, attention_mask = inputs[0], inputs[1]
-    words_mask, text_lengths, task_type, label_positions, label_mask = inputs[2:7]
-    feed = {
-        "input_ids": input_ids.cpu().numpy(),
-        "attention_mask": attention_mask.cpu().numpy(),
-        "words_mask": words_mask.cpu().numpy(),
-        "text_lengths": text_lengths.cpu().numpy(),
-        "task_type": task_type.cpu().numpy(),
-        "label_positions": label_positions.cpu().numpy(),
-        "label_mask": label_mask.cpu().numpy(),
-    }
-    if include_token_type_ids:
-        feed["token_type_ids"] = inputs[7].cpu().numpy()
-    outputs = session.run(["logits"], feed)
-    return outputs[0]
+def run_torch_logits(wrapper: SpanLogitsWrapper, inputs):
+    with torch.no_grad():
+        logits = wrapper(*inputs)
+        return logits.detach().cpu().numpy()
 
 
 def generate_entities_cases(n: int) -> List[Dict]:
@@ -160,54 +144,22 @@ def generate_json_cases(n: int) -> List[Dict]:
     return cases
 
 
-def ensure_onnx_export(repo_id: str, output_dir: str, model_file: str) -> str:
-    output_path = Path(output_dir)
-    output_path.mkdir(parents=True, exist_ok=True)
-
-    model_path = output_path / model_file
-    if model_path.exists():
-        return output_path.as_posix()
-
-    quantize = model_file == "model_int8.onnx"
-    export(
-        ExportConfig(
-            model_id=repo_id,
-            output_dir=output_path,
-            max_seq_len=512,
-            opset=19,
-            include_token_type_ids=False,
-            quantize=quantize,
-            validate=False,
-            validate_quantized=False,
-            validate_extraction=False,
-        )
-    )
-
-    return output_path.as_posix()
-
-
 def main() -> None:
     random.seed(42)
     repo_id = os.environ.get("GLINER_REPO_ID", "fastino/gliner2-multi-v1")
     model_file = os.environ.get("GLINER_MODEL_FILE", "model.onnx")
-    onnx_dir = os.environ.get(
-        "GLINER_ONNX_DIR",
-        os.path.join(".context", "onnx", repo_id.replace("/", "__")),
-    )
-    model_dir = ensure_onnx_export(repo_id, onnx_dir, model_file)
-    model_path = os.path.join(model_dir, model_file)
+    model_dir = os.environ.get("GLINER_MODEL_DIR", "")
 
-    config = load_config(model_dir)
-    tokenizer = AutoTokenizer.from_pretrained(model_dir)
-    decoder = SpanLogitsDecoder(
-        tokenizer,
-        max_width=config.get("max_width", 8),
-        max_seq_len=config.get("max_seq_len", 512),
-    )
+    extractor = GLiNER2.from_pretrained(repo_id)
+    extractor.eval()
+    wrapper = SpanLogitsWrapper(extractor)
+    wrapper.eval()
 
-    session = ort.InferenceSession(model_path, providers=["CPUExecutionProvider"])
-    input_names = [i.name for i in session.get_inputs()]
-    include_token_type_ids = "token_type_ids" in input_names
+    tokenizer = AutoTokenizer.from_pretrained(repo_id)
+    config = load_config(model_dir) if model_dir else {}
+    max_width = config.get("max_width", getattr(extractor, "max_width", 8))
+    max_seq_len = config.get("max_seq_len", getattr(extractor.encoder.config, "max_position_embeddings", 512))
+    decoder = SpanLogitsDecoder(tokenizer, max_width=max_width, max_seq_len=max_seq_len)
 
     entities_cases = generate_entities_cases(100)
     classification_cases = generate_classification_cases(100)
@@ -229,8 +181,8 @@ def main() -> None:
         prompt = decoder.build_prompt("entities", case["descriptions"])
         schema_tokens = decoder.schema_tokens_for(prompt, case["labels"], "[E]")
         prepared = decoder.prepare_inputs(case["text"], schema_tokens, len(case["labels"]))
-        inputs = build_inputs(prepared, task_type_val=0, num_labels=len(case["labels"]), include_token_type_ids=include_token_type_ids)
-        logits = run_ort(session, inputs, include_token_type_ids)
+        inputs = build_inputs(prepared, task_type_val=0, num_labels=len(case["labels"]))
+        logits = run_torch_logits(wrapper, inputs)
         expected = decoder.extract_entities(logits, prepared, case["labels"], case["threshold"])
         fixtures["entities"].append({"input": case, "expected": expected})
 
@@ -238,8 +190,8 @@ def main() -> None:
         prompt = decoder.build_prompt(case["task_name"], {})
         schema_tokens = decoder.schema_tokens_for(prompt, case["labels"], "[L]")
         prepared = decoder.prepare_inputs(case["text"], schema_tokens, len(case["labels"]))
-        inputs = build_inputs(prepared, task_type_val=1, num_labels=len(case["labels"]), include_token_type_ids=include_token_type_ids)
-        logits = run_ort(session, inputs, include_token_type_ids)
+        inputs = build_inputs(prepared, task_type_val=1, num_labels=len(case["labels"]))
+        logits = run_torch_logits(wrapper, inputs)
         expected = decoder.classify_text(
             logits,
             prepared,
@@ -255,8 +207,8 @@ def main() -> None:
         labels = [field.split("::")[0] for field in case["fields"]]
         schema_tokens = decoder.schema_tokens_for(prompt, labels, "[C]")
         prepared = decoder.prepare_inputs(case["text"], schema_tokens, len(case["fields"]))
-        inputs = build_inputs(prepared, task_type_val=2, num_labels=len(case["fields"]), include_token_type_ids=include_token_type_ids)
-        logits = run_ort(session, inputs, include_token_type_ids)
+        inputs = build_inputs(prepared, task_type_val=2, num_labels=len(case["fields"]))
+        logits = run_torch_logits(wrapper, inputs)
         expected = decoder.extract_json(
             logits,
             prepared,

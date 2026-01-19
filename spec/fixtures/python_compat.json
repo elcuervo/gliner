@@ -1,9 +1,9 @@
 {
   "meta": {
     "repo_id": "fastino/gliner2-multi-v1",
-    "model_dir": ".context/onnx/fastino__gliner2-multi-v1",
+    "model_dir": "",
     "model_file": "model.onnx",
-    "generated_at": "2026-01-19T15:34:09.764579+00:00"
+    "generated_at": "2026-01-19T15:51:03.714353+00:00"
   },
   "entities": [
     {
