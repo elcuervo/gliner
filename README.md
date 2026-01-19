@@ -108,6 +108,15 @@ This implementation expects a directory containing:
 One publicly available ONNX export is `cuerbot/gliner2-multi-v1` on Hugging Face.
 By default, `model_int8.onnx` is used; set `config.model_file` or `GLINER_MODEL_FILE` to override.
 
+To make CI runs more reproducible across Linux hosts, you can force a single-threaded,
+sequential ONNX Runtime session (this is also enabled automatically when `CI` is set):
+
+```bash
+GLINER_DETERMINISTIC=1
+# or:
+GLINER_ORT_THREADS=1
+```
+
 You can also configure the model directory in code:
 
 ```ruby

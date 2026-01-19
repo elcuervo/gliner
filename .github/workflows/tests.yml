@@ -8,6 +8,8 @@ on:
 
 jobs:
   test:
+    env:
+      GLINER_DETERMINISTIC: "1"
     strategy:
       fail-fast: false
       matrix:

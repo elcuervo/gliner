@@ -41,7 +41,8 @@ module Gliner
       @max_seq_len = Integer(max_seq_len)
 
       tokenizer = Tokenizers.from_file(@tokenizer_path)
-      session = OnnxRuntime::InferenceSession.new(@model_path)
+      apply_runtime_env!
+      session = build_session(@model_path)
 
       @text_processor = TextProcessor.new(tokenizer)
       @inference = Inference.new(session)
@@ -137,6 +138,73 @@ module Gliner
         include_confidence: include_confidence,
         include_spans: include_spans
       )
+    end
+
+    private
+
+    def build_session(path)
+      options = session_options
+      return OnnxRuntime::InferenceSession.new(path) if options.empty?
+
+      OnnxRuntime::InferenceSession.new(path, **options)
+    end
+
+    def session_options
+      options = {}
+      threads = runtime_threads
+      deterministic = deterministic_mode?
+
+      if threads
+        options[:intra_op_num_threads] = threads
+        options[:inter_op_num_threads] = threads
+      elsif deterministic
+        options[:intra_op_num_threads] = 1
+        options[:inter_op_num_threads] = 1
+      end
+
+      options[:execution_mode] = :sequential if deterministic
+
+      options
+    end
+
+    def apply_runtime_env!
+      threads = runtime_threads
+      return unless threads || deterministic_mode?
+
+      thread_value = threads || 1
+      set_env_default('OMP_NUM_THREADS', thread_value)
+      set_env_default('OMP_DYNAMIC', 'FALSE')
+      set_env_default('MKL_NUM_THREADS', thread_value)
+      set_env_default('OPENBLAS_NUM_THREADS', thread_value)
+      set_env_default('NUMEXPR_NUM_THREADS', thread_value)
+      set_env_default('VECLIB_MAXIMUM_THREADS', thread_value)
+    end
+
+    def runtime_threads
+      value = ENV.fetch('GLINER_ORT_THREADS', nil)
+      return nil if value.nil? || value.strip.empty?
+
+      threads = Integer(value)
+      threads.positive? ? threads : nil
+    rescue ArgumentError
+      nil
+    end
+
+    def deterministic_mode?
+      truthy_env?('GLINER_DETERMINISTIC') || truthy_env?('CI')
+    end
+
+    def truthy_env?(key)
+      value = ENV.fetch(key, nil)
+      return false if value.nil?
+
+      !%w[0 false no off].include?(value.strip.downcase)
+    end
+
+    def set_env_default(key, value)
+      return if ENV.key?(key)
+
+      ENV[key] = value.to_s
     end
   end
 end
