@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
-require 'gliner/concerns/position_iteration'
-require 'gliner/options'
+require 'gliner/position_iteration'
 
 module Gliner
   class SpanExtractor

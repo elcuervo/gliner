@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
+require 'set'
+
 module Gliner
   class InputBuilder
-    require 'set'
-
     def initialize(text_processor, max_seq_len:)
       @text_processor = text_processor
       @max_seq_len = max_seq_len

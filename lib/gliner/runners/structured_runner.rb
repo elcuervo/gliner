@@ -1,0 +1,36 @@
+# frozen_string_literal: true
+
+module Gliner
+  module Runners
+    class StructuredRunner
+      def initialize(model, config)
+        @tasks = build_tasks(model, config)
+      end
+
+      def [](text, **options)
+        @tasks.each_with_object({}) do |(name, task), out|
+          out[name] = task.call(text, **options)
+        end
+      end
+
+      alias call []
+
+      private
+
+      def build_tasks(model, config)
+        raise Error, 'structures must be a Hash' unless config.is_a?(Hash)
+
+        if config.key?(:name) || config.key?('name')
+          parsed = model.json_task.parse_config(config)
+
+          { parsed[:name].to_s => PreparedTask.new(model.json_task, parsed) }
+        else
+          config.each_with_object({}) do |(name, fields), tasks|
+            parsed = model.json_task.parse_config(name: name, fields: fields)
+            tasks[name.to_s] = PreparedTask.new(model.json_task, parsed)
+          end
+        end
+      end
+    end
+  end
+end

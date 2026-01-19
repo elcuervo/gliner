@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require 'gliner/options'
-
 module Gliner
   module Tasks
     class EntityExtraction < Task
