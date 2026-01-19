@@ -18,8 +18,8 @@ require "gliner"
 
 Gliner.configure do |config|
   config.threshold = 0.2
+  config.model_dir = "/path/to/gliner2-multi-v1"
 end
-This sets the default threshold for entity and structured extraction unless you pass `threshold:` per call.
 
 Gliner.load("path/to/gliner2-multi-v1")
 
@@ -106,6 +106,14 @@ This implementation expects a directory containing:
 - (optional) `config.json` with `max_width` and `max_seq_len`
 
 One publicly available ONNX export is `cuerbot/gliner2-multi-v1` on Hugging Face.
+
+You can also configure the model directory in code:
+
+```ruby
+Gliner.configure do |config|
+  config.model_dir = "/path/to/model_dir"
+end
+```
 
 ## Integration test
 

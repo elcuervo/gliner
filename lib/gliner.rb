@@ -57,7 +57,7 @@ module Gliner
     end
 
     def model
-      @model ||= model_from_env
+      @model ||= model_from_config || model_from_env
     end
 
     def model!
@@ -74,6 +74,13 @@ module Gliner
 
     private
 
+    def model_from_config
+      dir = config.model_dir
+      return nil if dir.nil? || dir.empty?
+
+      Model.from_dir(dir)
+    end
+
     def model_from_env
       dir = ENV.fetch('GLINER_MODEL_DIR', nil)
       return nil if dir.nil? || dir.empty?
@@ -86,7 +93,7 @@ module Gliner
       model = self.model
       return model if model
 
-      raise Error, 'No model loaded. Call Gliner.load("/path/to/model") or set GLINER_MODEL_DIR.'
+      raise Error, 'No model loaded. Call Gliner.load("/path/to/model"), set config.model_dir, or set GLINER_MODEL_DIR.'
     end
 
     def runner_for(config)
