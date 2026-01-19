@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'gliner/version'
+require 'gliner/configuration'
 require 'gliner/model'
 require 'gliner/runners/prepared_task'
 require 'gliner/runners/entity_runner'
@@ -41,6 +42,15 @@ module Gliner
 
   class << self
     attr_writer :model
+    attr_writer :config
+
+    def configure
+      yield(config)
+    end
+
+    def config
+      @config ||= Configuration.new
+    end
 
     def load(dir, file: 'model_int8.onnx')
       self.model = Model.from_dir(dir, file: file)

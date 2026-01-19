@@ -29,7 +29,7 @@ module Gliner
       end
 
       def process_output(logits, parsed, prepared, options)
-        threshold = options.fetch(:threshold, 0.5)
+        threshold = options.fetch(:threshold, Gliner.config.threshold)
         format_opts = FormatOptions.from(options)
         label_positions = options[:label_positions] || inference.label_positions_for(prepared.word_ids, parsed[:labels].length)
 
