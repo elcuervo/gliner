@@ -23,8 +23,9 @@ module Gliner
     DEFAULT_MAX_SEQ_LEN = 512
 
     def self.from_dir(dir, file: 'model_int8.onnx')
-      ensure_model_dir!(dir)
-      config = load_config(dir)
+      config_path = File.join(dir, 'config.json')
+      config = File.exist?(config_path) ? JSON.parse(File.read(config_path)) : {}
+
       new(
         model_path: File.join(dir, file),
         tokenizer_path: File.join(dir, 'tokenizer.json'),
@@ -39,16 +40,11 @@ module Gliner
       @max_width = Integer(max_width)
       @max_seq_len = Integer(max_seq_len)
 
-      validate_paths!
-      tokenizer = load_tokenizer
-      session = load_session
+      tokenizer = Tokenizers.from_file(@tokenizer_path)
+      session = OnnxRuntime::InferenceSession.new(@model_path)
 
       @text_processor = TextProcessor.new(tokenizer)
       @inference = Inference.new(session)
-      @input_builder = InputBuilder.new(@text_processor, max_seq_len: @max_seq_len)
-      @span_extractor = SpanExtractor.new(@inference, max_width: @max_width)
-      @classifier = Classifier.new(@inference, max_width: @max_width)
-      @structured_extractor = StructuredExtractor.new(@span_extractor)
     end
 
     def config_parser
@@ -59,12 +55,28 @@ module Gliner
       @pipeline ||= Pipeline.new(text_processor: @text_processor, inference: @inference)
     end
 
+    def input_builder
+      @input_builder ||= InputBuilder.new(@text_processor, max_seq_len: @max_seq_len)
+    end
+
+    def span_extractor
+      @span_extractor ||= SpanExtractor.new(@inference, max_width: @max_width)
+    end
+
+    def structured_extractor
+      @structured_extractor ||= StructuredExtractor.new(span_extractor)
+    end
+
+    def classifier
+      @classifier ||= Classifier.new(@inference, max_width: @max_width)
+    end
+
     def entity_task
       @entity_task ||= Tasks::EntityExtraction.new(
         config_parser: config_parser,
         inference: @inference,
-        input_builder: @input_builder,
-        span_extractor: @span_extractor
+        input_builder: input_builder,
+        span_extractor: span_extractor
       )
     end
 
@@ -72,8 +84,8 @@ module Gliner
       @classification_task ||= Tasks::Classification.new(
         config_parser: config_parser,
         inference: @inference,
-        input_builder: @input_builder,
-        classifier: @classifier
+        input_builder: input_builder,
+        classifier: classifier
       )
     end
 
@@ -81,9 +93,9 @@ module Gliner
       @json_task ||= Tasks::JsonExtraction.new(
         config_parser: config_parser,
         inference: @inference,
-        input_builder: @input_builder,
-        span_extractor: @span_extractor,
-        structured_extractor: @structured_extractor
+        input_builder: input_builder,
+        span_extractor: span_extractor,
+        structured_extractor: structured_extractor
       )
     end
 
@@ -174,32 +186,6 @@ module Gliner
         include_confidence: include_confidence,
         include_spans: include_spans
       )
-    end
-
-    def self.ensure_model_dir!(dir)
-      raise Error, "Model directory not found: #{dir}" unless Dir.exist?(dir)
-    end
-    private_class_method :ensure_model_dir!
-
-    def self.load_config(dir)
-      config_path = File.join(dir, 'config.json')
-      File.exist?(config_path) ? JSON.parse(File.read(config_path)) : {}
-    end
-    private_class_method :load_config
-
-    private
-
-    def validate_paths!
-      raise Error, "Model file not found: #{@model_path}" unless File.exist?(@model_path)
-      raise Error, "Tokenizer file not found: #{@tokenizer_path}" unless File.exist?(@tokenizer_path)
-    end
-
-    def load_tokenizer
-      Tokenizers.from_file(@tokenizer_path)
-    end
-
-    def load_session
-      OnnxRuntime::InferenceSession.new(@model_path)
     end
   end
 end
