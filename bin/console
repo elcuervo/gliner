@@ -42,12 +42,12 @@ repo_id = ENV["GLINER_REPO_ID"] || DEFAULT_REPO_ID
 model_file = ENV["GLINER_MODEL_FILE"] || DEFAULT_MODEL_FILE
 
 if model_dir && !model_dir.empty?
-  $gliner_model = Gliner::Model.from_dir(model_dir)
+  $gliner_model = Gliner.load(model_dir, file: model_file)
 else
   begin
     require "fileutils"
     model_dir = ensure_model_dir!(repo_id: repo_id, model_file: model_file)
-    $gliner_model = Gliner::Model.from_dir(model_dir, file: model_file)
+    $gliner_model = Gliner.load(model_dir, file: model_file)
   rescue => e
     warn "No model loaded (auto-download failed: #{e.class}: #{e.message})"
     warn "Set GLINER_MODEL_DIR to a local model dir, or set GLINER_REPO_ID/GLINER_MODEL_FILE for auto-download."
@@ -56,17 +56,17 @@ end
 
 def gliner_extract(text, labels, **opts)
   raise "No model loaded (set GLINER_MODEL_DIR or pass a directory arg)" unless $gliner_model
-  $gliner_model.extract_entities(text, labels, **opts)
+  Gliner[labels][text, **opts]
 end
 
 def gliner_classify(text, tasks, **opts)
   raise "No model loaded (set GLINER_MODEL_DIR or pass a directory arg)" unless $gliner_model
-  $gliner_model.classify_text(text, tasks, **opts)
+  Gliner.classify[tasks][text, **opts]
 end
 
 def gliner_extract_json(text, structures, **opts)
   raise "No model loaded (set GLINER_MODEL_DIR or pass a directory arg)" unless $gliner_model
-  $gliner_model.extract_json(text, structures, **opts)
+  Gliner[structures][text, **opts]
 end
 
 puts "Gliner console"

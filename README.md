@@ -18,12 +18,13 @@ gem "gliner"
 ```ruby
 require "gliner"
 
-model = Gliner::Model.from_dir("path/to/gliner2-multi-v1-int8")
+Gliner.load("path/to/gliner2-multi-v1")
 
 text = "Apple CEO Tim Cook announced iPhone 15 in Cupertino yesterday."
 labels = ["company", "person", "product", "location"]
 
-pp model.extract_entities(text, labels)
+model = Gliner[labels]
+pp model[text]
 ```
 
 Expected shape:
@@ -40,16 +41,18 @@ labels = {
   "person" => { "description" => "Person names", "dtype" => "str" }
 }
 
-pp model.extract_entities("Email John Doe at john@example.com.", labels, threshold: 0.5)
+model = Gliner[labels]
+pp model["Email John Doe at john@example.com.", threshold: 0.5]
 ```
 
 ## Usage (classification)
 
 ```ruby
-result = model.classify_text(
-  "This laptop has amazing performance but terrible battery life!",
+model = Gliner.classify[
   { "sentiment" => %w[positive negative neutral] }
-)
+]
+
+result = model["This laptop has amazing performance but terrible battery life!"]
 
 pp result
 ```
@@ -65,17 +68,16 @@ Expected shape:
 ```ruby
 text = "iPhone 15 Pro Max with 256GB storage, A17 Pro chip, priced at $1199."
 
-result = model.extract_json(
-  text,
-  {
-    "product" => [
-      "name::str::Full product name and model",
-      "storage::str::Storage capacity",
-      "processor::str::Chip or processor information",
-      "price::str::Product price with currency"
-    ]
-  }
-)
+structure = {
+  "product" => [
+    "name::str::Full product name and model",
+    "storage::str::Storage capacity",
+    "processor::str::Chip or processor information",
+    "price::str::Product price with currency"
+  ]
+}
+
+result = Gliner[structure][text]
 
 pp result
 ```
@@ -89,10 +91,7 @@ Expected shape:
 Choices can be included in field specs:
 
 ```ruby
-result = model.extract_json(
-  "Status: shipped",
-  { "order" => ["status::[pending|processing|shipped]::str"] }
-)
+result = Gliner[{ "order" => ["status::[pending|processing|shipped]::str"] }]["Status: shipped"]
 ```
 
 ## Model files
@@ -103,7 +102,7 @@ This implementation expects a directory containing:
 - `model.onnx` or `model_int8.onnx`
 - (optional) `config.json` with `max_width` and `max_seq_len`
 
-One publicly available ONNX export is `cuerbot/gliner2-multi-v1-int8` on Hugging Face.
+One publicly available ONNX export is `cuerbot/gliner2-multi-v1` on Hugging Face.
 
 ## Integration test (real model)
 
@@ -138,7 +137,7 @@ If you omit `MODEL_DIR`, the console auto-downloads a public test model (configu
 ```bash
 rake console
 # or:
-GLINER_REPO_ID=cuerbot/gliner2-multi-v1-int8 GLINER_MODEL_FILE=model_int8.onnx rake console
+GLINER_REPO_ID=cuerbot/gliner2-multi-v1GLINER_MODEL_FILE=model_int8.onnx rake console
 ```
 
 Or:

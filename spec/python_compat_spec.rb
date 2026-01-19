@@ -8,7 +8,9 @@ RSpec.describe 'Python compatibility', if: ENV.key?('GLINER_INTEGRATION') do
   let(:fixtures) { JSON.parse(File.read(fixtures_path)) }
   let(:model_file) { ENV.fetch('GLINER_MODEL_FILE', fixtures.dig('meta', 'model_file') || 'model.onnx') }
   let(:model_dir) { ENV['GLINER_MODEL_DIR'] || existing_fixture_dir || raise('Missing GLINER_MODEL_DIR or fixture model_dir') }
-  let(:model) { Gliner::Model.from_dir(model_dir, file: model_file) }
+  let(:model) { Gliner.load(model_dir, file: model_file) }
+
+  before { model }
 
   def entity_types_for(input)
     labels = input.fetch('labels')
@@ -25,13 +27,9 @@ RSpec.describe 'Python compatibility', if: ENV.key?('GLINER_INTEGRATION') do
   it 'matches Python entities extraction cases' do
     fixtures.fetch('entities').each_with_index do |case_data, idx|
       input = case_data.fetch('input')
-      expected = case_data.fetch('expected')
+      expected = case_data.fetch('expected').fetch('entities')
 
-      result = model.extract_entities(
-        input.fetch('text'),
-        entity_types_for(input),
-        threshold: input.fetch('threshold')
-      )
+      result = Gliner[entity_types_for(input)][input.fetch('text'), threshold: input.fetch('threshold')]
 
       expect(result).to eq(expected), "entities case ##{idx} mismatch"
     end
@@ -49,7 +47,7 @@ RSpec.describe 'Python compatibility', if: ENV.key?('GLINER_INTEGRATION') do
         'cls_threshold' => input.fetch('threshold')
       }
 
-      result = model.classify_text(input.fetch('text'), { task_name => task_config })
+      result = Gliner.classify[{ task_name => task_config }][input.fetch('text')]
 
       expect(result).to eq(expected), "classification case ##{idx} mismatch"
     end
@@ -60,11 +58,10 @@ RSpec.describe 'Python compatibility', if: ENV.key?('GLINER_INTEGRATION') do
       input = case_data.fetch('input')
       expected = case_data.fetch('expected')
 
-      result = model.extract_json(
+      result = Gliner[{ input.fetch('parent') => input.fetch('fields') }][
         input.fetch('text'),
-        { input.fetch('parent') => input.fetch('fields') },
         threshold: input.fetch('threshold')
-      )
+      ]
 
       expect(result).to eq(expected), "json case ##{idx} mismatch"
     end

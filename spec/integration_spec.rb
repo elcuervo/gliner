@@ -11,7 +11,7 @@ describe 'Gliner Integration', if: ENV.key?('GLINER_INTEGRATION') do
     context 'with entities extraction' do
       it 'extracts entities correctly' do
         model_dir = ensure_model_dir!
-        model = Gliner::Model.from_dir(model_dir)
+        Gliner.load(model_dir)
 
         text = 'Apple CEO Tim Cook announced iPhone 15 in Cupertino yesterday.'
         labels = {
@@ -21,8 +21,7 @@ describe 'Gliner Integration', if: ENV.key?('GLINER_INTEGRATION') do
           'location' => { 'description' => 'Places' }
         }
 
-        out = model.extract_entities(text, labels, threshold: 0.5)
-        entities = out.fetch('entities')
+        entities = Gliner[labels][text, threshold: 0.5]
 
         expect(entities.fetch('company')).to be_a(String)
         expect(entities.fetch('person')).to be_a(Array)
@@ -36,12 +35,12 @@ describe 'Gliner Integration', if: ENV.key?('GLINER_INTEGRATION') do
     context 'with text classification' do
       it 'classifies sentiment correctly' do
         model_dir = ensure_model_dir!
-        model = Gliner::Model.from_dir(model_dir)
+        Gliner.load(model_dir)
 
         text = 'This laptop has amazing performance but terrible battery life!'
         schema = { 'sentiment' => %w[positive negative neutral] }
 
-        out = model.classify_text(text, schema)
+        out = Gliner.classify[schema][text]
 
         expect(out.fetch('sentiment')).to eq('negative')
       end
@@ -50,7 +49,7 @@ describe 'Gliner Integration', if: ENV.key?('GLINER_INTEGRATION') do
     context 'with structured extraction' do
       it 'extracts JSON structure correctly' do
         model_dir = ensure_model_dir!
-        model = Gliner::Model.from_dir(model_dir)
+        Gliner.load(model_dir)
 
         text = 'iPhone 15 Pro Max with 256GB storage, A17 Pro chip, priced at $1199.'
         complex_schema = {
@@ -62,7 +61,7 @@ describe 'Gliner Integration', if: ENV.key?('GLINER_INTEGRATION') do
           ]
         }
 
-        out = model.extract_json(text, complex_schema, threshold: 0.4)
+        out = Gliner[complex_schema][text, threshold: 0.4]
         product = out.fetch('product').fetch(0)
 
         expect(product.fetch('name')).to include('iPhone')
@@ -73,7 +72,7 @@ describe 'Gliner Integration', if: ENV.key?('GLINER_INTEGRATION') do
 
       it 'supports choices and multiple instances' do
         model_dir = ensure_model_dir!
-        model = Gliner::Model.from_dir(model_dir)
+        Gliner.load(model_dir)
 
         text = <<~TEXT
           Transaction 1
@@ -103,7 +102,7 @@ describe 'Gliner Integration', if: ENV.key?('GLINER_INTEGRATION') do
           ]
         }
 
-        out = model.extract_json(text, schema, threshold: 0.2)
+        out = Gliner[schema][text, threshold: 0.2]
         transactions = out.fetch('transaction')
         order = out.fetch('order').fetch(0)
 
