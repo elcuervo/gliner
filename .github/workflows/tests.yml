@@ -27,7 +27,7 @@ jobs:
           bundle env
           bundle config
           gem list | grep -E 'onnxruntime|tokenizers' || true
-          ruby -e "require 'gliner'; puts \"gliner #{Gliner::VERSION}\""
+          bundle exec ruby -e "require 'gliner'; puts \"gliner #{Gliner::VERSION}\"" || true
 
       - name: Run unit tests
         run: bundle exec rake spec
