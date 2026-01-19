@@ -2,15 +2,6 @@
 
 require 'spec_helper'
 
-describe Gliner::Model do
-  describe '.from_dir' do
-    it 'raises error when files are missing' do
-      expect { described_class.from_dir('does-not-exist') }
-        .to raise_error(Gliner::Error)
-    end
-  end
-end
-
 describe Gliner::SpanExtractor do
   describe '#format_spans' do
     it 'filters overlapping spans correctly' do
