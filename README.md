@@ -19,11 +19,12 @@ require "gliner"
 
 Gliner.configure do |config|
   config.threshold = 0.2
-  config.model_dir = "/path/to/gliner2-multi-v1"
-  config.model_file = "model.onnx"
+  config.model = "https://huggingface.co/cuerbot/gliner2-multi-v1/tree/main/onnx"
+  # Or a local path:
+  # config.model = "/path/to/gliner2-multi-v1"
+  config.variant = :fp16
+  config.auto!
 end
-
-Gliner.load("path/to/gliner2-multi-v1")
 
 text = "Apple CEO Tim Cook announced iPhone 15 in Cupertino yesterday."
 labels = ["company", "person", "product", "location"]
@@ -108,14 +109,15 @@ This implementation expects a directory containing:
 - (optional) `config.json` with `max_width` and `max_seq_len`
 
 One publicly available ONNX export is `cuerbot/gliner2-multi-v1` on Hugging Face.
-By default, `model_int8.onnx` is used; set `config.model_file` or `GLINER_MODEL_FILE` to override.
+By default, `model_fp16.onnx` is used; set `config.variant` (or `GLINER_MODEL_FILE`) to override.
+Variants map to files as: `:fp16` → `model_fp16.onnx`, `:fp32` → `model.onnx`, `:int8` → `model_int8.onnx`.
 
-You can also configure the model directory in code:
+You can also configure the model source directly:
 
 ```ruby
 Gliner.configure do |config|
-  config.model_dir = "/path/to/model_dir"
-  config.model_file = "model_int8.onnx"
+  config.model = "/path/to/model_dir"
+  config.variant = :int8
 end
 ```
 
@@ -152,7 +154,7 @@ If you omit `MODEL_DIR`, the console auto-downloads a public test model (configu
 ```bash
 rake console
 # or:
-GLINER_REPO_ID=cuerbot/gliner2-multi-v1 GLINER_MODEL_FILE=model_int8.onnx rake console
+GLINER_REPO_ID=cuerbot/gliner2-multi-v1 GLINER_MODEL_FILE=model_fp16.onnx rake console
 ```
 
 Or:

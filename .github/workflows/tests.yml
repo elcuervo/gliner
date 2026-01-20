@@ -47,6 +47,4 @@ jobs:
         run: nix develop . --command bash -lc "bundle exec rspec"
 
       - name: Run integration tests
-        env:
-          MODEL_FILE: "model_fp16.onnx"
         run: nix develop . --command bash -lc "bundle exec rake spec:integration"
