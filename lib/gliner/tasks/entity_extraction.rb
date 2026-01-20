@@ -30,12 +30,11 @@ module Gliner
 
       def process_output(logits, parsed, prepared, options)
         threshold = options.fetch(:threshold, Gliner.config.threshold)
-        format_opts = FormatOptions.from(options)
         label_positions = options[:label_positions] || inference.label_positions_for(prepared.word_ids, parsed[:labels].length)
 
         spans_by_label = extract_spans(logits, parsed, prepared, label_positions, threshold)
 
-        { 'entities' => format_entities(parsed, spans_by_label, format_opts) }
+        { 'entities' => format_entities(parsed, spans_by_label) }
       end
 
       private
@@ -51,20 +50,23 @@ module Gliner
         )
       end
 
-      def format_entities(parsed, spans_by_label, format_opts)
+      def format_entities(parsed, spans_by_label)
         parsed[:labels].each_with_object({}) do |label, entities|
           spans = spans_by_label.fetch(label)
           dtype = parsed[:dtypes].fetch(label, :list)
 
-          entities[label] = format_entity_value(spans, dtype, format_opts)
+          entities[label] = format_entity_value(label, spans, dtype)
         end
       end
 
-      def format_entity_value(spans, dtype, format_opts)
+      def format_entity_value(label, spans, dtype)
         if dtype == :str
-          @span_extractor.format_single_span(@span_extractor.choose_best_span(spans), format_opts)
+          @span_extractor.format_single_span(
+            @span_extractor.choose_best_span(spans),
+            label: label
+          )
         else
-          @span_extractor.format_spans(spans, format_opts)
+          @span_extractor.format_spans(spans, label: label)
         end
       end
     end

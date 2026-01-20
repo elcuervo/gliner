@@ -52,9 +52,9 @@ module Gliner
 
         if field[:dtype] == :str
           best = @span_extractor.choose_best_span(spans)
-          obj[key] = @span_extractor.format_single_span(best, opts)
+          obj[key] = @span_extractor.format_single_span(best, label: key)
         else
-          obj[key] = @span_extractor.format_spans(spans, opts)
+          obj[key] = @span_extractor.format_spans(spans, label: key)
         end
       end
 
