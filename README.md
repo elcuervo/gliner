@@ -1,4 +1,6 @@
 # GLiNER
+[![tests](https://github.com/elcuervo/gliner/actions/workflows/tests.yml/badge.svg)](https://github.com/elcuervo/gliner/actions/workflows/tests.yml)
+![Gem Version](https://img.shields.io/gem/v/gliner)
 
 ![](https://images.unsplash.com/photo-1625768376503-68d2495d78c5?q=80&w=2225&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D)
 
