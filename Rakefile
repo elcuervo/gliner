@@ -13,7 +13,7 @@ namespace :spec do
   task :integration do
     env = { 'GLINER_INTEGRATION' => '1', }
 
-    sh env, 'rspec', 'spec/integration_spec.rb'
+    sh env, 'rspec', 'spec/integration_spec.rb', 'spec/python_compat_spec.rb'
   end
 end
 
