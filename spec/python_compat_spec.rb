@@ -79,7 +79,7 @@ RSpec.describe 'Python compatibility', if: ENV.key?('GLINER_INTEGRATION') do
       value.transform_values { |item| normalize_entities(item) }
     when Gliner::Structure
       normalize_entities(value.to_h)
-    when Gliner::StructureResult
+    when Gliner::Runners::StructuredRunner::Result
       normalize_entities(value.to_a)
     else
       value

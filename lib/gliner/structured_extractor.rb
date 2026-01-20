@@ -1,16 +1,6 @@
 # frozen_string_literal: true
 
 module Gliner
-  Structure = Data.define(:fields) do
-    def [](key) = fields[key]
-    def fetch(key, *args, &block) = fields.fetch(key, *args, &block)
-    def to_h = fields
-    def to_hash = fields
-    def keys = fields.keys
-    def values = fields.values
-    def each(&block) = fields.each(&block)
-  end
-
   class StructuredExtractor
     def initialize(span_extractor)
       @span_extractor = span_extractor

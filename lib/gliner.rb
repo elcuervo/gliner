@@ -31,6 +31,16 @@ module Gliner
     :text_len
   )
 
+  Structure = Data.define(:fields) do
+    def [](key) = fields[key]
+    def fetch(key, *args, &block) = fields.fetch(key, *args, &block)
+    def to_h = fields
+    def to_hash = fields
+    def keys = fields.keys
+    def values = fields.values
+    def each(&block) = fields.each(&block)
+  end
+
   Entity = Data.define(:index, :offsets, :text, :name, :probability) do
     def to_s = text.to_s
     def to_str = text.to_s
