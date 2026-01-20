@@ -51,15 +51,17 @@ module Gliner
       end
 
       def format_entities(parsed, spans_by_label)
-        parsed[:labels].each_with_object({}) do |label, entities|
+        entities = parsed[:labels].each_with_object({}) do |label, entries|
           spans = spans_by_label.fetch(label)
           dtype = parsed[:dtypes].fetch(label, :list)
 
           value = format_entity_value(label, spans, dtype)
           next if value.is_a?(Array) && value.empty?
 
-          entities[label] = value
+          entries[label] = value
         end
+
+        Gliner::Entities.new(entities)
       end
 
       def format_entity_value(label, spans, dtype)

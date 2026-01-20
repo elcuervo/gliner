@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require 'delegate'
 require 'fileutils'
 require 'httpx'
 require 'gliner/version'
@@ -34,6 +35,12 @@ module Gliner
   Entity = Data.define(:index, :offsets, :text, :name, :confidence) do
     def to_s = text.to_s
     def to_str = text.to_s
+  end
+
+  class Entities < SimpleDelegator
+    def list
+      __getobj__.values.flat_map { |value| Array(value) }
+    end
   end
 
   Label = Data.define(:label, :confidence) do
