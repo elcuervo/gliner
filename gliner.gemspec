@@ -24,6 +24,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'irb', '~> 1.16.0'
   spec.add_development_dependency 'rspec', '~> 3.13'
   spec.add_development_dependency 'rubocop', '~> 1.50'
+  spec.add_development_dependency 'debug', '~> 1.11'
 
   spec.metadata['rubygems_mfa_required'] = 'true'
 end

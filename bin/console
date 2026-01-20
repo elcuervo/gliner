@@ -9,6 +9,7 @@ end
 
 require "gliner"
 require "irb"
+require "debug"
 
 model_dir = ARGV[0] || ENV["GLINER_MODEL_DIR"]
 model_file = ENV["GLINER_MODEL_FILE"]

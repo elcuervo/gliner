@@ -141,32 +141,29 @@ module Gliner
       config.model = download_default_model
     end
 
+    def client
+      @client ||= HTTPX.plugin(:follow_redirects)
+    end
+
     def download_default_model
       model_file = model_file_for_variant(config.variant)
-      root = File.expand_path('..', __dir__)
-      dir = File.join(root, '.cache', 'models', HF_REPO.tr('/', '__'))
+      dir = File.join(Dir.pwd, '.cache', 'gliner', HF_REPO.tr('/', '__'))
 
       FileUtils.mkdir_p(dir)
 
       files = ['tokenizer.json', 'config.json', model_file]
-      client = HTTPX.plugin(:follow_redirects)
 
       files.each do |file|
-        dest = File.join(dir, file)
-        next if File.exist?(dest) && File.size?(dest)
+        target = File.join(dir, file)
 
-        download_file!(client, "#{DEFAULT_MODEL_BASE}/#{file}", dest)
+        next if File.exist?(target) && File.size?(target)
+
+        client
+          .get("#{DEFAULT_MODEL_BASE}/#{file}")
+          .copy_to(target)
       end
 
       dir
-    end
-
-    def download_file!(client, url, dest)
-      response = client.get(url)
-
-      raise Error, "Download failed: #{url} (status: #{response.error})" if response.error
-
-      File.binwrite(dest, response.body.to_s)
     end
 
     def env_model_dir
