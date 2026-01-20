@@ -7,6 +7,8 @@ module Gliner
     include PositionIteration
 
     SCORE_SIMILARITY_THRESHOLD = 0.02
+    SCORE_EPSILON = Float(ENV.fetch('GLINER_SCORE_EPSILON', '0'))
+    SCORE_ROUNDING = ENV['GLINER_SCORE_ROUNDING']&.to_i
 
     def initialize(inference, max_width:)
       @inference = inference
@@ -30,7 +32,7 @@ module Gliner
 
       each_position_width(seq_len, prepared, @max_width).filter_map do |pos, start_word, width|
         score = calculate_span_score(logits, pos, width, label_index, label_positions)
-        next if score < threshold
+        next unless above_threshold?(score, threshold)
 
         build_span(prepared, start_word, start_word + width, score)
       end
@@ -39,7 +41,7 @@ module Gliner
     def choose_best_span(spans)
       return nil if spans.empty?
 
-      sorted = spans.sort_by { |s| [-s.score, (s.end - s.start), s.text.length] }
+      sorted = spans.sort_by { |s| [score_key(s.score), (s.end - s.start), s.text.length, s.start] }
       best = sorted.first
       best_score = best.score
       near = spans_within_threshold(sorted, best_score)
@@ -54,7 +56,7 @@ module Gliner
     def format_spans(spans, opts)
       return [] if spans.empty?
 
-      sorted = spans.sort_by { |s| -s.score }
+      sorted = spans.sort_by { |s| [score_key(s.score), s.start, s.end, s.text.length] }
       selected = []
 
       sorted.each do |span|
@@ -76,6 +78,15 @@ module Gliner
 
     def spans_within_threshold(sorted_spans, best_score)
       sorted_spans.take_while { |span| (best_score - span.score) <= SCORE_SIMILARITY_THRESHOLD }
+    end
+
+    def above_threshold?(score, threshold)
+      score + SCORE_EPSILON >= threshold
+    end
+
+    def score_key(score)
+      value = SCORE_ROUNDING ? score.round(SCORE_ROUNDING) : score
+      -value
     end
 
     def threshold_for(label, default_threshold, thresholds_by_label)

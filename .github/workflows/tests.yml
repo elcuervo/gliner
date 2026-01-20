@@ -17,20 +17,8 @@ jobs:
 
     runs-on: ${{ matrix.os }}
     env:
-      OMP_NUM_THREADS: "1"
-      OMP_WAIT_POLICY: "PASSIVE"
-      OMP_PROC_BIND: "TRUE"
-      OMP_PLACES: "cores"
-      OMP_DYNAMIC: "FALSE"
-      OMP_MAX_ACTIVE_LEVELS: "1"
-      MKL_NUM_THREADS: "1"
-      MKL_DYNAMIC: "FALSE"
-      OPENBLAS_NUM_THREADS: "1"
-      NUMEXPR_NUM_THREADS: "1"
-      VECLIB_MAXIMUM_THREADS: "1"
-      KMP_BLOCKTIME: "0"
-      ORT_INTRA_OP_NUM_THREADS: "1"
-      ORT_INTER_OP_NUM_THREADS: "1"
+      GLINER_SCORE_EPSILON: "1e-6"
+      GLINER_SCORE_ROUNDING: "6"
     steps:
       - uses: actions/checkout@v6
 
@@ -59,10 +47,7 @@ jobs:
             ${{ runner.os }}-models-${{ matrix.ruby }}
 
       - name: Run unit tests
-        run: nix develop . --command bash -lc "if command -v taskset >/dev/null; then taskset -c 0 bundle exec rspec; else bundle exec rspec; fi"
+        run: nix develop . --command bash -lc "bundle exec rspec"
 
       - name: Run integration tests
-        env:
-          GLINER_MODEL_FILE: "model.onnx"
-          MODEL_FILE: "model.onnx"
-        run: nix develop . --command bash -lc "if command -v taskset >/dev/null; then taskset -c 0 bundle exec rake spec:integration; else bundle exec rake spec:integration; fi"
+        run: nix develop . --command bash -lc "bundle exec rake spec:integration"
