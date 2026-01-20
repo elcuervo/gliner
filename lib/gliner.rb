@@ -6,6 +6,7 @@ require 'gliner/version'
 require 'gliner/configuration'
 require 'gliner/model'
 require 'gliner/runners/prepared_task'
+require 'gliner/runners/inspectable'
 require 'gliner/runners/entity_runner'
 require 'gliner/runners/structured_runner'
 require 'gliner/runners/classification_runner'
@@ -68,7 +69,10 @@ module Gliner
     end
 
     def model
-      @model ||= model_from_config || model_from_env
+      @model ||= begin
+        apply_model_source!
+        model_from_config || model_from_env
+      end
     end
 
     def [](config)
@@ -98,7 +102,7 @@ module Gliner
     end
 
     def model_from_env
-      dir = ENV.fetch('GLINER_MODEL_DIR', nil)
+      dir = env_model_dir
       return if dir.nil?
 
       file = ENV['GLINER_MODEL_FILE'] || model_file_for_variant(config.variant)
@@ -130,7 +134,8 @@ module Gliner
       return unless config.auto?
 
       source = config.model
-      return unless source.nil? || source.empty?
+      return unless source.nil?
+      return if env_model_dir
 
       config.model = download_default_model
     end
@@ -143,14 +148,31 @@ module Gliner
       FileUtils.mkdir_p(dir)
 
       files = ['tokenizer.json', 'config.json', model_file]
-      client = HTTPX.plugin(:follow_redirects)
+      client = HTTPX.plugin(:follow_redirects).with(max_redirects: 5)
 
       files.each do |file|
-        response = client.get("#{DEFAULT_MODEL_BASE}/#{file}")
-        raise Error, "Download failed: #{file}" if response.error?
-
-        File.binwrite(File.join(dir, file), response.body.to_s)
+        dest = File.join(dir, file)
+        next if File.exist?(dest) && File.size?(dest)
+        download_file!(client, "#{DEFAULT_MODEL_BASE}/#{file}", dest)
       end
+
+      dir
+    end
+
+    def download_file!(client, url, dest)
+      response = client.get(url)
+      status = response.status
+
+      unless status && status.between?(200, 299)
+        raise Error, "Download failed: #{url} (status: #{status || 'unknown'})"
+      end
+
+      File.binwrite(dest, response.body.to_s)
+    end
+
+    def env_model_dir
+      dir = ENV.fetch('GLINER_MODEL_DIR', nil)
+      return nil if dir.nil? || dir.empty?
 
       dir
     end
