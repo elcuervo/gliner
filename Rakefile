@@ -10,17 +10,20 @@ task default: :spec
 
 namespace :model do
   DEFAULT_REPO_ID = 'cuerbot/gliner2-multi-v1'
-  DEFAULT_MODEL_FILE = 'model_int8.onnx'
+  DEFAULT_MODEL_FILE = 'model_fp16.onnx'
+  DEFAULT_MODEL_SUBDIR = 'onnx'
 
-  desc 'Downloads a test model to tmp/ (REPO_ID=... MODEL_FILE=model_int8.onnx)'
+  desc 'Downloads a test model to tmp/ (REPO_ID=... MODEL_FILE=model_fp16.onnx)'
   task :pull do
     repo_id = ENV['REPO_ID'] || DEFAULT_REPO_ID
     model_file = ENV['MODEL_FILE'] || DEFAULT_MODEL_FILE
+    model_subdir = ENV['MODEL_SUBDIR'] || DEFAULT_MODEL_SUBDIR
 
     dir = File.expand_path("tmp/models/#{repo_id.tr('/', '__')}", __dir__)
     FileUtils.mkdir_p(dir)
 
     base = "https://huggingface.co/#{repo_id}/resolve/main"
+    base = "#{base}/#{model_subdir}" unless model_subdir.nil? || model_subdir.empty?
     files = ['tokenizer.json', 'config.json', model_file]
     client = HTTPX.plugin(:follow_redirects).with(max_redirects: 5)
 
@@ -44,6 +47,7 @@ namespace :spec do
   task :integration do
     repo_id = ENV['REPO_ID'] || DEFAULT_REPO_ID
     model_file = ENV['MODEL_FILE'] || DEFAULT_MODEL_FILE
+    model_subdir = ENV['MODEL_SUBDIR'] || DEFAULT_MODEL_SUBDIR
 
     Rake::Task['model:pull'].invoke unless ENV['GLINER_MODEL_DIR'] && !ENV['GLINER_MODEL_DIR'].empty?
 
@@ -53,7 +57,8 @@ namespace :spec do
     env = {
       'GLINER_INTEGRATION' => '1',
       'GLINER_MODEL_DIR' => model_dir,
-      'GLINER_MODEL_FILE' => model_file
+      'GLINER_MODEL_FILE' => model_file,
+      'GLINER_MODEL_SUBDIR' => model_subdir
     }
     sh env, 'rspec', 'spec/integration_spec.rb'
   end

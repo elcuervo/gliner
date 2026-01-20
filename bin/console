@@ -12,13 +12,15 @@ require "httpx"
 require "irb"
 
 DEFAULT_REPO_ID = "cuerbot/gliner2-multi-v1"
-DEFAULT_MODEL_FILE = "model_int8.onnx"
+DEFAULT_MODEL_FILE = "model_fp16.onnx"
+DEFAULT_MODEL_SUBDIR = "onnx"
 
-def ensure_model_dir!(repo_id:, model_file:)
+def ensure_model_dir!(repo_id:, model_file:, model_subdir:)
   dir = File.expand_path("../tmp/models/#{repo_id.tr('/', '__')}", __dir__)
   FileUtils.mkdir_p(dir)
 
   base = "https://huggingface.co/#{repo_id}/resolve/main"
+  base = "#{base}/#{model_subdir}" unless model_subdir.nil? || model_subdir.empty?
   files = ["tokenizer.json", "config.json", model_file]
 
   files.each do |file|
@@ -40,13 +42,14 @@ end
 model_dir = ARGV[0] || ENV["GLINER_MODEL_DIR"]
 repo_id = ENV["GLINER_REPO_ID"] || DEFAULT_REPO_ID
 model_file = ENV["GLINER_MODEL_FILE"] || DEFAULT_MODEL_FILE
+model_subdir = ENV["GLINER_MODEL_SUBDIR"] || DEFAULT_MODEL_SUBDIR
 
 if model_dir && !model_dir.empty?
   $gliner_model = Gliner.load(model_dir, file: model_file)
 else
   begin
     require "fileutils"
-    model_dir = ensure_model_dir!(repo_id: repo_id, model_file: model_file)
+    model_dir = ensure_model_dir!(repo_id: repo_id, model_file: model_file, model_subdir: model_subdir)
     $gliner_model = Gliner.load(model_dir, file: model_file)
   rescue => e
     warn "No model loaded (auto-download failed: #{e.class}: #{e.message})"
