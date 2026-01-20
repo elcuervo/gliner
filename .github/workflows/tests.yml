@@ -62,4 +62,7 @@ jobs:
         run: nix develop . --command bash -lc "if command -v taskset >/dev/null; then taskset -c 0 bundle exec rspec; else bundle exec rspec; fi"
 
       - name: Run integration tests
+        env:
+          GLINER_MODEL_FILE: "model.onnx"
+          MODEL_FILE: "model.onnx"
         run: nix develop . --command bash -lc "if command -v taskset >/dev/null; then taskset -c 0 bundle exec rake spec:integration; else bundle exec rake spec:integration; fi"
