@@ -158,6 +158,8 @@ module Gliner
 
         next if File.exist?(target) && File.size?(target)
 
+        puts "Downloading #{DEFAULT_MODEL_BASE}/#{file}"
+
         client
           .get("#{DEFAULT_MODEL_BASE}/#{file}")
           .copy_to(target)
