@@ -16,9 +16,6 @@ jobs:
             os: ubuntu-22.04
 
     runs-on: ${{ matrix.os }}
-    env:
-      GLINER_SCORE_EPSILON: "1e-6"
-      GLINER_SCORE_ROUNDING: "6"
     steps:
       - uses: actions/checkout@v6
 

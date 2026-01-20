@@ -5,9 +5,6 @@ require 'gliner/position_iteration'
 module Gliner
   class Classifier
     include PositionIteration
-    SCORE_EPSILON = Float(ENV.fetch('GLINER_SCORE_EPSILON', '0'))
-    SCORE_ROUNDING = ENV['GLINER_SCORE_ROUNDING']&.to_i
-
     def initialize(inference, max_width:)
       @inference = inference
       @max_width = max_width
@@ -43,7 +40,7 @@ module Gliner
     def sorted_label_scores(scores, labels)
       scores
         .each_with_index.map { |score, i| [labels.fetch(i), score] }
-        .sort_by { |(_label, score)| score_key(score) }
+        .sort_by { |(_label, score)| -score }
     end
 
     def format_multi_label(label_scores, cls_threshold, include_confidence)
@@ -53,7 +50,7 @@ module Gliner
     end
 
     def labels_above_threshold(label_scores, threshold)
-      above = label_scores.select { |_label, score| score + SCORE_EPSILON >= threshold }
+      above = label_scores.select { |_label, score| score >= threshold }
       above.empty? && label_scores.first ? [label_scores.first] : above
     end
 
@@ -67,9 +64,5 @@ module Gliner
       include_confidence ? { 'label' => label, 'confidence' => score } : label
     end
 
-    def score_key(score)
-      value = SCORE_ROUNDING ? score.round(SCORE_ROUNDING) : score
-      -value
-    end
   end
 end
