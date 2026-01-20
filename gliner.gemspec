@@ -16,11 +16,13 @@ Gem::Specification.new do |spec|
   spec.files = Dir.glob('lib/**/*') + Dir.glob('bin/*') + %w[README.md LICENSE gliner.gemspec]
   spec.require_paths = ['lib']
 
+  spec.add_dependency 'httpx', '~> 1.0'
   spec.add_dependency 'onnxruntime', '~> 0.10'
   spec.add_dependency 'tokenizers', '~> 0.6'
-  spec.add_dependency 'httpx', '~> 1.0'
 
   spec.add_development_dependency 'rake', '~> 13.0'
   spec.add_development_dependency 'rspec', '~> 3.13'
   spec.add_development_dependency 'rubocop', '~> 1.50'
+
+  spec.metadata['rubygems_mfa_required'] = 'true'
 end

@@ -4,15 +4,24 @@
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
     flake-utils.url = "github:numtide/flake-utils";
+    nixpkgs-ruby = {
+      url = "github:bobvanderlinden/nixpkgs-ruby";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
-  outputs = { self, nixpkgs, flake-utils }:
+  outputs = { self, nixpkgs, flake-utils, nixpkgs-ruby }:
     flake-utils.lib.eachDefaultSystem (system:
       let
-        pkgs = import nixpkgs { inherit system; };
+        pkgs = nixpkgs.legacyPackages.${system};
         lib = pkgs.lib;
 
         isLinux = pkgs.stdenv.isLinux;
+
+        rubyPkg = nixpkgs-ruby.lib.packageFromRubyVersionFile {
+          file = ./.ruby-version;
+          inherit system;
+        };
 
         python-with-packages = pkgs.python3.withPackages (ps: with ps; [
           huggingface-hub
@@ -26,12 +35,12 @@
 
         rubyWrapped = pkgs.writeShellScriptBin "ruby" ''
           ${lib.optionalString isLinux ''export LD_LIBRARY_PATH="$NIX_LD_LIBRARY_PATH"''}
-          exec ${pkgs.ruby}/bin/ruby "$@"
+          exec ${rubyPkg}/bin/ruby "$@"
         '';
 
         bundleWrapped = pkgs.writeShellScriptBin "bundle" ''
           ${lib.optionalString isLinux ''export LD_LIBRARY_PATH="$NIX_LD_LIBRARY_PATH"''}
-          exec ${pkgs.bundler}/bin/bundle "$@"
+          exec ${rubyPkg}/bin/bundle "$@"
         '';
       in
       {
@@ -41,9 +50,7 @@
               rubyWrapped
               bundleWrapped
 
-              pkgs.ruby
-              pkgs.bundler
-              pkgs.rubocop
+              rubyPkg
 
               python-with-packages
               pkgs.pipenv
@@ -60,6 +67,7 @@
           BUNDLE_DISABLE_SHARED_GEMS = "true";
 
           shellHook = ''
+            export PATH="${rubyPkg}/bin:$PATH"
             export PATH="$PWD/.bundle/bin:$PATH"
           '';
         };
