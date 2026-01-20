@@ -29,6 +29,5 @@ module Gliner
       def inspect_label = 'Classification'
       def inspect_items = @tasks.keys
     end
-
   end
 end

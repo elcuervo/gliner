@@ -24,6 +24,5 @@ module Gliner
       def inspect_label = 'Entity'
       def inspect_items = @labels
     end
-
   end
 end

@@ -5,7 +5,7 @@ module Gliner
     include Enumerable
 
     def [](key) = fields[key]
-    def fetch(key, *args, &block) = fields.fetch(key, *args, &block)
+    def fetch(key, ...) = fields.fetch(key, ...)
     def to_h = fields
     def to_hash = fields
     def keys = fields.keys

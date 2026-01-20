@@ -70,6 +70,5 @@ module Gliner
         end
       end
     end
-
   end
 end
