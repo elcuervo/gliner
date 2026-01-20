@@ -15,7 +15,7 @@ module Gliner
     end
 
     def variant=(value)
-      @variant = value.nil? ? nil : value.to_sym
+      @variant = value&.to_sym
     end
 
     def auto!(value = true)

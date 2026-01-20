@@ -14,7 +14,7 @@ module Gliner
   HF_REPO = 'cuerbot/gliner2-multi-v1'
   HF_DIR = 'onnx'
 
-  DEFAULT_MODEL_BASE = "https://huggingface.co/#{HF_REPO}/resolve/main/#{HF_DIR}"
+  DEFAULT_MODEL_BASE = "https://huggingface.co/#{HF_REPO}/resolve/main/#{HF_DIR}".freeze
 
   Error = Class.new(StandardError)
 
@@ -48,8 +48,7 @@ module Gliner
   end
 
   class << self
-    attr_writer :model
-    attr_writer :config
+    attr_writer :model, :config
 
     def configure
       yield(config)
@@ -88,7 +87,6 @@ module Gliner
       raise Error, 'No model loaded. Call Gliner.load("/path/to/model"), set config.model, or set GLINER_MODEL_DIR.'
     end
 
-
     private
 
     def model_from_config
@@ -100,7 +98,7 @@ module Gliner
     end
 
     def model_from_env
-      dir = ENV['GLINER_MODEL_DIR']
+      dir = ENV.fetch('GLINER_MODEL_DIR', nil)
       return if dir.nil?
 
       file = ENV['GLINER_MODEL_FILE'] || model_file_for_variant(config.variant)
