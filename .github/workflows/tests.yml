@@ -39,7 +39,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: tmp/models
-          key: ${{ runner.os }}-models-${{ matrix.ruby }}-fp32
+          key: ${{ runner.os }}-models-${{ matrix.ruby }}-variants
           restore-keys: |
             ${{ runner.os }}-models-${{ matrix.ruby }}
 
@@ -48,5 +48,5 @@ jobs:
 
       - name: Run integration tests
         env:
-          MODEL_FILE: "model.onnx"
+          MODEL_FILE: "model_fp16.onnx"
         run: nix develop . --command bash -lc "bundle exec rake spec:integration"
