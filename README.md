@@ -73,7 +73,7 @@ result = model["This laptop has amazing performance but terrible battery life!"]
 
 pp result
 
-# => {"sentiment"=>#<data Gliner::Label ...>}
+# => { sentiment: #<data Gliner::Label ...> }
 
 result["sentiment"].label
 # => "negative"
@@ -88,15 +88,15 @@ Multiple classification tasks:
 text = "Breaking: Tech giant announces major layoffs amid market downturn"
 
 tasks = {
-  "sentiment" => %w[positive negative neutral],
-  "urgency" => %w[high medium low],
-  "category" => { "labels" => %w[tech finance politics sports], "multi_label" => false }
+  sentiment: %w[positive negative neutral],
+  urgency: %w[high medium low],
+  category: { labels: %w[tech finance politics sports], multi_label: false }
 }
 
 results = Gliner.classify[tasks][text]
 
 results.transform_values { |value| value.label }
-# => {"sentiment"=>"negative", "urgency"=>"high", "category"=>"tech"}
+# => { sentiment: "negative", urgency: "high", category: "tech" }
 ```
 
 ### Structured extraction
@@ -128,7 +128,7 @@ product["processor"].text
 # => "A17 Pro"
 
 product["price"].text
-# => "$1199"
+# => "1199"
 ```
 
 Choices can be included in field specs:
@@ -136,7 +136,8 @@ Choices can be included in field specs:
 ```ruby
 result = Gliner[{ order: ["status::[pending|processing|shipped]::str"] }]["Status: shipped"]
 
-# => {"order"=>[{"status"=>"shipped"}]}
+result.fetch("order").first["status"].text
+# shipped
 ```
 
 ## Model files
