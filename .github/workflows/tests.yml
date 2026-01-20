@@ -15,6 +15,9 @@ jobs:
           - ruby: 3.4
             os: ubuntu-22.04
 
+          - ruby: "4.0"
+            os: ubuntu-latest
+
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v6
