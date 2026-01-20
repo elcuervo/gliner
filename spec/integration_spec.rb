@@ -47,7 +47,7 @@ describe 'Gliner Integration', if: ENV.key?('GLINER_INTEGRATION') do
 
         expect(sentiment).to be_a(Gliner::Label)
         expect(sentiment.label).to eq('negative')
-        expect(sentiment.confidence).to be_a(Float)
+        expect(sentiment.probability).to be_a(Float)
       end
     end
 

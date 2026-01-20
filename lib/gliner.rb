@@ -32,7 +32,7 @@ module Gliner
     :text_len
   )
 
-  Entity = Data.define(:index, :offsets, :text, :name, :confidence) do
+  Entity = Data.define(:index, :offsets, :text, :name, :probability) do
     def to_s = text.to_s
     def to_str = text.to_s
   end
@@ -43,7 +43,7 @@ module Gliner
     end
   end
 
-  Label = Data.define(:label, :confidence) do
+  Label = Data.define(:label, :probability) do
     def to_s = label.to_s
     def to_str = label.to_s
   end

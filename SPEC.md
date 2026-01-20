@@ -46,7 +46,7 @@ result = model[text]
 result["sentiment"].label
 # => "negative"
 
-result["sentiment"].confidence
+result["sentiment"].probability
 # => 87.1
 ```
 

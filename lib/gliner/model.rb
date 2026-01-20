@@ -101,7 +101,7 @@ module Gliner
 
     def extract_entities(text, entity_types, **options)
       threshold = options.fetch(:threshold, Gliner.config.threshold)
-      include_confidence = options.fetch(:include_confidence, false)
+      include_probability = options.fetch(:include_probability, false)
       include_spans = options.fetch(:include_spans, false)
 
       pipeline.execute(
@@ -109,16 +109,16 @@ module Gliner
         text,
         entity_types,
         threshold: threshold,
-        include_confidence: include_confidence,
+        include_probability: include_probability,
         include_spans: include_spans
       )
     end
 
     def classify_text(text, tasks, **options)
-      include_confidence = options.fetch(:include_confidence, false)
+      include_probability = options.fetch(:include_probability, false)
       threshold = options[:threshold]
 
-      task_options = { include_confidence: include_confidence }
+      task_options = { include_probability: include_probability }
       task_options[:threshold] = threshold unless threshold.nil?
 
       classification_task.execute_all(pipeline, text, tasks, **task_options)
@@ -126,7 +126,7 @@ module Gliner
 
     def extract_json(text, structures, **options)
       threshold = options.fetch(:threshold, Gliner.config.threshold)
-      include_confidence = options.fetch(:include_confidence, false)
+      include_probability = options.fetch(:include_probability, false)
       include_spans = options.fetch(:include_spans, false)
 
       json_task.execute_all(
@@ -134,7 +134,7 @@ module Gliner
         text,
         structures,
         threshold: threshold,
-        include_confidence: include_confidence,
+        include_probability: include_probability,
         include_spans: include_spans
       )
     end

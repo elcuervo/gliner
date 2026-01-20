@@ -109,7 +109,7 @@ module Gliner
         offsets: [span.start, span.end],
         text: span.text,
         name: label&.to_s,
-        confidence: span.score * 100.0
+        probability: span.score * 100.0
       )
     end
 
