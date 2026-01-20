@@ -2,7 +2,7 @@
 
 module Gliner
   module Runners
-    class EntityRunner
+    class Entity
       include Inspectable
 
       def initialize(model, config)
@@ -24,5 +24,6 @@ module Gliner
       def inspect_label = 'Entity'
       def inspect_items = @labels
     end
+
   end
 end

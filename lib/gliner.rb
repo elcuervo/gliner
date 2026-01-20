@@ -95,7 +95,7 @@ module Gliner
     end
 
     def classify
-      Runners::ClassificationRunner
+      Runners::Classification
     end
 
     def model!
@@ -126,9 +126,9 @@ module Gliner
     end
 
     def runner_for(config)
-      return Runners::StructuredRunner if structured_config?(config)
+      return Runners::Structure if structured_config?(config)
 
-      Runners::EntityRunner
+      Runners::Entity
     end
 
     def structured_config?(config)

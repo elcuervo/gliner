@@ -2,7 +2,7 @@
 
 module Gliner
   module Runners
-    class ClassificationRunner
+    class Classification
       include Inspectable
 
       def self.[](tasks)
@@ -29,5 +29,6 @@ module Gliner
       def inspect_label = 'Classification'
       def inspect_items = @tasks.keys
     end
+
   end
 end

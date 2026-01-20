@@ -2,21 +2,21 @@
 
 module Gliner
   module Runners
-    class StructuredRunner
+    class Structure
       include Inspectable
 
       Result = Data.define(:name, :items) do
         def [](index) = items[index]
-          def fetch(*args, &block) = items.fetch(*args, &block)
-          def each(&block) = items.each(&block)
-          def map(&block) = items.map(&block)
-          def length = items.length
-          def size = items.size
-          def empty? = items.empty?
-          def first = items.first
-          def last = items.last
-          def to_a = items
-        end
+        def fetch(*args, &block) = items.fetch(*args, &block)
+        def each(&block) = items.each(&block)
+        def map(&block) = items.map(&block)
+        def length = items.length
+        def size = items.size
+        def empty? = items.empty?
+        def first = items.first
+        def last = items.last
+        def to_a = items
+      end
 
       def initialize(model, config)
         @tasks = build_tasks(model, config)
@@ -50,5 +50,6 @@ module Gliner
         end
       end
     end
+
   end
 end

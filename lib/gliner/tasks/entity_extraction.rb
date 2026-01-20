@@ -2,7 +2,7 @@
 
 module Gliner
   module Tasks
-    class EntityExtraction < Task
+    class Entity < Task
       def initialize(config_parser:, inference:, input_builder:, span_extractor:)
         super(config_parser: config_parser, inference: inference, input_builder: input_builder)
         @span_extractor = span_extractor
@@ -70,5 +70,6 @@ module Gliner
         end
       end
     end
+
   end
 end

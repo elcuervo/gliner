@@ -2,7 +2,7 @@
 
 module Gliner
   module Tasks
-    class JsonExtraction < Task
+    class Json < Task
       def initialize(config_parser:, inference:, input_builder:, span_extractor:, structured_extractor:)
         super(config_parser: config_parser, inference: inference, input_builder: input_builder)
 
@@ -87,5 +87,6 @@ module Gliner
         )
       end
     end
+
   end
 end
