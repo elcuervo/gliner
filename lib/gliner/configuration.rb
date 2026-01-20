@@ -11,7 +11,7 @@ module Gliner
       @threshold = DEFAULT_THRESHOLD
       @model = nil
       @variant = :fp16
-      @auto = false
+      @auto = true
     end
 
     def variant=(value)

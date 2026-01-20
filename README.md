@@ -19,11 +19,10 @@ require "gliner"
 
 Gliner.configure do |config|
   config.threshold = 0.2
-  # If unset, auto! downloads the default model to .cache/
+  # By default, the gem downloads the default model to .cache/
   # Or set a local path explicitly:
   # config.model = "/path/to/gliner2-multi-v1"
   config.variant = :fp16
-  config.auto!
 end
 
 text = "Apple CEO Tim Cook announced iPhone 15 in Cupertino yesterday."

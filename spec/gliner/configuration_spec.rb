@@ -72,5 +72,35 @@ describe Gliner do
         expect(Gliner).not_to have_received(:download_default_model)
       end
     end
+
+    it 'auto! does not download when model is explicitly set' do
+      allow(Gliner).to receive(:download_default_model)
+
+      Gliner.configure do |config|
+        config.model = ''
+        config.auto!
+      end
+
+      expect(Gliner.config.model).to eq('')
+      expect(Gliner).not_to have_received(:download_default_model)
+    end
+
+    it 'auto! respects GLINER_MODEL_DIR when set' do
+      allow(Gliner).to receive(:download_default_model)
+
+      previous = ENV['GLINER_MODEL_DIR']
+      ENV['GLINER_MODEL_DIR'] = '/tmp/env-model'
+
+      begin
+        Gliner.configure do |config|
+          config.auto!
+        end
+
+        expect(Gliner.config.model).to be_nil
+        expect(Gliner).not_to have_received(:download_default_model)
+      ensure
+        ENV['GLINER_MODEL_DIR'] = previous
+      end
+    end
   end
 end
