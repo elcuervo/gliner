@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'fileutils'
+require 'httpx'
 require 'gliner/version'
 require 'gliner/configuration'
 require 'gliner/model'
@@ -9,6 +11,11 @@ require 'gliner/runners/structured_runner'
 require 'gliner/runners/classification_runner'
 
 module Gliner
+  HF_REPO = 'cuerbot/gliner2-multi-v1'
+  HF_DIR = 'onnx'
+
+  DEFAULT_MODEL_BASE = "https://huggingface.co/#{HF_REPO}/resolve/main/#{HF_DIR}".freeze
+
   Error = Class.new(StandardError)
 
   PreparedInput = Data.define(
@@ -41,11 +48,13 @@ module Gliner
   end
 
   class << self
-    attr_writer :model
-    attr_writer :config
+    attr_writer :model, :config
 
     def configure
       yield(config)
+
+      reset_model!
+      apply_model_source!
     end
 
     def config
@@ -53,53 +62,48 @@ module Gliner
     end
 
     def load(dir, file: nil)
-      file ||= ENV['GLINER_MODEL_FILE']
-      file ||= config.model_file
+      file ||= ENV['GLINER_MODEL_FILE'] || model_file_for_variant(config.variant)
 
-      self.model = Model.from_dir(dir, file: file || 'model_int8.onnx')
+      self.model = Model.from_dir(dir, file: file)
     end
 
     def model
       @model ||= model_from_config || model_from_env
     end
 
-    def model!
-      fetch_model!
-    end
-
     def [](config)
-      runner_for(config).new(fetch_model!, config)
+      runner_for(config).new(model!, config)
     end
 
     def classify
       Runners::ClassificationRunner
     end
 
+    def model!
+      model = self.model
+
+      return model if model
+
+      raise Error, 'No model loaded. Call Gliner.load("/path/to/model"), set config.model, or set GLINER_MODEL_DIR.'
+    end
+
     private
 
     def model_from_config
-      dir = config.model_dir
-      return nil if dir.nil? || dir.empty?
+      source = config.model
+      return nil if source.nil?
 
-      file = config.model_file
-      return Model.from_dir(dir) if file.nil? || file.empty?
-
-      Model.from_dir(dir, file: file)
+      file = model_file_for_variant(config.variant)
+      Model.from_dir(source, file: file)
     end
 
     def model_from_env
       dir = ENV.fetch('GLINER_MODEL_DIR', nil)
-      return nil if dir.nil? || dir.empty?
+      return if dir.nil?
 
-      file = ENV['GLINER_MODEL_FILE'] || 'model_int8.onnx'
+      file = ENV['GLINER_MODEL_FILE'] || model_file_for_variant(config.variant)
+
       Model.from_dir(dir, file: file)
-    end
-
-    def fetch_model!
-      model = self.model
-      return model if model
-
-      raise Error, 'No model loaded. Call Gliner.load("/path/to/model"), set config.model_dir, or set GLINER_MODEL_DIR.'
     end
 
     def runner_for(config)
@@ -112,9 +116,53 @@ module Gliner
       return false unless config.is_a?(Hash)
 
       keys = config.transform_keys(&:to_s)
+
       return true if keys.key?('name') && keys.key?('fields')
 
       config.values.all? { |value| value.is_a?(Array) }
+    end
+
+    def reset_model!
+      @model = nil
+    end
+
+    def apply_model_source!
+      return unless config.auto?
+
+      source = config.model
+      return unless source.nil? || source.empty?
+
+      config.model = download_default_model
+    end
+
+    def download_default_model
+      model_file = model_file_for_variant(config.variant)
+      root = File.expand_path('..', __dir__)
+      dir = File.join(root, '.cache', 'models', HF_REPO.tr('/', '__'))
+
+      FileUtils.mkdir_p(dir)
+
+      files = ['tokenizer.json', 'config.json', model_file]
+      client = HTTPX.plugin(:follow_redirects)
+
+      files.each do |file|
+        response = client.get("#{DEFAULT_MODEL_BASE}/#{file}")
+        raise Error, "Download failed: #{file}" if response.error?
+
+        File.binwrite(File.join(dir, file), response.body.to_s)
+      end
+
+      dir
+    end
+
+    def model_file_for_variant(variant = :fp16)
+      case variant.to_sym
+      when :fp16 then 'model_fp16.onnx'
+      when :fp32 then 'model.onnx'
+      when :int8 then 'model_int8.onnx'
+      else
+        raise Error, "Unknown model variant: #{variant.inspect}"
+      end
     end
   end
 end

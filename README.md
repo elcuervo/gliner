@@ -19,53 +19,48 @@ require "gliner"
 
 Gliner.configure do |config|
   config.threshold = 0.2
-  config.model_dir = "/path/to/gliner2-multi-v1"
-  config.model_file = "model.onnx"
+  # If unset, auto! downloads the default model to .cache/
+  # Or set a local path explicitly:
+  # config.model = "/path/to/gliner2-multi-v1"
+  config.variant = :fp16
+  config.auto!
 end
-
-Gliner.load("path/to/gliner2-multi-v1")
 
 text = "Apple CEO Tim Cook announced iPhone 15 in Cupertino yesterday."
 labels = ["company", "person", "product", "location"]
 
 model = Gliner[labels]
 pp model[text]
-```
 
-Expected shape:
-
-```ruby
-{"entities"=>{"company"=>["Apple"], "person"=>["Tim Cook"], "product"=>["iPhone 15"], "location"=>["Cupertino"]}}
+# => {"company"=>["Apple"], "person"=>["Tim Cook"], "product"=>["iPhone 15"], "location"=>["Cupertino"]}
 ```
 
 You can also pass per-entity configs:
 
 ```ruby
 labels = {
-  "email" => { "description" => "Email addresses", "dtype" => "list", "threshold" => 0.9 },
-  "person" => { "description" => "Person names", "dtype" => "str" }
+  email: { description: "Email addresses", dtype: "list", threshold: 0.9 },
+  person: { description: "Person names", dtype: "str" }
 }
 
 model = Gliner[labels]
 pp model["Email John Doe at john@example.com.", threshold: 0.5]
+
+# => {"email"=>["john@example.com"], "person"=>"John Doe"}
 ```
 
 ### Classification
 
 ```ruby
 model = Gliner.classify[
-  { "sentiment" => %w[positive negative neutral] }
+  { sentiment: %w[positive negative neutral] }
 ]
 
 result = model["This laptop has amazing performance but terrible battery life!"]
 
 pp result
-```
 
-Expected shape:
-
-```ruby
-{"sentiment"=>"negative"}
+# => {"sentiment"=>"negative"}
 ```
 
 ### Structured extraction
@@ -74,7 +69,7 @@ Expected shape:
 text = "iPhone 15 Pro Max with 256GB storage, A17 Pro chip, priced at $1199."
 
 structure = {
-  "product" => [
+  product: [
     "name::str::Full product name and model",
     "storage::str::Storage capacity",
     "processor::str::Chip or processor information",
@@ -85,18 +80,16 @@ structure = {
 result = Gliner[structure][text]
 
 pp result
-```
 
-Expected shape:
-
-```ruby
-{"product"=>[{"name"=>"iPhone 15 Pro Max", "storage"=>"256GB", "processor"=>"A17 Pro chip", "price"=>"$1199"}]}
+# => {"product"=>[{"name"=>"iPhone 15 Pro Max", "storage"=>"256GB", "processor"=>"A17 Pro", "price"=>"1199"}]}
 ```
 
 Choices can be included in field specs:
 
 ```ruby
-result = Gliner[{ "order" => ["status::[pending|processing|shipped]::str"] }]["Status: shipped"]
+result = Gliner[{ order: ["status::[pending|processing|shipped]::str"] }]["Status: shipped"]
+
+# => {"order"=>[{"status"=>"shipped"}]}
 ```
 
 ## Model files
@@ -108,14 +101,15 @@ This implementation expects a directory containing:
 - (optional) `config.json` with `max_width` and `max_seq_len`
 
 One publicly available ONNX export is `cuerbot/gliner2-multi-v1` on Hugging Face.
-By default, `model_int8.onnx` is used; set `config.model_file` or `GLINER_MODEL_FILE` to override.
+By default, `model_fp16.onnx` is used; set `config.variant` (or `GLINER_MODEL_FILE`) to override.
+Variants map to files as: `:fp16` → `model_fp16.onnx`, `:fp32` → `model.onnx`, `:int8` → `model_int8.onnx`.
 
-You can also configure the model directory in code:
+You can also configure the model source directly:
 
 ```ruby
 Gliner.configure do |config|
-  config.model_dir = "/path/to/model_dir"
-  config.model_file = "model_int8.onnx"
+  config.model = "/path/to/model_dir"
+  config.variant = :int8
 end
 ```
 
@@ -152,7 +146,7 @@ If you omit `MODEL_DIR`, the console auto-downloads a public test model (configu
 ```bash
 rake console
 # or:
-GLINER_REPO_ID=cuerbot/gliner2-multi-v1 GLINER_MODEL_FILE=model_int8.onnx rake console
+GLINER_REPO_ID=cuerbot/gliner2-multi-v1 GLINER_MODEL_FILE=model_fp16.onnx rake console
 ```
 
 Or:
