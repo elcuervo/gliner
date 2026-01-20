@@ -134,6 +134,7 @@ module Gliner
       return unless config.auto?
 
       source = config.model
+
       return unless source.nil?
       return if env_model_dir
 
@@ -148,11 +149,12 @@ module Gliner
       FileUtils.mkdir_p(dir)
 
       files = ['tokenizer.json', 'config.json', model_file]
-      client = HTTPX.plugin(:follow_redirects).with(max_redirects: 5)
+      client = HTTPX.plugin(:follow_redirects)
 
       files.each do |file|
         dest = File.join(dir, file)
         next if File.exist?(dest) && File.size?(dest)
+
         download_file!(client, "#{DEFAULT_MODEL_BASE}/#{file}", dest)
       end
 
@@ -161,11 +163,8 @@ module Gliner
 
     def download_file!(client, url, dest)
       response = client.get(url)
-      status = response.status
 
-      unless status && status.between?(200, 299)
-        raise Error, "Download failed: #{url} (status: #{status || 'unknown'})"
-      end
+      raise Error, "Download failed: #{url} (status: #{response.error})" if response.error
 
       File.binwrite(dest, response.body.to_s)
     end
