@@ -2,6 +2,8 @@
 
 module Gliner
   Structure = Data.define(:fields) do
+    include Enumerable
+
     def [](key) = fields[key]
     def fetch(key, *args, &block) = fields.fetch(key, *args, &block)
     def to_h = fields
@@ -42,15 +44,14 @@ module Gliner
     end
 
     def build_structure_instances(parsed_fields, spans_by_label, opts)
-      format_opts = FormatOptions.from(opts)
       anchor_field = anchor_field_for(parsed_fields)
       return [Gliner::Structure.new(fields: {})] unless anchor_field
 
       anchors = spans_by_label.fetch(anchor_field[:name], [])
-      return [format_structure_object(parsed_fields, spans_by_label, format_opts)] if anchors.empty?
+      return [format_structure_object(parsed_fields, spans_by_label, opts)] if anchors.empty?
 
       instance_spans = build_instance_spans(anchors, spans_by_label)
-      format_instances(parsed_fields, instance_spans, format_opts)
+      format_instances(parsed_fields, instance_spans, opts)
     end
 
     def format_structure_object(parsed_fields, spans_by_label, _opts)

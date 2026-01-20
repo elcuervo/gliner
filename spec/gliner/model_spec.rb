@@ -22,7 +22,7 @@ describe Gliner::SpanExtractor do
           offsets: [0, 8],
           text: 'Tim Cook',
           name: 'person',
-          probability: 90.0
+          confidence: 90.0
         )
       )
     end
@@ -109,21 +109,21 @@ describe Gliner::StructuredExtractor do
             offsets: [0, 5],
             text: 'Jan 5',
             name: 'date',
-            probability: 90.0
+            confidence: 90.0
           ),
           'merchant' => Gliner::Entity.new(
             index: 0,
             offsets: [7, 16],
             text: 'Starbucks',
             name: 'merchant',
-            probability: 90.0
+            confidence: 90.0
           ),
           'amount' => Gliner::Entity.new(
             index: 0,
             offsets: [17, 22],
             text: '$5.50',
             name: 'amount',
-            probability: 90.0
+            confidence: 90.0
           )
         })
       )
@@ -134,21 +134,21 @@ describe Gliner::StructuredExtractor do
             offsets: [40, 45],
             text: 'Jan 6',
             name: 'date',
-            probability: 80.0
+            confidence: 80.0
           ),
           'merchant' => Gliner::Entity.new(
             index: 0,
             offsets: [47, 53],
             text: 'Amazon',
             name: 'merchant',
-            probability: 70.0
+            confidence: 70.0
           ),
           'amount' => Gliner::Entity.new(
             index: 0,
             offsets: [54, 61],
             text: '$156.99',
             name: 'amount',
-            probability: 80.0
+            confidence: 80.0
           )
         })
       )

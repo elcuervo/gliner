@@ -31,7 +31,7 @@ module Gliner
     :text_len
   )
 
-  Entity = Data.define(:index, :offsets, :text, :name, :probability) do
+  Entity = Data.define(:index, :offsets, :text, :name, :confidence) do
     def to_s = text.to_s
     def to_str = text.to_s
   end
@@ -44,17 +44,6 @@ module Gliner
   Span = Data.define(:text, :score, :start, :end) do
     def overlaps?(other)
       !(self.end <= other.start || start >= other.end)
-    end
-  end
-
-  FormatOptions = Data.define(:include_confidence, :include_spans) do
-    def self.from(input)
-      return input if input.is_a?(FormatOptions)
-
-      new(
-        include_confidence: input.fetch(:include_confidence, false),
-        include_spans: input.fetch(:include_spans, false)
-      )
     end
   end
 

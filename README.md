@@ -29,9 +29,19 @@ text = "Apple CEO Tim Cook announced iPhone 15 in Cupertino yesterday."
 labels = ["company", "person", "product", "location"]
 
 model = Gliner[labels]
-pp model[text]
+entities = model[text]
 
-# => {"company"=>["Apple"], "person"=>["Tim Cook"], "product"=>["iPhone 15"], "location"=>["Cupertino"]}
+pp entities["person"]
+# => [#<data Gliner::Entity ...>]
+
+entities["person"].first.text
+# => "Tim Cook"
+
+entities["person"].first.confidence
+# => 92.4
+
+entities["person"].first.offsets
+# => [10, 18]
 ```
 
 You can also pass per-entity configs:
@@ -43,9 +53,13 @@ labels = {
 }
 
 model = Gliner[labels]
-pp model["Email John Doe at john@example.com.", threshold: 0.5]
+entities = model["Email John Doe at john@example.com.", threshold: 0.5]
 
-# => {"email"=>["john@example.com"], "person"=>"John Doe"}
+entities["person"].text
+# => "John Doe"
+
+entities["email"].map(&:text)
+# => ["john@example.com"]
 ```
 
 ### Classification
@@ -59,7 +73,30 @@ result = model["This laptop has amazing performance but terrible battery life!"]
 
 pp result
 
-# => {"sentiment"=>"negative"}
+# => {"sentiment"=>#<data Gliner::Label ...>}
+
+result["sentiment"].label
+# => "negative"
+
+result["sentiment"].confidence
+# => 87.1
+```
+
+Multiple classification tasks:
+
+```ruby
+text = "Breaking: Tech giant announces major layoffs amid market downturn"
+
+tasks = {
+  "sentiment" => %w[positive negative neutral],
+  "urgency" => %w[high medium low],
+  "category" => { "labels" => %w[tech finance politics sports], "multi_label" => false }
+}
+
+results = Gliner.classify[tasks][text]
+
+results.transform_values { |value| value.label }
+# => {"sentiment"=>"negative", "urgency"=>"high", "category"=>"tech"}
 ```
 
 ### Structured extraction
@@ -77,10 +114,21 @@ structure = {
 }
 
 result = Gliner[structure][text]
+product = result.fetch("product").first
 
 pp result
 
-# => {"product"=>[{"name"=>"iPhone 15 Pro Max", "storage"=>"256GB", "processor"=>"A17 Pro", "price"=>"1199"}]}
+product["name"].text
+# => "iPhone 15 Pro Max"
+
+product["storage"].text
+# => "256GB"
+
+product["processor"].text
+# => "A17 Pro"
+
+product["price"].text
+# => "$1199"
 ```
 
 Choices can be included in field specs:
