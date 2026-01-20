@@ -38,7 +38,7 @@ module Gliner
       end
 
       def process_output(logits, parsed, prepared, options)
-        include_confidence = options.fetch(:include_confidence, false)
+        include_probability = options.fetch(:include_probability, false)
         threshold_override = options[:threshold]
         cls_threshold = threshold_override.nil? ? parsed[:cls_threshold] : threshold_override
 
@@ -47,7 +47,7 @@ module Gliner
           scores,
           labels: parsed[:labels],
           multi_label: parsed[:multi_label],
-          include_confidence: include_confidence,
+          include_probability: include_probability,
           cls_threshold: cls_threshold
         )
       end

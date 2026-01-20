@@ -37,7 +37,7 @@ pp entities["person"]
 entities["person"].first.text
 # => "Tim Cook"
 
-entities["person"].first.confidence
+entities["person"].first.probability
 # => 92.4
 
 entities["person"].first.offsets
@@ -78,7 +78,7 @@ pp result
 result["sentiment"].label
 # => "negative"
 
-result["sentiment"].confidence
+result["sentiment"].probability
 # => 87.1
 ```
 
