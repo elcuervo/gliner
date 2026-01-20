@@ -79,8 +79,6 @@ RSpec.describe 'Python compatibility', if: ENV.key?('GLINER_INTEGRATION') do
       value.transform_values { |item| normalize_entities(item) }
     when Gliner::Structure
       normalize_entities(value.to_h)
-    when Gliner::Runners::Structure::Result
-      normalize_entities(value.to_a)
     else
       value
     end
@@ -92,8 +90,6 @@ RSpec.describe 'Python compatibility', if: ENV.key?('GLINER_INTEGRATION') do
       value.map { |item| normalize_classification(item) }.sort
     when Hash
       value.transform_values { |item| normalize_classification(item) }
-    when Gliner::Runners::Classification::Results
-      normalize_classification(value.to_h)
     when Gliner::Runners::Classification::Label
       value.label
     else

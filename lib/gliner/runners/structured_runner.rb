@@ -5,26 +5,13 @@ module Gliner
     class Structure
       include Inspectable
 
-      Result = Data.define(:name, :items) do
-        def [](index) = items[index]
-        def fetch(*args, &block) = items.fetch(*args, &block)
-        def each(&block) = items.each(&block)
-        def map(&block) = items.map(&block)
-        def length = items.length
-        def size = items.size
-        def empty? = items.empty?
-        def first = items.first
-        def last = items.last
-        def to_a = items
-      end
-
       def initialize(model, config)
         @tasks = build_tasks(model, config)
       end
 
       def [](text, **options)
         @tasks.each_with_object({}) do |(name, task), out|
-          out[name] = Result.new(name: name, items: task.call(text, **options))
+          out[name] = task.call(text, **options)
         end
       end
 
