@@ -19,8 +19,8 @@ require "gliner"
 
 Gliner.configure do |config|
   config.threshold = 0.2
-  config.model = "https://huggingface.co/cuerbot/gliner2-multi-v1/tree/main/onnx"
-  # Or a local path:
+  # If unset, auto! downloads the default model to .cache/
+  # Or set a local path explicitly:
   # config.model = "/path/to/gliner2-multi-v1"
   config.variant = :fp16
   config.auto!

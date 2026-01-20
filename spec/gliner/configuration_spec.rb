@@ -47,23 +47,21 @@ describe Gliner do
       expect(Gliner.model).to eq(:model)
     end
 
-    it 'auto! downloads when model is a URL' do
-      allow(Gliner).to receive(:download_model).and_return('/tmp/model')
+    it 'auto! downloads when model is not set' do
+      allow(Gliner).to receive(:download_default_model).and_return('/tmp/model')
 
       Gliner.configure do |config|
-        config.model = 'https://huggingface.co/cuerbot/gliner2-multi-v1/tree/main/onnx'
         config.variant = :fp16
         config.auto!
       end
 
       expect(Gliner.config.model).to eq('/tmp/model')
-      expect(Gliner).to have_received(:download_model)
-        .with('https://huggingface.co/cuerbot/gliner2-multi-v1/tree/main/onnx')
+      expect(Gliner).to have_received(:download_default_model)
     end
 
     it 'auto! uses a local path when provided' do
       Dir.mktmpdir do |dir|
-        allow(Gliner).to receive(:download_model)
+        allow(Gliner).to receive(:download_default_model)
 
         Gliner.configure do |config|
           config.model = dir
@@ -71,7 +69,7 @@ describe Gliner do
         end
 
         expect(Gliner.config.model).to eq(dir)
-        expect(Gliner).not_to have_received(:download_model)
+        expect(Gliner).not_to have_received(:download_default_model)
       end
     end
   end
