@@ -6,11 +6,6 @@ require 'json'
 RSpec.describe 'Python compatibility', if: ENV.key?('GLINER_INTEGRATION') do
   let(:fixtures_path) { File.join(__dir__, 'fixtures', 'python_compat.json') }
   let(:fixtures) { JSON.parse(File.read(fixtures_path)) }
-  let(:model_file) { ENV.fetch('GLINER_MODEL_FILE', fixtures.dig('meta', 'model_file') || 'model.onnx') }
-  let(:model_dir) { ENV['GLINER_MODEL_DIR'] || existing_fixture_dir || raise('Missing GLINER_MODEL_DIR or fixture model_dir') }
-  let(:model) { Gliner.load(model_dir, file: model_file) }
-
-  before { model }
 
   def entity_types_for(input)
     labels = input.fetch('labels')
@@ -31,7 +26,7 @@ RSpec.describe 'Python compatibility', if: ENV.key?('GLINER_INTEGRATION') do
 
       result = Gliner[entity_types_for(input)][input.fetch('text'), threshold: input.fetch('threshold')]
 
-      expect(result).to eq(expected), "entities case ##{idx} mismatch"
+      expect(normalize_entities(result)).to eq(expected), "entities case ##{idx} mismatch"
     end
   end
 
@@ -49,7 +44,8 @@ RSpec.describe 'Python compatibility', if: ENV.key?('GLINER_INTEGRATION') do
 
       result = Gliner.classify[{ task_name => task_config }][input.fetch('text')]
 
-      expect(result).to eq(expected), "classification case ##{idx} mismatch"
+      expect(normalize_classification(result)).to eq(normalize_classification(expected)),
+        "classification case ##{idx} mismatch"
     end
   end
 
@@ -63,7 +59,7 @@ RSpec.describe 'Python compatibility', if: ENV.key?('GLINER_INTEGRATION') do
         threshold: input.fetch('threshold')
       ]
 
-      expect(result).to eq(expected), "json case ##{idx} mismatch"
+      expect(normalize_entities(result)).to eq(expected), "json case ##{idx} mismatch"
     end
   end
 
@@ -71,6 +67,34 @@ RSpec.describe 'Python compatibility', if: ENV.key?('GLINER_INTEGRATION') do
     dir = fixtures.dig('meta', 'model_dir')
     return unless dir && Dir.exist?(dir)
     return dir if File.exist?(File.join(dir, model_file))
+  end
+
+  def normalize_entities(value)
+    case value
+    when Gliner::Entity
+      value.text
+    when Array
+      value.map { |item| normalize_entities(item) }
+    when Hash
+      value.transform_values { |item| normalize_entities(item) }
+    when Gliner::Structure
+      normalize_entities(value.to_h)
+    else
+      value
+    end
+  end
+
+  def normalize_classification(value)
+    case value
+    when Array
+      value.map { |item| normalize_classification(item) }.sort
+    when Hash
+      value.transform_values { |item| normalize_classification(item) }
+    when Gliner::Label
+      value.label
+    else
+      value
+    end
   end
 
 end

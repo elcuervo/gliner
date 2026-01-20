@@ -2,7 +2,7 @@
 
 module Gliner
   module Runners
-    class ClassificationRunner
+    class Classification
       include Inspectable
 
       def self.[](tasks)

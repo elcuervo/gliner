@@ -31,20 +31,19 @@ module Gliner
     :text_len
   )
 
+  Entity = Data.define(:index, :offsets, :text, :name, :confidence) do
+    def to_s = text.to_s
+    def to_str = text.to_s
+  end
+
+  Label = Data.define(:label, :confidence) do
+    def to_s = label.to_s
+    def to_str = label.to_s
+  end
+
   Span = Data.define(:text, :score, :start, :end) do
     def overlaps?(other)
       !(self.end <= other.start || start >= other.end)
-    end
-  end
-
-  FormatOptions = Data.define(:include_confidence, :include_spans) do
-    def self.from(input)
-      return input if input.is_a?(FormatOptions)
-
-      new(
-        include_confidence: input.fetch(:include_confidence, false),
-        include_spans: input.fetch(:include_spans, false)
-      )
     end
   end
 
@@ -80,7 +79,7 @@ module Gliner
     end
 
     def classify
-      Runners::ClassificationRunner
+      Runners::Classification
     end
 
     def model!
@@ -111,9 +110,9 @@ module Gliner
     end
 
     def runner_for(config)
-      return Runners::StructuredRunner if structured_config?(config)
+      return Runners::Structure if structured_config?(config)
 
-      Runners::EntityRunner
+      Runners::Entity
     end
 
     def structured_config?(config)

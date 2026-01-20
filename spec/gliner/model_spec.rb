@@ -14,8 +14,17 @@ describe Gliner::SpanExtractor do
         Gliner::Span.new(text: 'Cook', score: 0.7, start: 4, end: 8)
       ]
 
-      out = span_extractor.format_spans(spans, include_confidence: false, include_spans: false)
-      expect(out).to eq(['Tim Cook'])
+      out = span_extractor.format_spans(spans, include_confidence: false, include_spans: false, label: 'person')
+      expect(out.map(&:text)).to eq(['Tim Cook'])
+      expect(out.first).to eq(
+        Gliner::Entity.new(
+          index: 0,
+          offsets: [0, 8],
+          text: 'Tim Cook',
+          name: 'person',
+          confidence: 90.0
+        )
+      )
     end
   end
 end
@@ -93,8 +102,56 @@ describe Gliner::StructuredExtractor do
         .build_structure_instances(parsed_fields, spans_by_label, include_confidence: false, include_spans: false)
 
       expect(instances.length).to eq(2)
-      expect(instances[0]).to eq({ 'date' => 'Jan 5', 'merchant' => 'Starbucks', 'amount' => '$5.50' })
-      expect(instances[1]).to eq({ 'date' => 'Jan 6', 'merchant' => 'Amazon', 'amount' => '$156.99' })
+      expect(instances[0]).to eq(
+        Gliner::Structure.new(fields: {
+          'date' => Gliner::Entity.new(
+            index: 0,
+            offsets: [0, 5],
+            text: 'Jan 5',
+            name: 'date',
+            confidence: 90.0
+          ),
+          'merchant' => Gliner::Entity.new(
+            index: 0,
+            offsets: [7, 16],
+            text: 'Starbucks',
+            name: 'merchant',
+            confidence: 90.0
+          ),
+          'amount' => Gliner::Entity.new(
+            index: 0,
+            offsets: [17, 22],
+            text: '$5.50',
+            name: 'amount',
+            confidence: 90.0
+          )
+        })
+      )
+      expect(instances[1]).to eq(
+        Gliner::Structure.new(fields: {
+          'date' => Gliner::Entity.new(
+            index: 0,
+            offsets: [40, 45],
+            text: 'Jan 6',
+            name: 'date',
+            confidence: 80.0
+          ),
+          'merchant' => Gliner::Entity.new(
+            index: 0,
+            offsets: [47, 53],
+            text: 'Amazon',
+            name: 'merchant',
+            confidence: 70.0
+          ),
+          'amount' => Gliner::Entity.new(
+            index: 0,
+            offsets: [54, 61],
+            text: '$156.99',
+            name: 'amount',
+            confidence: 80.0
+          )
+        })
+      )
     end
   end
 end

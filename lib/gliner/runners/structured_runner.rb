@@ -2,7 +2,7 @@
 
 module Gliner
   module Runners
-    class StructuredRunner
+    class Structure
       include Inspectable
 
       def initialize(model, config)

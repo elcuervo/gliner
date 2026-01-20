@@ -47,7 +47,9 @@ module Gliner
     def format_multi_label(label_scores, cls_threshold, include_confidence)
       chosen = labels_above_threshold(label_scores, cls_threshold)
 
-      chosen.map { |label, score| format_label(label, score, include_confidence) }
+      chosen
+        .sort_by { |(_label, score)| -score }
+        .map { |label, score| format_label(label, score, include_confidence) }
     end
 
     def labels_above_threshold(label_scores, threshold)
@@ -61,8 +63,8 @@ module Gliner
       format_label(label, score, include_confidence)
     end
 
-    def format_label(label, score, include_confidence)
-      include_confidence ? { 'label' => label, 'confidence' => score } : label
+    def format_label(label, score, _include_confidence)
+      Gliner::Label.new(label: label, confidence: score * 100.0)
     end
   end
 end

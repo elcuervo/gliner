@@ -2,7 +2,7 @@
 
 module Gliner
   module Runners
-    class EntityRunner
+    class Entity
       include Inspectable
 
       def initialize(model, config)

@@ -2,7 +2,7 @@
 
 module Gliner
   module Tasks
-    class JsonExtraction < Task
+    class Json < Task
       def initialize(config_parser:, inference:, input_builder:, span_extractor:, structured_extractor:)
         super(config_parser: config_parser, inference: inference, input_builder: input_builder)
 
@@ -47,9 +47,7 @@ module Gliner
       def process_output(logits, parsed, prepared, options)
         spans_by_label = extract_spans(logits, parsed, prepared, options)
         filtered_spans = @structured_extractor.apply_choice_filters(spans_by_label, parsed[:parsed_fields])
-        format_opts = FormatOptions.from(options)
-
-        @structured_extractor.build_structure_instances(parsed[:parsed_fields], filtered_spans, format_opts)
+        @structured_extractor.build_structure_instances(parsed[:parsed_fields], filtered_spans, options)
       end
 
       def execute_all(pipeline, text, structures_config, **options)

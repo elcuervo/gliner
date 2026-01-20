@@ -47,11 +47,13 @@ module Gliner
       near.min_by { |s| [(s.end - s.start), -s.score, s.text.length] } || best
     end
 
-    def format_single_span(span, opts)
-      format_span(span, opts)
+    def format_single_span(span, opts = nil)
+      label = extract_label(opts)
+      format_span(span, opts, label: label, index: 0)
     end
 
-    def format_spans(spans, opts)
+    def format_spans(spans, opts = nil)
+      label = extract_label(opts)
       return [] if spans.empty?
 
       sorted = spans.sort_by { |s| -s.score }
@@ -64,7 +66,9 @@ module Gliner
         selected << span
       end
 
-      selected.map { |span| format_span(span, opts) }
+      selected.each_with_index.map do |span, index|
+        format_span(span, opts, label: label, index: index)
+      end
     end
 
     private
@@ -97,21 +101,22 @@ module Gliner
       Span.new(text: text_span, score: score, start: char_start, end: char_end)
     end
 
-    def format_span(span, opts)
+    def format_span(span, _opts, label:, index:)
       return nil if span.nil?
 
-      format_opts = FormatOptions.from(opts)
-      return span.text unless format_opts.include_confidence || format_opts.include_spans
+      Gliner::Entity.new(
+        index: index,
+        offsets: [span.start, span.end],
+        text: span.text,
+        name: label&.to_s,
+        confidence: span.score * 100.0
+      )
+    end
 
-      result = { 'text' => span.text }
-      result['confidence'] = span.score if format_opts.include_confidence
+    def extract_label(opts)
+      return nil unless opts.is_a?(Hash)
 
-      if format_opts.include_spans
-        result['start'] = span.start
-        result['end'] = span.end
-      end
-
-      result
+      opts[:label] || opts['label']
     end
   end
 end

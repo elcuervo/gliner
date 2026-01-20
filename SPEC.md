@@ -5,9 +5,12 @@ text = "Apple CEO Tim Cook announced iPhone 15 in Cupertino yesterday."
 
 entities = ["company", "person", "product", "location"]
 model = Gliner[entities]
-model[text]
+entities = model[text]
 
-# => {company"=>["Apple"], "person"=>["Tim Cook"], "product"=>["iPhone 15"], "location"=>["Cupertino"]}
+# => {"company"=>[#<data Gliner::Entity ...>], "person"=>[#<data Gliner::Entity ...>], ...}
+
+entities["person"].first.text
+# => "Tim Cook"
 ```
 
 # Per entity config
@@ -21,9 +24,13 @@ entities = {
 }
 
 model = Gliner[entities]
-model[text]
+entities = model[text]
 
-# => {company"=>["Apple"], "person"=>["Tim Cook"], "product"=>["iPhone 15"], "location"=>["Cupertino"]}
+entities["person"].text
+# => "John Doe"
+
+entities["email"].map(&:text)
+# => ["john@example.com"]
 ```
 
 # Classfication
@@ -32,9 +39,15 @@ model[text]
 text = "This laptop has amazing performance but terrible battery life!",
 concept = { "sentiment" => %w[positive negative neutral] }
 model = Gliner.classify[concept]
-model[text]
+result = model[text]
 
-# => {"sentiment"=>"negative"}
+# => {"sentiment"=>#<data Gliner::Label ...>}
+
+result["sentiment"].label
+# => "negative"
+
+result["sentiment"].confidence
+# => 87.1
 ```
 
 # Structured
@@ -52,7 +65,18 @@ structure = {
 }
 
 model = Gliner[structure]
-model[text]
+result = model[text]
+product = result.fetch("product").first
 
-# => {"product"=>[{"name"=>"iPhone 15 Pro Max", "storage"=>"256GB", "processor"=>"A17 Pro chip", "price"=>"$1199"}]}
+product["name"].text
+# => "iPhone 15 Pro Max"
+
+product["storage"].text
+# => "256GB"
+
+product["processor"].text
+# => "A17 Pro chip"
+
+product["price"].text
+# => "$1199"
 ```

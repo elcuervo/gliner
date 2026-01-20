@@ -72,7 +72,7 @@ module Gliner
     end
 
     def entity_task
-      @entity_task ||= Tasks::EntityExtraction.new(
+      @entity_task ||= Tasks::Entity.new(
         config_parser: config_parser,
         inference: @inference,
         input_builder: input_builder,
@@ -90,7 +90,7 @@ module Gliner
     end
 
     def json_task
-      @json_task ||= Tasks::JsonExtraction.new(
+      @json_task ||= Tasks::Json.new(
         config_parser: config_parser,
         inference: @inference,
         input_builder: input_builder,
