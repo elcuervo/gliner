@@ -13,22 +13,15 @@
   outputs = { self, nixpkgs, flake-utils, nixpkgs-ruby }:
     flake-utils.lib.eachDefaultSystem (system:
       let
-        pkgs = import nixpkgs {
-          inherit system;
-          overlays = [ nixpkgs-ruby.overlays.default ];
-        };
+        pkgs = nixpkgs.legacyPackages.${system};
         lib = pkgs.lib;
 
         isLinux = pkgs.stdenv.isLinux;
 
-        rubyVersion = lib.strings.trim (builtins.readFile ./.ruby-version);
-        rubyMajorMinor = lib.versions.majorMinor rubyVersion;
-        rubyAttr = "ruby-${rubyVersion}";
-        rubyFallbackAttr = "ruby-${rubyMajorMinor}";
-        rubyPkg =
-          if builtins.hasAttr rubyAttr pkgs
-          then pkgs.${rubyAttr}
-          else pkgs.${rubyFallbackAttr};
+        rubyPkg = nixpkgs-ruby.lib.packageFromRubyVersionFile {
+          file = ./.ruby-version;
+          inherit system;
+        };
 
         python-with-packages = pkgs.python3.withPackages (ps: with ps; [
           huggingface-hub
@@ -58,7 +51,6 @@
               bundleWrapped
 
               rubyPkg
-              pkgs.rubocop
 
               python-with-packages
               pkgs.pipenv
@@ -75,6 +67,7 @@
           BUNDLE_DISABLE_SHARED_GEMS = "true";
 
           shellHook = ''
+            export PATH="${rubyPkg}/bin:$PATH"
             export PATH="$PWD/.bundle/bin:$PATH"
           '';
         };
