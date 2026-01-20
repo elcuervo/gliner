@@ -42,9 +42,19 @@ end
 namespace :spec do
   desc 'Runs real-model integration test (downloads ~357MB unless GLINER_MODEL_DIR is set)'
   task :integration do
+    repo_id = ENV['REPO_ID'] || DEFAULT_REPO_ID
+    model_file = ENV['MODEL_FILE'] || DEFAULT_MODEL_FILE
+
     Rake::Task['model:pull'].invoke unless ENV['GLINER_MODEL_DIR'] && !ENV['GLINER_MODEL_DIR'].empty?
 
-    env = { 'GLINER_INTEGRATION' => '1' }
+    model_dir = ENV['GLINER_MODEL_DIR']
+    model_dir = File.expand_path("tmp/models/#{repo_id.tr('/', '__')}", __dir__) if model_dir.nil? || model_dir.empty?
+
+    env = {
+      'GLINER_INTEGRATION' => '1',
+      'GLINER_MODEL_DIR' => model_dir,
+      'GLINER_MODEL_FILE' => model_file
+    }
     sh env, 'rspec', 'spec/integration_spec.rb'
   end
 end

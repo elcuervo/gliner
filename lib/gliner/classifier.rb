@@ -5,7 +5,6 @@ require 'gliner/position_iteration'
 module Gliner
   class Classifier
     include PositionIteration
-
     def initialize(inference, max_width:)
       @inference = inference
       @max_width = max_width
@@ -64,5 +63,6 @@ module Gliner
     def format_label(label, score, include_confidence)
       include_confidence ? { 'label' => label, 'confidence' => score } : label
     end
+
   end
 end

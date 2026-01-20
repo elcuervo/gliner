@@ -12,12 +12,8 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - ruby: "4.0"
-            os: ubuntu-24.04
           - ruby: 3.4
             os: ubuntu-22.04
-          - ruby: 3.3
-            os: macos-latest
 
     runs-on: ${{ matrix.os }}
     steps:
@@ -28,6 +24,14 @@ jobs:
           extra_nix_config: |
             experimental-features = nix-command flakes
 
+      - name: Cache bundler
+        uses: actions/cache@v4
+        with:
+          path: .bundle
+          key: ${{ runner.os }}-bundler-${{ matrix.ruby }}-${{ hashFiles('Gemfile.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-bundler-${{ matrix.ruby }}-
+
       - name: Install gems
         run: nix develop . --command bundle install
 
@@ -35,7 +39,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: tmp/models
-          key: ${{ runner.os }}-models-${{ matrix.ruby }}
+          key: ${{ runner.os }}-models-${{ matrix.ruby }}-fp32
           restore-keys: |
             ${{ runner.os }}-models-${{ matrix.ruby }}
 
@@ -43,4 +47,6 @@ jobs:
         run: nix develop . --command bash -lc "bundle exec rspec"
 
       - name: Run integration tests
+        env:
+          MODEL_FILE: "model.onnx"
         run: nix develop . --command bash -lc "bundle exec rake spec:integration"

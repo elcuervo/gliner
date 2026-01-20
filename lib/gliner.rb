@@ -53,6 +53,7 @@ module Gliner
     end
 
     def load(dir, file: nil)
+      file ||= ENV['GLINER_MODEL_FILE']
       file ||= config.model_file
 
       self.model = Model.from_dir(dir, file: file || 'model_int8.onnx')
