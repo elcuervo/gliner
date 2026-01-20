@@ -31,42 +31,36 @@ labels = ["company", "person", "product", "location"]
 
 model = Gliner[labels]
 pp model[text]
-```
 
-Expected shape:
-
-```ruby
-{"entities"=>{"company"=>["Apple"], "person"=>["Tim Cook"], "product"=>["iPhone 15"], "location"=>["Cupertino"]}}
+# => {"company"=>["Apple"], "person"=>["Tim Cook"], "product"=>["iPhone 15"], "location"=>["Cupertino"]}
 ```
 
 You can also pass per-entity configs:
 
 ```ruby
 labels = {
-  "email" => { "description" => "Email addresses", "dtype" => "list", "threshold" => 0.9 },
-  "person" => { "description" => "Person names", "dtype" => "str" }
+  email: { description: "Email addresses", dtype: "list", threshold: 0.9 },
+  person: { description: "Person names", dtype: "str" }
 }
 
 model = Gliner[labels]
 pp model["Email John Doe at john@example.com.", threshold: 0.5]
+
+# => {"email"=>["john@example.com"], "person"=>"John Doe"}
 ```
 
 ### Classification
 
 ```ruby
 model = Gliner.classify[
-  { "sentiment" => %w[positive negative neutral] }
+  { sentiment: %w[positive negative neutral] }
 ]
 
 result = model["This laptop has amazing performance but terrible battery life!"]
 
 pp result
-```
 
-Expected shape:
-
-```ruby
-{"sentiment"=>"negative"}
+# => {"sentiment"=>"negative"}
 ```
 
 ### Structured extraction
@@ -75,7 +69,7 @@ Expected shape:
 text = "iPhone 15 Pro Max with 256GB storage, A17 Pro chip, priced at $1199."
 
 structure = {
-  "product" => [
+  product: [
     "name::str::Full product name and model",
     "storage::str::Storage capacity",
     "processor::str::Chip or processor information",
@@ -86,18 +80,16 @@ structure = {
 result = Gliner[structure][text]
 
 pp result
-```
 
-Expected shape:
-
-```ruby
-{"product"=>[{"name"=>"iPhone 15 Pro Max", "storage"=>"256GB", "processor"=>"A17 Pro chip", "price"=>"$1199"}]}
+# => {"product"=>[{"name"=>"iPhone 15 Pro Max", "storage"=>"256GB", "processor"=>"A17 Pro", "price"=>"1199"}]}
 ```
 
 Choices can be included in field specs:
 
 ```ruby
-result = Gliner[{ "order" => ["status::[pending|processing|shipped]::str"] }]["Status: shipped"]
+result = Gliner[{ order: ["status::[pending|processing|shipped]::str"] }]["Status: shipped"]
+
+# => {"order"=>[{"status"=>"shipped"}]}
 ```
 
 ## Model files
