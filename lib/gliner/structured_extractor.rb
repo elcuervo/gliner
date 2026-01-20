@@ -43,7 +43,7 @@ module Gliner
       format_instances(parsed_fields, instance_spans, format_opts)
     end
 
-    def format_structure_object(parsed_fields, spans_by_label, opts)
+    def format_structure_object(parsed_fields, spans_by_label, _opts)
       obj = {}
 
       parsed_fields.each do |field|

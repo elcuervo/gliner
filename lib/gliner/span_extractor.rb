@@ -108,7 +108,7 @@ module Gliner
         index: index,
         offsets: [span.start, span.end],
         text: span.text,
-        name: label.nil? ? nil : label.to_s,
+        name: label&.to_s,
         probability: span.score * 100.0
       )
     end

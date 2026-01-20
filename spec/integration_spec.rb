@@ -25,12 +25,12 @@ describe 'Gliner Integration', if: ENV.key?('GLINER_INTEGRATION') do
 
         entities = Gliner[labels][text, threshold: 0.5]
 
-        expect(entities.fetch('company')).to be_a(String)
-        expect(entities.fetch('person')).to be_a(Array)
-        expect(entities.fetch('company')).to include('Apple')
-        expect(entities.fetch('person')).to include('Tim Cook')
-        expect(entities.fetch('product')).to include('iPhone 15')
-        expect(entities.fetch('location')).to include('Cupertino')
+        expect(entities.fetch('company')).to be_a(Gliner::Entity)
+        expect(entities.fetch('person')).to all(be_a(Gliner::Entity))
+        expect(entity_text(entities.fetch('company'))).to include('Apple')
+        expect(entity_texts(entities.fetch('person'))).to include('Tim Cook')
+        expect(entity_texts(entities.fetch('product'))).to include('iPhone 15')
+        expect(entity_texts(entities.fetch('location'))).to include('Cupertino')
       end
     end
 
@@ -66,10 +66,10 @@ describe 'Gliner Integration', if: ENV.key?('GLINER_INTEGRATION') do
         out = Gliner[complex_schema][text, threshold: 0.4]
         product = out.fetch('product').fetch(0)
 
-        expect(product.fetch('name')).to include('iPhone')
-        expect(product.fetch('storage')).to include('256')
-        expect(product.fetch('processor')).to include('A17')
-        expect(product.fetch('price')).to include('1199')
+        expect(entity_text(product.fetch('name'))).to include('iPhone')
+        expect(entity_text(product.fetch('storage'))).to include('256')
+        expect(entity_text(product.fetch('processor'))).to include('A17')
+        expect(entity_text(product.fetch('price'))).to include('1199')
       end
 
       it 'supports choices and multiple instances' do
@@ -109,16 +109,16 @@ describe 'Gliner Integration', if: ENV.key?('GLINER_INTEGRATION') do
         order = out.fetch('order').fetch(0)
 
         expect(transactions.length).to be >= 1
-        dates = transactions.map { |t| t['date'] }.compact
+        dates = transactions.map { |t| entity_text(t['date']) }.compact
         expect(dates).not_to be_empty
         expect(dates.join(' ')).to include('Jan')
 
-        categories = transactions.map { |t| t['category'] }.compact
+        categories = transactions.map { |t| entity_text(t['category']) }.compact
         categories.each do |category|
           expect(%w[food transport shopping]).to include(category)
         end
 
-        expect(%w[pending processing shipped]).to include(order.fetch('status'))
+        expect(%w[pending processing shipped]).to include(entity_text(order.fetch('status')))
       end
     end
   end
@@ -143,9 +143,23 @@ describe 'Gliner Integration', if: ENV.key?('GLINER_INTEGRATION') do
 
   def download(url, dest)
     return if File.exist?(dest) && File.size?(dest)
+
     response = HTTPX.plugin(:follow_redirects).with(max_redirects: 5).get(url)
     raise "Download failed: #{url} (status: #{response.status})" unless response.status.between?(200, 299)
 
     File.binwrite(dest, response.body.to_s)
+  end
+
+  def entity_text(value)
+    return value.text if value.is_a?(Gliner::Entity)
+
+    value
+  end
+
+  def entity_texts(value)
+    return [] if value.nil?
+    return value.map { |item| entity_text(item) } if value.is_a?(Array)
+
+    [entity_text(value)]
   end
 end
