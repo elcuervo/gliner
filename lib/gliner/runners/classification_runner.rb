@@ -5,11 +5,6 @@ module Gliner
     class Classification
       include Inspectable
 
-      Label = Data.define(:label, :confidence) do
-        def to_s = label.to_s
-        def to_str = label.to_s
-      end
-
       def self.[](tasks)
         new(Gliner.model!, tasks)
       end

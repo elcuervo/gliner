@@ -45,7 +45,7 @@ describe 'Gliner Integration', if: ENV.key?('GLINER_INTEGRATION') do
         out = Gliner.classify[schema][text]
         sentiment = out.fetch('sentiment')
 
-        expect(sentiment).to be_a(Gliner::Runners::Classification::Label)
+        expect(sentiment).to be_a(Gliner::Label)
         expect(sentiment.label).to eq('negative')
         expect(sentiment.confidence).to be_a(Float)
       end

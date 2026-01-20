@@ -36,6 +36,11 @@ module Gliner
     def to_str = text.to_s
   end
 
+  Label = Data.define(:label, :confidence) do
+    def to_s = label.to_s
+    def to_str = label.to_s
+  end
+
   Span = Data.define(:text, :score, :start, :end) do
     def overlaps?(other)
       !(self.end <= other.start || start >= other.end)

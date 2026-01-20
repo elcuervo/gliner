@@ -62,7 +62,7 @@ module Gliner
     end
 
     def format_label(label, score, _include_confidence)
-      Runners::Classification::Label.new(label: label, confidence: score)
+      Gliner::Label.new(label: label, confidence: score * 100.0)
     end
   end
 end
