@@ -19,6 +19,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'httpx', '~> 1.0'
   spec.add_dependency 'onnxruntime', '~> 0.10'
   spec.add_dependency 'tokenizers', '~> 0.6'
+  spec.add_dependency 'openssl', '~> 4.0'
 
   spec.add_development_dependency 'rake', '~> 13.0'
   spec.add_development_dependency 'irb', '~> 1.16.0'
