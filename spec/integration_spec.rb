@@ -43,8 +43,11 @@ describe 'Gliner Integration', if: ENV.key?('GLINER_INTEGRATION') do
         schema = { 'sentiment' => %w[positive negative neutral] }
 
         out = Gliner.classify[schema][text]
+        sentiment = out.fetch('sentiment')
 
-        expect(out.fetch('sentiment')).to eq('negative')
+        expect(sentiment).to be_a(Gliner::Runners::Classification::Label)
+        expect(sentiment.label).to eq('negative')
+        expect(sentiment.confidence).to be_a(Float)
       end
     end
 

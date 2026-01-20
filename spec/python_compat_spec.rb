@@ -87,10 +87,18 @@ RSpec.describe 'Python compatibility', if: ENV.key?('GLINER_INTEGRATION') do
   end
 
   def normalize_classification(value)
-    return value.sort if value.is_a?(Array)
-    return value.transform_values { |item| normalize_classification(item) } if value.is_a?(Hash)
-
-    value
+    case value
+    when Array
+      value.map { |item| normalize_classification(item) }.sort
+    when Hash
+      value.transform_values { |item| normalize_classification(item) }
+    when Gliner::Runners::Classification::Results
+      normalize_classification(value.to_h)
+    when Gliner::Runners::Classification::Label
+      value.label
+    else
+      value
+    end
   end
 
 end

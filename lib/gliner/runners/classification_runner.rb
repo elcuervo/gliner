@@ -5,6 +5,21 @@ module Gliner
     class Classification
       include Inspectable
 
+      Label = Data.define(:label, :confidence) do
+        def to_s = label.to_s
+        def to_str = label.to_s
+      end
+
+      Results = Data.define(:tasks) do
+        def [](key) = tasks[key]
+        def fetch(*args, &block) = tasks.fetch(*args, &block)
+        def each(&block) = tasks.each(&block)
+        def to_h = tasks
+        def to_hash = tasks
+        def keys = tasks.keys
+        def values = tasks.values
+      end
+
       def self.[](tasks)
         new(Gliner.model!, tasks)
       end
@@ -19,7 +34,7 @@ module Gliner
       end
 
       def [](text, **options)
-        @tasks.transform_values { |task| task.call(text, **options) }
+        Results.new(tasks: @tasks.transform_values { |task| task.call(text, **options) })
       end
 
       alias call []

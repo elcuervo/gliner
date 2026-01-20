@@ -1,6 +1,16 @@
 # frozen_string_literal: true
 
 module Gliner
+  Structure = Data.define(:fields) do
+    def [](key) = fields[key]
+    def fetch(key, *args, &block) = fields.fetch(key, *args, &block)
+    def to_h = fields
+    def to_hash = fields
+    def keys = fields.keys
+    def values = fields.values
+    def each(&block) = fields.each(&block)
+  end
+
   class StructuredExtractor
     def initialize(span_extractor)
       @span_extractor = span_extractor
@@ -34,7 +44,7 @@ module Gliner
     def build_structure_instances(parsed_fields, spans_by_label, opts)
       format_opts = FormatOptions.from(opts)
       anchor_field = anchor_field_for(parsed_fields)
-      return [Structure.new(fields: {})] unless anchor_field
+      return [Gliner::Structure.new(fields: {})] unless anchor_field
 
       anchors = spans_by_label.fetch(anchor_field[:name], [])
       return [format_structure_object(parsed_fields, spans_by_label, format_opts)] if anchors.empty?
@@ -58,7 +68,7 @@ module Gliner
         end
       end
 
-      Structure.new(fields: obj)
+      Gliner::Structure.new(fields: obj)
     end
 
     private
