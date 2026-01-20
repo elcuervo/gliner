@@ -3,10 +3,10 @@
 module Gliner
   module Runners
     module Inspectable
-      def inspect
-        items = Array(inspect_items).map(&:to_s)
+      attr_reader :config
 
-        "#<Gliner(#{inspect_label}) input=#{items.inspect}>"
+      def inspect
+        "#<Gliner(#{inspect_label}) config=#{config.inspect}>"
       end
     end
   end

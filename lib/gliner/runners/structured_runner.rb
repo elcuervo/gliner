@@ -6,6 +6,7 @@ module Gliner
       include Inspectable
 
       def initialize(model, config)
+        @config = config
         @tasks = build_tasks(model, config)
       end
 

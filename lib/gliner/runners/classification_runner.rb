@@ -12,6 +12,7 @@ module Gliner
       def initialize(model, tasks_config)
         raise Error, 'tasks must be a Hash' unless tasks_config.is_a?(Hash)
 
+        @config = tasks_config
         @tasks = tasks_config.to_h do |name, config|
           parsed = model.classification_task.parse_config(name: name, config: config)
           [name.to_s, PreparedTask.new(model.classification_task, parsed)]

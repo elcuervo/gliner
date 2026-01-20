@@ -55,7 +55,10 @@ module Gliner
           spans = spans_by_label.fetch(label)
           dtype = parsed[:dtypes].fetch(label, :list)
 
-          entities[label] = format_entity_value(label, spans, dtype)
+          value = format_entity_value(label, spans, dtype)
+          next if value.is_a?(Array) && value.empty?
+
+          entities[label] = value
         end
       end
 

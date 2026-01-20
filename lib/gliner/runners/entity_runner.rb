@@ -8,6 +8,7 @@ module Gliner
       def initialize(model, config)
         parsed = model.entity_task.parse_config(config)
 
+        @config = config
         @labels = parsed[:labels]
         @task = PreparedTask.new(model.entity_task, parsed)
       end
