@@ -1,11 +1,13 @@
 #!/usr/bin/env python3
 import argparse
+import inspect
 import json
 import shutil
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Dict, List, Sequence, Tuple
 
+import onnx
 import torch
 from huggingface_hub import snapshot_download
 from onnxruntime.quantization import quantize_dynamic, QuantType
@@ -40,6 +42,7 @@ class ExportConfig:
     max_seq_len: int
     opset: int
     include_token_type_ids: bool
+    fp16: bool
     quantize: bool
     validate: bool
     validate_quantized: bool
@@ -151,6 +154,33 @@ def export_onnx(
     )
 
 
+def load_fp16_converter():
+    try:
+        from onnxruntime.transformers.float16 import convert_float_to_float16
+
+        return convert_float_to_float16
+    except ImportError:
+        try:
+            from onnxconverter_common.float16 import convert_float_to_float16
+
+            return convert_float_to_float16
+        except ImportError as exc:
+            raise RuntimeError(
+                "FP16 conversion requires onnxruntime.transformers.float16 or onnxconverter-common."
+            ) from exc
+
+
+def export_fp16(onnx_path: Path, fp16_path: Path) -> None:
+    converter = load_fp16_converter()
+    model = onnx.load(onnx_path.as_posix())
+    params = inspect.signature(converter).parameters
+    kwargs = {}
+    if "keep_io_types" in params:
+        kwargs["keep_io_types"] = True
+    fp16_model = converter(model, **kwargs)
+    onnx.save(fp16_model, fp16_path.as_posix())
+
+
 def export(config: ExportConfig) -> None:
     config.output_dir.mkdir(parents=True, exist_ok=True)
 
@@ -176,6 +206,9 @@ def export(config: ExportConfig) -> None:
         dynamic_axes=dynamic_axes,
         opset=config.opset,
     )
+
+    if config.fp16:
+        export_fp16(onnx_path, config.output_dir / "model_fp16.onnx")
 
     if config.quantize:
         quantize_dynamic(
@@ -244,6 +277,11 @@ def parse_args() -> ExportConfig:
         help="Include token_type_ids input in the ONNX graph.",
     )
     parser.add_argument(
+        "--no-fp16",
+        action="store_true",
+        help="Skip FP16 conversion step.",
+    )
+    parser.add_argument(
         "--no-validate",
         action="store_true",
         help="Skip ONNX validation after export.",
@@ -270,6 +308,7 @@ def parse_args() -> ExportConfig:
         max_seq_len=args.max_seq_len,
         opset=args.opset,
         include_token_type_ids=args.include_token_type_ids,
+        fp16=not args.no_fp16,
         quantize=not args.no_quantize,
         validate=not args.no_validate,
         validate_quantized=args.validate_quantized,

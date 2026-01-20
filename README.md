@@ -104,7 +104,7 @@ result = Gliner[{ "order" => ["status::[pending|processing|shipped]::str"] }]["S
 This implementation expects a directory containing:
 
 - `tokenizer.json`
-- `model.onnx` or `model_int8.onnx`
+- `model.onnx`, `model_fp16.onnx`, or `model_int8.onnx`
 - (optional) `config.json` with `max_width` and `max_seq_len`
 
 One publicly available ONNX export is `cuerbot/gliner2-multi-v1` on Hugging Face.

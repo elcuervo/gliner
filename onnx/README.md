@@ -1,6 +1,14 @@
+---
+license: mit
+base_model:
+- fastino/gliner2-multi-v1
+---
+
 # GLiNER2 ONNX export
+## gliner2-multi-v1 ONNX
 
 - `model.onnx` (FP32 export)
+- `model_fp16.onnx` (FP16 weights converted from FP32)
 - `model_int8.onnx` (dynamic INT8 quantization via onnxruntime)
 - tokenizer files copied verbatim from the HF model
 - a small `config.json` describing runtime constraints
@@ -12,6 +20,7 @@ The export script follows the same design:
 - Inputs: `input_ids`, `attention_mask` (optionally `token_type_ids`)
 - Output: `span_logits`
 - Export with `torch.onnx.export` (opset 19) and dynamic batch/sequence axes
+- Convert FP32 weights to FP16 with `convert_float_to_float16`
 - Quantize with `onnxruntime.quantization.quantize_dynamic(QInt8)`
 
 ## Usage
@@ -47,11 +56,13 @@ validation or to load the quantized model, use:
 pipenv run python export.py --no-validate
 pipenv run python export.py --no-validate-extraction
 pipenv run python export.py --validate-quantized
+pipenv run python export.py --no-fp16
 ```
 
 The output directory will include:
 
 - `model.onnx`
+- `model_fp16.onnx`
 - `model_int8.onnx`
 - `tokenizer.json`
 - `tokenizer_config.json`
