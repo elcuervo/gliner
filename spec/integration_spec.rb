@@ -6,12 +6,14 @@ require 'httpx'
 
 describe 'Gliner Integration', if: ENV.key?('GLINER_INTEGRATION') do
   REPO_ID = 'cuerbot/gliner2-multi-v1'
+  REPO_SUBDIR = 'onnx'
+  MODEL_FILE = 'model_fp16.onnx'
 
   describe 'real model inference' do
     context 'with entities extraction' do
       it 'extracts entities correctly' do
         model_dir = ensure_model_dir!
-        Gliner.load(model_dir)
+        Gliner.load(model_dir, file: MODEL_FILE)
 
         text = 'Apple CEO Tim Cook announced iPhone 15 in Cupertino yesterday.'
         labels = {
@@ -35,7 +37,7 @@ describe 'Gliner Integration', if: ENV.key?('GLINER_INTEGRATION') do
     context 'with text classification' do
       it 'classifies sentiment correctly' do
         model_dir = ensure_model_dir!
-        Gliner.load(model_dir)
+        Gliner.load(model_dir, file: MODEL_FILE)
 
         text = 'This laptop has amazing performance but terrible battery life!'
         schema = { 'sentiment' => %w[positive negative neutral] }
@@ -49,7 +51,7 @@ describe 'Gliner Integration', if: ENV.key?('GLINER_INTEGRATION') do
     context 'with structured extraction' do
       it 'extracts JSON structure correctly' do
         model_dir = ensure_model_dir!
-        Gliner.load(model_dir)
+        Gliner.load(model_dir, file: MODEL_FILE)
 
         text = 'iPhone 15 Pro Max with 256GB storage, A17 Pro chip, priced at $1199.'
         complex_schema = {
@@ -72,7 +74,7 @@ describe 'Gliner Integration', if: ENV.key?('GLINER_INTEGRATION') do
 
       it 'supports choices and multiple instances' do
         model_dir = ensure_model_dir!
-        Gliner.load(model_dir)
+        Gliner.load(model_dir, file: MODEL_FILE)
 
         text = <<~TEXT
           Transaction 1
@@ -130,13 +132,13 @@ describe 'Gliner Integration', if: ENV.key?('GLINER_INTEGRATION') do
 
     download(hf_resolve_url('tokenizer.json').to_s, File.join(dir, 'tokenizer.json'))
     download(hf_resolve_url('config.json').to_s, File.join(dir, 'config.json'))
-    download(hf_resolve_url('model_int8.onnx').to_s, File.join(dir, 'model_int8.onnx'))
+    download(hf_resolve_url(MODEL_FILE).to_s, File.join(dir, MODEL_FILE))
 
     dir
   end
 
   def hf_resolve_url(filename)
-    "https://huggingface.co/#{REPO_ID}/resolve/main/#{filename}"
+    "https://huggingface.co/#{REPO_ID}/resolve/main/#{REPO_SUBDIR}/#{filename}"
   end
 
   def download(url, dest)
