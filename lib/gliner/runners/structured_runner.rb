@@ -2,6 +2,19 @@
 
 module Gliner
   module Runners
+    StructureResult = Data.define(:name, :items) do
+      def [](index) = items[index]
+      def fetch(*args, &block) = items.fetch(*args, &block)
+      def each(&block) = items.each(&block)
+      def map(&block) = items.map(&block)
+      def length = items.length
+      def size = items.size
+      def empty? = items.empty?
+      def first = items.first
+      def last = items.last
+      def to_a = items
+    end
+
     class StructuredRunner
       include Inspectable
 
@@ -10,8 +23,8 @@ module Gliner
       end
 
       def [](text, **options)
-        @tasks.transform_values do |task|
-          task.call(text, **options)
+        @tasks.each_with_object({}) do |(name, task), out|
+          out[name] = StructureResult.new(name: name, items: task.call(text, **options))
         end
       end
 

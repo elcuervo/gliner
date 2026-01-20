@@ -103,7 +103,7 @@ describe Gliner::StructuredExtractor do
 
       expect(instances.length).to eq(2)
       expect(instances[0]).to eq(
-        {
+        Gliner::Structure.new(fields: {
           'date' => Gliner::Entity.new(
             index: 0,
             offsets: [0, 5],
@@ -125,10 +125,10 @@ describe Gliner::StructuredExtractor do
             name: 'amount',
             probability: 90.0
           )
-        }
+        })
       )
       expect(instances[1]).to eq(
-        {
+        Gliner::Structure.new(fields: {
           'date' => Gliner::Entity.new(
             index: 0,
             offsets: [40, 45],
@@ -150,7 +150,7 @@ describe Gliner::StructuredExtractor do
             name: 'amount',
             probability: 80.0
           )
-        }
+        })
       )
     end
   end
