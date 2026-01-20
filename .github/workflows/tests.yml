@@ -54,7 +54,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: tmp/models
-          key: ${{ runner.os }}-models-${{ matrix.ruby }}
+          key: ${{ runner.os }}-models-${{ matrix.ruby }}-fp32
           restore-keys: |
             ${{ runner.os }}-models-${{ matrix.ruby }}
 
