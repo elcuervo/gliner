@@ -73,6 +73,8 @@ RSpec.describe 'Python compatibility', if: ENV.key?('GLINER_INTEGRATION') do
     case value
     when Gliner::Entity
       value.text
+    when Gliner::Entities
+      normalize_entities(value.to_h)
     when Array
       value.map { |item| normalize_entities(item) }
     when Hash
