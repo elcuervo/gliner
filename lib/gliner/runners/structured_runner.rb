@@ -3,6 +3,8 @@
 module Gliner
   module Runners
     class StructuredRunner
+      include Inspectable
+
       def initialize(model, config)
         @tasks = build_tasks(model, config)
       end
@@ -16,6 +18,9 @@ module Gliner
       alias call []
 
       private
+
+      def inspect_label = 'Structure'
+      def inspect_items = @tasks.keys
 
       def build_tasks(model, config)
         raise Error, 'structures must be a Hash' unless config.is_a?(Hash)

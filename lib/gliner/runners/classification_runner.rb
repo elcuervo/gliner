@@ -3,6 +3,8 @@
 module Gliner
   module Runners
     class ClassificationRunner
+      include Inspectable
+
       def self.[](tasks)
         new(Gliner.model!, tasks)
       end
@@ -21,6 +23,11 @@ module Gliner
       end
 
       alias call []
+
+      private
+
+      def inspect_label = 'Classification'
+      def inspect_items = @tasks.keys
     end
   end
 end
