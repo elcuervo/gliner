@@ -28,11 +28,11 @@ describe Gliner do
       expect(Gliner.model).to eq(:model)
     end
 
-    it 'defaults to fp16 when no variant is set' do
+    it 'defaults to int8 when no variant is set' do
       config = Gliner.config
       config.model = '/tmp/model'
 
-      expect(Gliner::Model).to receive(:from_dir).with('/tmp/model', file: 'model_fp16.onnx').and_return(:model)
+      expect(Gliner::Model).to receive(:from_dir).with('/tmp/model', file: 'model_int8.onnx').and_return(:model)
 
       expect(Gliner.model).to eq(:model)
     end

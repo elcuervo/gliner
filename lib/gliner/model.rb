@@ -22,7 +22,7 @@ module Gliner
     DEFAULT_MAX_WIDTH = 8
     DEFAULT_MAX_SEQ_LEN = 512
 
-    def self.from_dir(dir, file: 'model_fp16.onnx')
+    def self.from_dir(dir, file: 'model_int8.onnx')
       config_path = File.join(dir, 'config.json')
       config = File.exist?(config_path) ? JSON.parse(File.read(config_path)) : {}
 

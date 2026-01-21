@@ -10,7 +10,7 @@ module Gliner
     def initialize
       @threshold = DEFAULT_THRESHOLD
       @model = nil
-      @variant = :fp16
+      @variant = :int8
       @auto = true
     end
 

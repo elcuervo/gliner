@@ -181,7 +181,7 @@ module Gliner
       dir
     end
 
-    def model_file_for_variant(variant = :fp16)
+    def model_file_for_variant(variant = :int8)
       case variant.to_sym
       when :fp16 then 'model_fp16.onnx'
       when :fp32 then 'model.onnx'

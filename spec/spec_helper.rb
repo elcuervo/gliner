@@ -8,4 +8,10 @@ RSpec.configure do |config|
   config.expect_with :rspec do |c|
     c.syntax = :expect
   end
+
+  config.before(:suite) do
+    Gliner.configure do |gliner_config|
+      gliner_config.variant = :fp16
+    end
+  end
 end
